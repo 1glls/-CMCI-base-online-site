@@ -1,0 +1,178 @@
+// Schema Prisma pour CMCI Belgique
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Event {
+  id                      String   @id @default(uuid())
+  title                   String
+  date                    String
+  time                    String
+  location                String
+  description             String
+  image                   String?
+  registrationUrl         String?  // URL vers Google Form (optionnel)
+  registrationButtonText  String?  // Texte personnalisé du bouton d'inscription
+  exploreButtonText       String?  // Texte personnalisé du bouton explorer
+  exploreUrl              String?  // URL personnalisée du bouton explorer
+  status                  String   @default("published") // published, draft
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("events")
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  quote     String
+  image     String?
+  status    String   @default("published") // published, draft
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+model GalleryImage {
+  id        String   @id @default(uuid())
+  src       String
+  alt       String
+  category  String
+  status    String   @default("published") // published, draft
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gallery_images")
+}
+
+model SocialMediaPost {
+  id             String   @id @default(uuid())
+  platform       String   // youtube, facebook, instagram, tiktok, snapchat
+  postId         String   @unique
+  content        String?
+  mediaUrl       String?
+  thumbnailUrl   String?
+  author         String?
+  publishedAt    DateTime?
+  status         String   @default("pending") // pending, approved, rejected
+  validatedBy    String?
+  validatedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("social_media_posts")
+}
+
+model Settings {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+
+  @@map("settings")
+}
+
+model HeroSlide {
+  id          String   @id @default(uuid())
+  title       String
+  subtitle    String
+  image       String?
+  imageMobile String?  // Version mobile optimisée de l'image
+  eventId     String?  // Lien optionnel vers un événement
+  buttonText  String?  // Texte du bouton (optionnel, ex: "S'inscrire", "En savoir plus")
+  buttonUrl   String?  // URL du bouton (Google Form, page externe, etc.)
+  order       Int      @default(0)
+  status      String   @default("published") // published, draft
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("hero_slides")
+}
+
+model Newsletter {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  status      String   @default("active") // active, unsubscribed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("newsletter_subscribers")
+}
+
+model Assembly {
+  id          String   @id @default(uuid())
+  city        String
+  address     String
+  latitude    Float?
+  longitude   Float?
+  schedule    String
+  phone       String
+  email       String
+  status      String   @default("published") // published, draft
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("assemblies")
+}
+
+model Ministry {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  icon        String?  // Nom de l'icône ou URL
+  image       String?
+  order       Int      @default(0)
+  status      String   @default("published") // published, draft
+  link        String?  // Lien vers page dédiée ou contact
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("ministries")
+}
+
+model Form {
+  id             String   @id @default(uuid())
+  title          String
+  description    String?
+  slug           String   @unique  // URL-friendly identifier
+  fields         String   // JSON array of form fields
+  googleSheetId  String?  // Google Spreadsheet ID
+  googleSheetUrl String?  // Full URL for admin reference
+  status         String   @default("published") // published, draft, closed
+  submitCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  submissions    FormSubmission[]
+
+  @@map("forms")
+}
+
+model FormSubmission {
+  id        String   @id @default(uuid())
+  formId    String
+  data      String   // JSON object of field values
+  createdAt DateTime @default(now())
+
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@map("form_submissions")
+}

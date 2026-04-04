@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Events</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .event { border: 1px solid #ccc; margin: 10px; padding: 10px; }
+        .event img { max-width: 300px; height: 200px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <h1>Test de l'API Événements</h1>
+    <div id="status">Chargement...</div>
+    <div id="events"></div>
+
+    <script>
+        async function testAPI() {
+            const statusDiv = document.getElementById('status');
+            const eventsDiv = document.getElementById('events');
+            
+            try {
+                console.log('🔍 Fetching from http://localhost:5000/api/events');
+                const response = await fetch('http://localhost:5000/api/events');
+                console.log('📡 Response status:', response.status);
+                
+                if (!response.ok) {
+                    statusDiv.textContent = `❌ Erreur: ${response.status} ${response.statusText}`;
+                    return;
+                }
+                
+                const events = await response.json();
+                console.log('✅ Events loaded:', events);
+                
+                statusDiv.textContent = `✅ ${events.length} événements chargés`;
+                
+                events.forEach(event => {
+                    const div = document.createElement('div');
+                    div.className = 'event';
+                    div.innerHTML = `
+                        <h3>${event.title}</h3>
+                        <p>${event.date} - ${event.time}</p>
+                        <p>${event.location}</p>
+                        <p>${event.description}</p>
+                        ${event.image ? `<img src="http://localhost:5000${event.image}" alt="${event.title}">` : '<p>Pas d\'image</p>'}
+                    `;
+                    eventsDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('❌ Error:', error);
+                statusDiv.textContent = `❌ Erreur: ${error.message}`;
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>

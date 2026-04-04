@@ -1,0 +1,48 @@
+═══════════════════════════════════════════════════════════════
+    🚀 CMCI Belgique - Commandes d'Exécution
+═══════════════════════════════════════════════════════════════
+
+✅ PROBLÈME RÉSOLU !
+Le projet a été restructuré. Les dossiers sont maintenant dans src/
+
+📁 NOUVELLE STRUCTURE :
+    src/frontend/   ← Application Next.js
+    src/backend/    ← API Express
+
+═══════════════════════════════════════════════════════════════
+    COMMANDES PRINCIPALES
+═══════════════════════════════════════════════════════════════
+
+🎯 LANCER LE PROJET (Frontend uniquement pour commencer)
+    cd src/frontend
+    npm run dev
+
+    ➡️  Site: http://localhost:3000
+
+─────────────────────────────────────────────────────────────
+
+🎯 LANCER LE BACKEND (à faire dans un 2e terminal)
+    cd src/backend
+    npm run dev
+
+    ➡️  API: http://localhost:5000
+
+─────────────────────────────────────────────────────────────
+
+🎯 LANCER LES DEUX EN MÊME TEMPS
+    ./demarrer.sh
+
+    OU depuis la racine:
+    npm run dev
+
+═══════════════════════════════════════════════════════════════
+    ACCÈS AU SITE
+═══════════════════════════════════════════════════════════════
+
+🌐 Site public:      http://localhost:3000
+👤 Interface admin:  http://localhost:3000/admin
+📡 API Backend:      http://localhost:5000
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION: voir README.md et DEMARRAGE-RAPIDE.md

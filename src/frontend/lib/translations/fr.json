@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "vision": "Vision",
+    "ministries": "Ministères",
+    "events": "Événements",
+    "assemblies": "Assemblées",
+    "testimonials": "Témoignages",
+    "contact": "Contact"
+  },
+  "hero": {
+    "discover": "Découvrir"
+  },
+  "about": {
+    "label": "À propos",
+    "title": "Une communauté de disciples",
+    "paragraph1": "La Communauté Missionnaire Chrétienne Internationale (CMCI) est un mouvement de disciples dévoués à Jésus-Christ, notre modèle en toutes choses. Fondée sur la Parole de Dieu, notre mission est de former des disciples et d'atteindre le monde avec l'Évangile.",
+    "paragraph2": "En Belgique, nous sommes une famille spirituelle unie par la foi et l'amour du Christ. Nos assemblées sont des lieux de croissance, de communion fraternelle et d'adoration véritable.",
+    "paragraph3": "Nous croyons en la puissance de l'Esprit Saint pour transformer les vies et impacter les nations. Chaque membre est équipé et encouragé à accomplir le plan de Dieu pour sa vie.",
+    "quote": "Être disciple de Jésus, c'est faire de Lui notre modèle absolu dans tout ce que nous pensons, disons et faisons.",
+    "quoteAuthor": "Vision CMCI",
+    "learnMore": "En savoir plus",
+    "cmciBelgium": "CMCI Belgique",
+    "cmciFullName": "Communauté Missionnaire Chrétienne Internationale",
+    "yearsPresence": "années de présence",
+    "assemblies": "assemblées"
+  },
+  "values": {
+    "label": "Nos valeurs",
+    "title": "Ce en quoi nous croyons",
+    "subtitle": "Nos valeurs fondamentales guident notre vie et notre mission",
+    "faith": {
+      "title": "Foi vivante",
+      "description": "Une foi authentique qui transforme et inspire, fondée sur la Parole de Dieu"
+    },
+    "community": {
+      "title": "Communion fraternelle",
+      "description": "Une famille spirituelle unie par l'amour du Christ et le soutien mutuel"
+    },
+    "service": {
+      "title": "Service dévoué",
+      "description": "Servir Dieu et notre prochain avec excellence et dévouement"
+    },
+    "growth": {
+      "title": "Croissance continue",
+      "description": "Un développement spirituel constant pour accomplir notre destinée"
+    }
+  },
+  "vision": {
+    "label": "Notre vision",
+    "title": "Former des disciples pour impacter les nations",
+    "subtitle": "Notre vision est claire : équiper chaque croyant pour vivre pleinement sa foi",
+    "item1": {
+      "title": "Formation biblique",
+      "description": "Équiper les disciples à travers un enseignement solide et pratique de la Parole"
+    },
+    "item2": {
+      "title": "Impact missionnaire",
+      "description": "Atteindre les nations avec l'Évangile et transformer les communautés"
+    },
+    "item3": {
+      "title": "Leadership",
+      "description": "Former des leaders selon le modèle de Christ pour servir l'Église"
+    }
+  },
+  "ministries": {
+    "label": "Nos ministères",
+    "title": "Servir ensemble",
+    "subtitle": "Découvrez nos différents ministères et trouvez votre place pour servir"
+  },
+  "events": {
+    "label": "Événements",
+    "title": "Nos prochains événements",
+    "subtitle": "Rejoignez-nous pour des moments de communion, d'adoration et d'enseignement",
+    "moreInfo": "Plus d'infos",
+    "noEvents": "Aucun événement à venir pour le moment."
+  },
+  "assemblies": {
+    "label": "Nos assemblées",
+    "title": "Trouvez une assemblée près de chez vous",
+    "subtitle": "Nous sommes présents dans plusieurs villes de Belgique. Rejoignez une communauté près de chez vous",
+    "viewAll": "Voir toutes nos assemblées",
+    "loading": "Chargement des assemblées...",
+    "schedule": "Horaires des cultes",
+    "address": "Adresse",
+    "contact": "Contact"
+  },
+  "testimonials": {
+    "label": "Témoignages",
+    "title": "Ils témoignent",
+    "subtitle": "Découvrez comment Dieu transforme des vies à travers notre communauté",
+    "noTestimonials": "Aucun témoignage disponible pour le moment."
+  },
+  "gallery": {
+    "label": "Galerie",
+    "title": "Nos moments en images",
+    "subtitle": "Découvrez la vie de notre communauté à travers ces moments partagés"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous accompagner dans votre cheminement spirituel.",
+    "phone": "Téléphone",
+    "email": "Email",
+    "address": "Adresse",
+    "hours": "Horaires",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Recevez nos dernières nouvelles, événements et messages inspirants.",
+      "placeholder": "Votre adresse email",
+      "subscribe": "S'inscrire",
+      "subscribing": "Inscription...",
+      "success": "Merci ! Vous êtes maintenant inscrit à notre newsletter.",
+      "accept": "En vous inscrivant, vous acceptez de recevoir nos communications."
+    },
+    "social": {
+      "title": "Restez connectés avec nous sur les réseaux",
+      "subtitle": "Suivez-nous pour ne rien manquer de nos activités, événements et messages inspirants."
+    }
+  },
+  "footer": {
+    "about": "À propos",
+    "aboutText": "La CMCI Belgique est une communauté chrétienne dédiée à former des disciples de Jésus-Christ et à impacter les nations avec l'Évangile.",
+    "quickLinks": "Liens rapides",
+    "followUs": "Suivez-nous",
+    "rights": "Tous droits réservés. Fait avec",
+    "by": "par"
+  }
+}

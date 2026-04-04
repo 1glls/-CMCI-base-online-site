@@ -1,0 +1,64 @@
+╔══════════════════════════════════════════════════════════════╗
+║   ✅ PROBLÈME RÉSOLU - Comment créer un admin maintenant    ║
+╚══════════════════════════════════════════════════════════════╝
+
+📝 EXPLICATION DU PROBLÈME :
+Le script ne fonctionnait pas car le backend n'était pas démarré.
+Le backend a maintenant été configuré avec SQLite (pas besoin de PostgreSQL).
+
+═══════════════════════════════════════════════════════════════
+
+🚀 ÉTAPES POUR CRÉER UN ADMIN :
+
+1️⃣  DÉMARRER LE BACKEND (dans un terminal)
+    
+    ./demarrer-backend.sh
+    
+    Vous devriez voir : 🚀 Server running on port 5000
+
+─────────────────────────────────────────────────────────────
+
+2️⃣  CRÉER L'ADMIN (dans un 2e terminal)
+
+    cd otherthings/scripts
+    ./create-admin.sh
+    
+    Suivez les instructions :
+    - Email: admin@cmci.be
+    - Mot de passe: (votre choix)
+    - Nom: Admin CMCI
+
+─────────────────────────────────────────────────────────────
+
+3️⃣  SE CONNECTER
+
+    Frontend : http://localhost:3000/admin
+    
+    Utilisez l'email et mot de passe créés à l'étape 2
+
+═══════════════════════════════════════════════════════════════
+
+🔧 COMMANDE ALTERNATIVE (si le script ne fonctionne pas) :
+
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@cmci.be","password":"VotreMotDePasse","name":"Admin CMCI"}'
+
+═══════════════════════════════════════════════════════════════
+
+✅ CE QUI A ÉTÉ FAIT AUTOMATIQUEMENT :
+
+✓ Base de données SQLite créée (dev.db)
+✓ Dépendances backend installées
+✓ Client Prisma généré
+✓ Migrations appliquées
+✓ Dossiers d'upload créés
+
+═══════════════════════════════════════════════════════════════
+
+📊 VÉRIFIER QUE TOUT FONCTIONNE :
+
+Test API : curl http://localhost:5000/api/health
+Réponse attendue : {"status":"OK","message":"CMCI Backend is running"}
+
+═══════════════════════════════════════════════════════════════

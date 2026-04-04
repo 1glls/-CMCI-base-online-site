@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "vision": "Vision",
+    "ministries": "Ministries",
+    "events": "Events",
+    "assemblies": "Assemblies",
+    "testimonials": "Testimonials",
+    "contact": "Contact"
+  },
+  "hero": {
+    "discover": "Discover"
+  },
+  "about": {
+    "label": "About",
+    "title": "A community of disciples",
+    "paragraph1": "The International Christian Missionary Community (CMCI) is a movement of disciples devoted to Jesus Christ, our model in all things. Founded on the Word of God, our mission is to train disciples and reach the world with the Gospel.",
+    "paragraph2": "In Belgium, we are a spiritual family united by faith and love for Christ. Our assemblies are places of growth, fellowship and true worship.",
+    "paragraph3": "We believe in the power of the Holy Spirit to transform lives and impact nations. Each member is equipped and encouraged to fulfill God's plan for their life.",
+    "quote": "Being a disciple of Jesus means making Him our absolute model in everything we think, say and do.",
+    "quoteAuthor": "CMCI Vision",
+    "learnMore": "Learn more",
+    "cmciBelgium": "CMCI Belgium",
+    "cmciFullName": "International Christian Missionary Community",
+    "yearsPresence": "years of presence",
+    "assemblies": "assemblies"
+  },
+  "values": {
+    "label": "Our values",
+    "title": "What we believe in",
+    "subtitle": "Our core values guide our life and mission",
+    "faith": {
+      "title": "Living faith",
+      "description": "An authentic faith that transforms and inspires, based on God's Word"
+    },
+    "community": {
+      "title": "Fellowship",
+      "description": "A spiritual family united by Christ's love and mutual support"
+    },
+    "service": {
+      "title": "Devoted service",
+      "description": "Serving God and our neighbor with excellence and dedication"
+    },
+    "growth": {
+      "title": "Continuous growth",
+      "description": "Constant spiritual development to fulfill our destiny"
+    }
+  },
+  "vision": {
+    "label": "Our vision",
+    "title": "Training disciples to impact nations",
+    "subtitle": "Our vision is clear: equip every believer to fully live their faith",
+    "item1": {
+      "title": "Biblical training",
+      "description": "Equipping disciples through solid and practical teaching of the Word"
+    },
+    "item2": {
+      "title": "Missionary impact",
+      "description": "Reaching nations with the Gospel and transforming communities"
+    },
+    "item3": {
+      "title": "Leadership",
+      "description": "Training leaders according to Christ's model to serve the Church"
+    }
+  },
+  "ministries": {
+    "label": "Our ministries",
+    "title": "Serving together",
+    "subtitle": "Discover our different ministries and find your place to serve"
+  },
+  "events": {
+    "label": "Events",
+    "title": "Our upcoming events",
+    "subtitle": "Join us for moments of fellowship, worship and teaching",
+    "moreInfo": "More info",
+    "noEvents": "No upcoming events at the moment."
+  },
+  "assemblies": {
+    "label": "Our assemblies",
+    "title": "Find an assembly near you",
+    "subtitle": "We are present in several cities in Belgium. Join a community near you",
+    "viewAll": "View all our assemblies",
+    "loading": "Loading assemblies...",
+    "schedule": "Service schedules",
+    "address": "Address",
+    "contact": "Contact"
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "title": "They testify",
+    "subtitle": "Discover how God transforms lives through our community",
+    "noTestimonials": "No testimonials available at the moment."
+  },
+  "gallery": {
+    "label": "Gallery",
+    "title": "Our moments in pictures",
+    "subtitle": "Discover the life of our community through these shared moments"
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "We are here to accompany you in your spiritual journey.",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Hours",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Receive our latest news, events and inspiring messages.",
+      "placeholder": "Your email address",
+      "subscribe": "Subscribe",
+      "subscribing": "Subscribing...",
+      "success": "Thank you! You are now subscribed to our newsletter.",
+      "accept": "By subscribing, you agree to receive our communications."
+    },
+    "social": {
+      "title": "Stay connected with us on social media",
+      "subtitle": "Follow us to not miss any of our activities, events and inspiring messages."
+    }
+  },
+  "footer": {
+    "about": "About",
+    "aboutText": "CMCI Belgium is a Christian community dedicated to training disciples of Jesus Christ and impacting nations with the Gospel.",
+    "quickLinks": "Quick links",
+    "followUs": "Follow us",
+    "rights": "All rights reserved. Made with",
+    "by": "by"
+  }
+}

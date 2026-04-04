@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "Over ons",
+    "vision": "Visie",
+    "ministries": "Ministeries",
+    "events": "Evenementen",
+    "assemblies": "Gemeentes",
+    "testimonials": "Getuigenissen",
+    "contact": "Contact"
+  },
+  "hero": {
+    "discover": "Ontdekken"
+  },
+  "about": {
+    "label": "Over ons",
+    "title": "Een gemeenschap van discipelen",
+    "paragraph1": "De Internationale Christelijke Missionaire Gemeenschap (CMCI) is een beweging van discipelen toegewijd aan Jezus Christus, ons model in alle dingen. Gebaseerd op het Woord van God is onze missie om discipelen te vormen en de wereld te bereiken met het Evangelie.",
+    "paragraph2": "In België zijn we een spirituele familie verenigd door geloof en liefde voor Christus. Onze gemeenschappen zijn plaatsen van groei, gemeenschap en ware aanbidding.",
+    "paragraph3": "We geloven in de kracht van de Heilige Geest om levens te transformeren en naties te beïnvloeden. Elk lid wordt uitgerust en aangemoedigd om Gods plan voor hun leven te vervullen.",
+    "quote": "Een discipel van Jezus zijn betekent Hem tot ons absolute model maken in alles wat we denken, zeggen en doen.",
+    "quoteAuthor": "CMCI Visie",
+    "learnMore": "Meer informatie",
+    "cmciBelgium": "CMCI België",
+    "cmciFullName": "Internationale Christelijke Missionaire Gemeenschap",
+    "yearsPresence": "jaar aanwezig",
+    "assemblies": "gemeentes"
+  },
+  "values": {
+    "label": "Onze waarden",
+    "title": "Waar we in geloven",
+    "subtitle": "Onze kernwaarden leiden ons leven en onze missie",
+    "faith": {
+      "title": "Levend geloof",
+      "description": "Een authentiek geloof dat transformeert en inspireert, gebaseerd op Gods Woord"
+    },
+    "community": {
+      "title": "Broederschap",
+      "description": "Een spirituele familie verenigd door Christus' liefde en wederzijdse steun"
+    },
+    "service": {
+      "title": "Toegewijde dienst",
+      "description": "God en onze naaste dienen met uitmuntendheid en toewijding"
+    },
+    "growth": {
+      "title": "Continue groei",
+      "description": "Constante spirituele ontwikkeling om onze bestemming te vervullen"
+    }
+  },
+  "vision": {
+    "label": "Onze visie",
+    "title": "Discipelen vormen om naties te beïnvloeden",
+    "subtitle": "Onze visie is duidelijk: elk gelovige uitrusten om hun geloof ten volle te leven",
+    "item1": {
+      "title": "Bijbelse vorming",
+      "description": "Discipelen uitrusten door solide en praktisch onderwijs van het Woord"
+    },
+    "item2": {
+      "title": "Missionaire impact",
+      "description": "Naties bereiken met het Evangelie en gemeenschappen transformeren"
+    },
+    "item3": {
+      "title": "Leiderschap",
+      "description": "Leiders vormen volgens het model van Christus om de Kerk te dienen"
+    }
+  },
+  "ministries": {
+    "label": "Onze ministeries",
+    "title": "Samen dienen",
+    "subtitle": "Ontdek onze verschillende ministeries en vind je plaats om te dienen"
+  },
+  "events": {
+    "label": "Evenementen",
+    "title": "Onze komende evenementen",
+    "subtitle": "Sluit je bij ons aan voor momenten van gemeenschap, aanbidding en onderwijs",
+    "moreInfo": "Meer info",
+    "noEvents": "Momenteel geen komende evenementen."
+  },
+  "assemblies": {
+    "label": "Onze gemeentes",
+    "title": "Vind een gemeente bij jou in de buurt",
+    "subtitle": "We zijn aanwezig in verschillende steden in België. Sluit je aan bij een gemeenschap bij jou in de buurt",
+    "viewAll": "Bekijk al onze gemeentes",
+    "loading": "Gemeentes laden...",
+    "schedule": "Dienstroosters",
+    "address": "Adres",
+    "contact": "Contact"
+  },
+  "testimonials": {
+    "label": "Getuigenissen",
+    "title": "Zij getuigen",
+    "subtitle": "Ontdek hoe God levens transformeert door onze gemeenschap",
+    "noTestimonials": "Momenteel geen getuigenissen beschikbaar."
+  },
+  "gallery": {
+    "label": "Galerij",
+    "title": "Onze momenten in beeld",
+    "subtitle": "Ontdek het leven van onze gemeenschap door deze gedeelde momenten"
+  },
+  "contact": {
+    "title": "Contacteer ons",
+    "subtitle": "We zijn hier om je te begeleiden in je spirituele reis.",
+    "phone": "Telefoon",
+    "email": "E-mail",
+    "address": "Adres",
+    "hours": "Uren",
+    "newsletter": {
+      "title": "Nieuwsbrief",
+      "description": "Ontvang ons laatste nieuws, evenementen en inspirerende boodschappen.",
+      "placeholder": "Uw e-mailadres",
+      "subscribe": "Abonneren",
+      "subscribing": "Abonneren...",
+      "success": "Bedankt! Je bent nu geabonneerd op onze nieuwsbrief.",
+      "accept": "Door je te abonneren, ga je akkoord met het ontvangen van onze communicatie."
+    },
+    "social": {
+      "title": "Blijf verbonden met ons op sociale media",
+      "subtitle": "Volg ons om geen van onze activiteiten, evenementen en inspirerende berichten te missen."
+    }
+  },
+  "footer": {
+    "about": "Over ons",
+    "aboutText": "CMCI België is een christelijke gemeenschap toegewijd aan het vormen van discipelen van Jezus Christus en het beïnvloeden van naties met het Evangelie.",
+    "quickLinks": "Snelle links",
+    "followUs": "Volg ons",
+    "rights": "Alle rechten voorbehouden. Gemaakt met",
+    "by": "door"
+  }
+}

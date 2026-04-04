@@ -1,0 +1,10 @@
+# robots.txt pour CMCI Belgique
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.cmcibelgique.org/sitemap.xml
+
+# Désactiver l'indexation des API
+Disallow: /api/
+User-agent: *
