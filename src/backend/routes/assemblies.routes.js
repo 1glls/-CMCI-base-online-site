@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/auth.middleware');
+const { applyTranslations } = require('../services/translation.service');
 
 const prisma = new PrismaClient();
 
