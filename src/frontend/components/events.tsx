@@ -137,7 +137,7 @@ export function Events() {
               Agenda
             </span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-2">
-              Prochains Evenements
+              Prochains Événements
             </h2>
             <div className="w-20 h-1 bg-accent mx-auto mb-6" />
             <p className="text-muted-foreground">Aucun événement à venir pour le moment.</p>
@@ -161,7 +161,7 @@ export function Events() {
               Agenda
             </span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-2">
-              Prochains Evenements
+              Prochains Événements
             </h2>
             <div className="w-20 h-1 bg-accent" />
           </div>
@@ -172,7 +172,7 @@ export function Events() {
               onClick={prevSlide}
               disabled={currentIndex === 0}
               className="p-3 rounded-full border border-primary/20 hover:bg-primary hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Evenement precedent"
+              aria-label="Événement précédent"
             >
               <ChevronLeft size={20} />
             </button>
@@ -180,7 +180,7 @@ export function Events() {
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
               className="p-3 rounded-full border border-primary/20 hover:bg-primary hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Evenement suivant"
+              aria-label="Événement suivant"
             >
               <ChevronRight size={20} />
             </button>

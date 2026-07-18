@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 const values = [
   {
     number: "01",
-    title: "Communaute",
+    title: "Communauté",
     icon: Heart,
     description:
       "Nous sommes une famille spirituelle unie par l'amour du Christ, vivant dans la communion fraternelle et le soutien mutuel.",
@@ -17,21 +17,21 @@ const values = [
     title: "Missionnaire",
     icon: Compass,
     description:
-      "Nous sommes appeles a porter l'Evangile partout, faisant des disciples dans toutes les nations selon le commandement de Jesus.",
+      "Nous sommes appelés à porter l'Évangile partout, faisant des disciples dans toutes les nations selon le commandement de Jésus.",
   },
   {
     number: "03",
-    title: "Chretienne",
+    title: "Chrétienne",
     icon: Cross,
     description:
-      "Christ est notre fondement, notre modele et notre but. Nous vivons selon Sa Parole et marchons par Son Esprit.",
+      "Christ est notre fondement, notre modèle et notre but. Nous vivons selon Sa Parole et marchons par Son Esprit.",
   },
   {
     number: "04",
     title: "Internationale",
     icon: Globe2,
     description:
-      "Nous accueillons toutes les nations dans l'amour de Dieu, refletant la diversite du Royaume des cieux sur terre.",
+      "Nous accueillons toutes les nations dans l'amour de Dieu, reflétant la diversité du Royaume des cieux sur terre.",
   },
 ]
 
@@ -124,7 +124,7 @@ export function Values() {
         <div className="text-center mt-16">
           <p className="text-white/60 italic text-lg max-w-2xl mx-auto">
             C.M.C.I. - Quatre lettres, une mission : transformer le monde par la
-            puissance de l'Evangile.
+            puissance de l'Évangile.
           </p>
         </div>
       </div>

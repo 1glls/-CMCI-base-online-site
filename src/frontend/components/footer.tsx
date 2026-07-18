@@ -15,8 +15,8 @@ const quickLinks = [
   { href: "#accueil", label: "Accueil" },
   { href: "#vision", label: "Notre Vision" },
   { href: "#valeurs", label: "Nos Valeurs" },
-  { href: "#evenements", label: "Evenements" },
-  { href: "#assemblees", label: "Assemblees" },
+  { href: "#evenements", label: "Événements" },
+  { href: "#assemblees", label: "Assemblées" },
   { href: "#galerie", label: "Galerie" },
 ]
 
@@ -43,8 +43,8 @@ export function Footer() {
           </div>
         </div>
         <p className="text-white/70 leading-relaxed mb-6">
-          La Communaute Missionnaire Chretienne Internationale en Belgique -
-          une famille de disciples devoues a Jesus-Christ, notre modele en
+          La Communauté Missionnaire Chrétienne Internationale en Belgique -
+          une famille de disciples dévoués à Jésus-Christ, notre modèle en
           toutes choses.
         </p>
         </div>

@@ -35,7 +35,7 @@ export function Testimonials() {
         }
       } catch (error) {
         console.error('Error fetching testimonials:', error);
-        // Aucun contenu de repli : mieux vaut ne rien afficher qu'un faux temoignage
+        // Aucun contenu de repli : mieux vaut ne rien afficher qu'un faux témoignage
       } finally {
         setLoading(false);
       }
@@ -88,7 +88,7 @@ export function Testimonials() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-            Temoignages
+            Témoignages
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mt-3 mb-4">
             Ce que disent nos membres
@@ -98,12 +98,12 @@ export function Testimonials() {
 
         {/* Etats vides : ni squelette trompeur, ni faux contenu */}
         {loading && (
-          <p className="text-center text-white/70">Chargement des temoignages...</p>
+          <p className="text-center text-white/70">Chargement des témoignages...</p>
         )}
 
         {!loading && testimonials.length === 0 && (
           <p className="text-center text-white/70">
-            Aucun temoignage disponible pour le moment.
+            Aucun témoignage disponible pour le moment.
           </p>
         )}
 
@@ -160,7 +160,7 @@ export function Testimonials() {
               <button
                 onClick={prevTestimonial}
                 className="p-3 rounded-full border border-white/30 hover:bg-white/20 transition-colors text-white"
-                aria-label="Temoignage precedent"
+                aria-label="Témoignage précédent"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -177,7 +177,7 @@ export function Testimonials() {
                         ? "bg-accent w-6"
                         : "bg-white/40 hover:bg-white/60"
                     )}
-                    aria-label={`Aller au temoignage ${index + 1}`}
+                    aria-label={`Aller au témoignage ${index + 1}`}
                   />
                 ))}
               </div>
@@ -185,7 +185,7 @@ export function Testimonials() {
               <button
                 onClick={nextTestimonial}
                 className="p-3 rounded-full border border-white/30 hover:bg-white/20 transition-colors text-white"
-                aria-label="Temoignage suivant"
+                aria-label="Témoignage suivant"
               >
                 <ChevronRight size={20} />
               </button>

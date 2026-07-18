@@ -18,9 +18,9 @@ const _openSans = Open_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cmcibelgique.org'),
-  title: 'CMCI Belgique - Communaute Missionnaire Chretienne Internationale',
-  description: 'Rejoignez la CMCI Belgique - Une communaute de disciples devoues a Jesus-Christ, notre modele en toutes choses. Decouvrez notre vision, nos valeurs et nos assemblees.',
-  keywords: ['CMCI', 'Belgique', 'eglise', 'chretien', 'communaute', 'missionnaire', 'Bruxelles', 'culte', 'priere'],
+  title: 'CMCI Belgique - Communauté Missionnaire Chrétienne Internationale',
+  description: 'Rejoignez la CMCI Belgique - Une communauté de disciples dévoués à Jésus-Christ, notre modèle en toutes choses. Découvrez notre vision, nos valeurs et nos assemblées.',
+  keywords: ['CMCI', 'Belgique', 'église', 'chrétien', 'communauté', 'missionnaire', 'Bruxelles', 'culte', 'prière'],
   generator: 'v0.app',
   verification: {
     google: 'Z0jrhdY3JojQh64BINvb-fjvBQEBFffumX_A1zak2Is',
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     canonical: 'https://www.cmcibelgique.org',
   },
   openGraph: {
-    title: 'CMCI Belgique - Communaute Missionnaire Chretienne Internationale',
-    description: 'Une communaute de disciples devoues a Jesus-Christ',
+    title: 'CMCI Belgique - Communauté Missionnaire Chrétienne Internationale',
+    description: 'Une communauté de disciples dévoués à Jésus-Christ',
     url: 'https://www.cmcibelgique.org',
     siteName: 'CMCI Belgique',
     type: 'website',

@@ -77,11 +77,11 @@ export function Assemblies() {
             Nous Trouver
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Nos Assemblees en Belgique
+            Nos Assemblées en Belgique
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto mb-6" />
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Rejoignez-nous dans l'une de nos assemblees pour vivre la communion
+            Rejoignez-nous dans l'une de nos assemblées pour vivre la communion
             fraternelle et grandir ensemble dans la foi.
           </p>
         </div>

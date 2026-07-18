@@ -188,7 +188,7 @@ export function Hero() {
                 element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
             >
-              Decouvrir notre vision
+              Découvrir notre vision
             </Button>
             <Button
               size="lg"
@@ -199,7 +199,7 @@ export function Hero() {
                 element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
             >
-              Prochains evenements
+              Prochains événements
             </Button>
           </div>
         </div>
@@ -209,7 +209,7 @@ export function Hero() {
       <button
         onClick={prevSlide}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-white/20 hover:bg-white/40 transition-colors text-white"
-        aria-label="Slide precedent"
+        aria-label="Slide précédent"
       >
         <ChevronLeft size={24} />
       </button>

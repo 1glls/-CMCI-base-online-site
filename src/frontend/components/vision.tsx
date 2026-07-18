@@ -7,21 +7,21 @@ import { cn } from "@/lib/utils"
 const visionCards = [
   {
     icon: Globe,
-    title: "Evangeliser le monde",
+    title: "Évangéliser le monde",
     description:
-      "Atteindre 10 milliards de personnes par l'evangile dans la puissance du Saint-Esprit, proclamant le message de salut a toutes les nations.",
+      "Atteindre 10 milliards de personnes par l'Évangile dans la puissance du Saint-Esprit, proclamant le message de salut à toutes les nations.",
   },
   {
     icon: Users,
     title: "Former des disciples",
     description:
-      "1 milliard de disciples dans 250 nations organises en 25 millions d'eglises de maison d'ici 2065, suivant le modele de Jesus.",
+      "1 milliard de disciples dans 250 nations organisés en 25 millions d'églises de maison d'ici 2065, suivant le modèle de Jésus.",
   },
   {
     icon: HandHeart,
-    title: "Prier pour le reveil",
+    title: "Prier pour le réveil",
     description:
-      "Cooperer avec Dieu par le jeune et l'intercession pour le reveil mondial, preparant le retour glorieux de notre Seigneur.",
+      "Coopérer avec Dieu par le jeûne et l'intercession pour le réveil mondial, préparant le retour glorieux de notre Seigneur.",
   },
 ]
 
@@ -59,7 +59,7 @@ export function Vision() {
             Notre Vision
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Transformer le monde par l'Evangile
+            Transformer le monde par l'Évangile
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
