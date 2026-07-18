@@ -60,3 +60,5 @@ Thumbs.db
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Tracts : sorties generees (HTML, PDF, apercus) — reproductibles par build.mjs
+otherthings/tracts/*/dist/

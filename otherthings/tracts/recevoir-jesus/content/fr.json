@@ -1,0 +1,118 @@
+{
+  "lang": "fr",
+  "dir": "ltr",
+  "font": "noto-sans",
+
+  "cover": {
+    "eyebrow": "Un message qui peut changer votre vie",
+    "title": "Comment recevoir Jésus-Christ ?",
+    "tagline": "Dieu vous aime et désire vous pardonner dès maintenant."
+  },
+
+  "light": {
+    "heading": "Jésus-Christ est la lumière du monde",
+    "intro": "Jésus-Christ est la lumière du monde, et si vous ne marchez pas dans cette lumière, vous marchez dans les ténèbres. Il n'y a de salut en aucun autre, car il n'y a sous le ciel aucun autre nom donné parmi les hommes par lequel nous devions être sauvés.",
+    "closing": "Écoutez son appel. Il n'est pas venu pour condamner le monde, mais pour que le monde soit sauvé par lui."
+  },
+
+  "abc": {
+    "heading": "Trois choses auxquelles réfléchir",
+    "intro": "Il y a trois choses sur lesquelles réfléchir et agir si vous voulez appartenir à Jésus-Christ. Elles sont représentées par les lettres A, C et C.",
+    "items": [
+      {
+        "letter": "A",
+        "word": "ADMETTEZ",
+        "text": "que vous êtes pécheur. Dites à Dieu que vous avez péché d'une manière personnelle, dans vos pensées, vos paroles et vos actes. Confessez-Lui tous vos péchés en les citant l'un après l'autre. Détournez-vous d'eux, abandonnez-les, décidez que vous en avez fini pour toujours avec ce genre de vie. Dieu ne pardonnera pas à moins que vous ne soyez déterminé, avec Son aide, à en finir à tout jamais avec toutes vos voies pécheresses."
+      },
+      {
+        "letter": "C",
+        "word": "CROYEZ",
+        "text": "que Jésus-Christ est mort sur la croix à votre place. En croyant, vous rejetez tout système ou philosophie qui suggère qu'un homme peut se réconcilier avec Dieu et aller au ciel sans passer par Jésus-Christ. Si vous croyez réellement que Jésus est le seul chemin que Dieu a donné aux hommes pour entrer au ciel, alors recevez-Le personnellement dans votre cœur et dans votre vie. Vous voudrez aussi le faire immédiatement, avant qu'il ne soit trop tard."
+      },
+      {
+        "letter": "C",
+        "word": "CONSIDÉREZ",
+        "text": "le coût de Le suivre. Jésus exigera que vous L'aimiez et que vous Lui obéissiez en toute chose et toujours. Chaque fois que les exigences de Jésus contrediront vos propres désirs ou les exigences de quelqu'un d'autre, il vous faudra Lui obéir à Lui. Êtes-vous prêt à abandonner chaque jour vos intérêts personnels pour ceux de Jésus ? Êtes-vous prêt à Le laisser vous conduire dans des directions nouvelles ?"
+      }
+    ]
+  },
+
+  "salut": {
+    "heading": "Recevoir le salut de Dieu",
+    "intro": "Le salut de Dieu est contenu dans la personne de Jésus-Christ. Quand vous recevez Jésus-Christ dans votre vie, Dieu vous donne immédiatement le pardon de vos péchés et vous libère pour Le servir.",
+    "items": [
+      { "word": "ADMETTEZ", "text": "que vous êtes pécheur, en pensées, en paroles et en actes." },
+      { "word": "CONFESSEZ", "text": "tous vos péchés à Jésus, sans en laisser aucun, y compris ceux dont vous seul vous souvenez." },
+      { "word": "RENONCEZ", "text": "à vos péchés et tournez-vous vers Dieu. Abandonnez votre propre chemin et suivez celui de Jésus." },
+      { "word": "DEMANDEZ", "text": "à Jésus d'entrer dans votre vie et de devenir votre Seigneur." }
+    ]
+  },
+
+  "invite": {
+    "heading": "Invitation",
+    "intro": "Êtes-vous prêt à souffrir et, si nécessaire, à mourir pour Lui ? Si vous êtes prêt à Le suivre et à renoncer à tout, alors priez maintenant, à voix haute, la prière suivante :",
+    "prayer": "Seigneur Jésus, je suis un pécheur misérable. Je T'ai confessé mes péchés et je les ai abandonnés complètement. Je crois que Tu es mort sur la croix pour moi. Entre maintenant dans mon cœur et aide-moi à prendre totalement la liberté de conduire ma vie. Écris mon nom dans le livre de vie afin que je ne périsse jamais et que je vienne plutôt être un jour avec Toi. Amen.",
+    "afterPrayer": "Si vous avez reçu le Seigneur Jésus en priant sincèrement cette prière, alors il est entré dans votre vie et il a écrit votre nom dans le livre de la vie. Il ne vous laissera jamais.",
+    "blessing": "Que Dieu vous bénisse abondamment !",
+    "attribution": "Professeur Zacharias Tanee Fomum"
+  },
+
+  "coupon": {
+    "heading": "Coupon à renvoyer",
+    "intro": "Je souhaite recevoir gratuitement :",
+    "options": [
+      "Une de vos publications",
+      "Des informations sur la CMCI"
+    ],
+    "fieldsHeading": "Mes coordonnées",
+    "fields": ["Nom", "Prénom", "Adresse", "Code postal et ville", "Téléphone ou e-mail"]
+  },
+
+  "verses": {
+    "jean_8_12": {
+      "ref": "Jean 8:12",
+      "text": "Je suis la lumière du monde ; celui qui me suit ne marchera pas dans les ténèbres, mais il aura la lumière de la vie.",
+      "source": "Louis Segond 1910 — domaine public"
+    },
+    "actes_4_12": {
+      "ref": "Actes 4:12",
+      "text": "Il n'y a de salut en aucun autre ; car il n'y a sous le ciel aucun autre nom qui ait été donné parmi les hommes, par lequel nous devions être sauvés.",
+      "source": "Louis Segond 1910 — domaine public"
+    },
+    "matthieu_11_28": {
+      "ref": "Matthieu 11:28-29",
+      "text": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos. Prenez mon joug sur vous et recevez mes instructions, car je suis doux et humble de cœur ; et vous trouverez du repos pour vos âmes.",
+      "source": "Louis Segond 1910 — domaine public"
+    },
+    "jean_6_37": {
+      "ref": "Jean 6:37",
+      "text": "Tous ceux que le Père me donne viendront à moi, et je ne mettrai pas dehors celui qui vient à moi.",
+      "source": "Louis Segond 1910 — domaine public"
+    },
+    "jean_3_16": {
+      "ref": "Jean 3:16-17",
+      "text": "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle. Dieu, en effet, n'a pas envoyé son Fils dans le monde pour qu'il juge le monde, mais pour que le monde soit sauvé par lui.",
+      "source": "Louis Segond 1910 — domaine public"
+    }
+  },
+
+  "qr": {
+    "url": "https://www.cmcibelgique.org/t/recevoir-jesus?de=fr",
+    "caption": "Scannez pour lire ce tract dans votre langue, ou le télécharger."
+  },
+
+  "contact": {
+    "printedBy": "Cet imprimé vous est donné par :",
+    "org": "Communauté Missionnaire Chrétienne Internationale en Belgique",
+    "phoneLabel": "Téléphone",
+    "phones": [
+      { "city": "Bruxelles", "numbers": "0032 485 07 94 39 · 0032 465 68 01 05" },
+      { "city": "Liège", "numbers": "0032 466 20 25 53" },
+      { "city": "Mons-Charleroi", "numbers": "0032 466 14 31 24" }
+    ],
+    "emailLabel": "E-mail",
+    "email": "belgiquecmci@gmail.com",
+    "social": "@cmci_be",
+    "website": "www.cmcibelgique.org"
+  }
+}

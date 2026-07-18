@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="{{lang}}" dir="{{dir}}">
+<head>
+<meta charset="utf-8">
+<title>{{cover.title}} — CMCI Belgique</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Depliant tri-fold A4 paysage, 2 pages (recto/verso).
+   Aucun texte n'est ecrit ici : tout vient de content/<lang>.json.
+
+   La mise en page utilise des proprietes LOGIQUES (margin-inline,
+   padding-inline, border-inline) et non left/right : le gabarit bascule donc
+   en RTL pour l'arabe sans etre refondu.
+--------------------------------------------------------------------------- */
+
+@page { size: A4 landscape; margin: 0; }
+
+:root {
+  --vert: #0f5f5c;          /* vert sarcelle des photos */
+  --vert-clair: #14807c;
+  --creme: #faf7f0;
+  --orange: #e07a2f;
+  --encre: #1c2b2a;
+  --gris: #5b6b6a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--police, "Noto Sans"), system-ui, sans-serif;
+  color: var(--encre);
+  background: #e8e8e8;
+  font-size: 8.4pt;
+  line-height: 1.45;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: 297mm; height: 210mm;
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  background: var(--creme);
+  page-break-after: always;
+  position: relative;
+}
+.page:last-child { page-break-after: auto; }
+
+/* Reperes de pliage : discrets a l'ecran, presque invisibles a l'impression */
+.page::before, .page::after {
+  content: ""; position: absolute; top: 0; bottom: 0;
+  width: 0; border-inline-start: 0.2mm dashed rgba(0,0,0,.18);
+}
+.page::before { inset-inline-start: 99mm; }
+.page::after  { inset-inline-start: 198mm; }
+
+.panel {
+  padding: 11mm 9mm;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Couverture ---------------------------------------------------------- */
+.cover {
+  background: linear-gradient(160deg, var(--vert) 0%, var(--vert-clair) 100%);
+  color: #fff;
+  justify-content: center; text-align: center;
+}
+.cover .eyebrow {
+  font-size: 7.6pt; letter-spacing: .12em; text-transform: uppercase;
+  opacity: .85; margin-bottom: 6mm;
+}
+.cover h1 {
+  font-size: 21pt; line-height: 1.15; font-weight: 800; margin-bottom: 5mm;
+}
+.cover .rule { width: 22mm; height: 1.1mm; background: var(--orange); margin: 0 auto 5mm; }
+.cover .tagline { font-size: 10pt; opacity: .95; }
+.cover .org {
+  margin-top: auto; padding-top: 8mm;
+  font-size: 7.4pt; opacity: .8; line-height: 1.5;
+}
+
+/* --- Titres de section --------------------------------------------------- */
+h2 {
+  font-size: 12pt; color: var(--vert); font-weight: 800;
+  margin-bottom: 3mm; line-height: 1.2;
+}
+h2::after {
+  content: ""; display: block; width: 14mm; height: 0.8mm;
+  background: var(--orange); margin-top: 2mm;
+}
+p { margin-bottom: 2.6mm; text-align: justify; hyphens: auto; }
+.intro { color: var(--gris); }
+
+/* --- Versets ------------------------------------------------------------- */
+.verse {
+  border-inline-start: 0.9mm solid var(--orange);
+  padding-inline-start: 3mm;
+  margin: 3mm 0; font-style: italic; color: #2f4342;
+}
+.verse .ref {
+  display: block; font-style: normal; font-weight: 700;
+  font-size: 7.4pt; color: var(--vert); margin-top: 1mm;
+}
+
+/* --- Blocs ADMETTEZ / CROYEZ / CONSIDEREZ -------------------------------- */
+.step { margin-bottom: 3.4mm; }
+.step .word {
+  font-weight: 800; color: var(--vert); letter-spacing: .02em;
+}
+.step .letter {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 5.5mm; height: 5.5mm; border-radius: 50%;
+  background: var(--orange); color: #fff;
+  font-weight: 800; font-size: 8pt;
+  margin-inline-end: 1.8mm; vertical-align: -1mm;
+}
+
+/* --- Priere -------------------------------------------------------------- */
+.prayer {
+  background: #fff; border: 0.3mm solid rgba(15,95,92,.25);
+  border-radius: 2mm; padding: 4mm; margin: 3mm 0;
+  font-style: italic;
+}
+.attribution {
+  font-weight: 700; color: var(--vert); font-size: 8pt;
+  margin-top: 2mm; text-align: end;
+}
+.blessing { font-weight: 700; color: var(--orange); text-align: center; margin: 2mm 0; }
+
+/* --- Coupon detachable --------------------------------------------------- */
+.coupon {
+  margin-top: auto;
+  border: 0.4mm dashed var(--vert);
+  border-radius: 1.5mm; padding: 3.5mm;
+  background: #fff;
+}
+.coupon h3 { font-size: 8.6pt; color: var(--vert); margin-bottom: 2mm; }
+.coupon .opt { margin-bottom: 1.2mm; }
+.coupon .box {
+  display: inline-block; width: 3mm; height: 3mm;
+  border: 0.3mm solid var(--gris); margin-inline-end: 1.5mm; vertical-align: -0.4mm;
+}
+.coupon .field {
+  border-bottom: 0.25mm solid #b9c5c4;
+  padding-bottom: 0.6mm; margin-bottom: 2.2mm;
+  font-size: 7.2pt; color: var(--gris);
+}
+
+/* --- QR + contact -------------------------------------------------------- */
+.qr-block {
+  margin-top: auto; padding-top: 4mm; text-align: center;
+}
+.qr-block svg { width: 26mm; height: 26mm; }
+.qr-block .caption {
+  font-size: 7pt; color: var(--gris); margin-top: 1.5mm; line-height: 1.35;
+}
+.contact {
+  margin-top: 3mm; padding-top: 3mm;
+  border-top: 0.3mm solid rgba(15,95,92,.25);
+  font-size: 7.2pt; line-height: 1.5;
+}
+.contact .org { font-weight: 700; color: var(--vert); }
+.contact .row { margin-top: 1mm; }
+.contact .city { font-weight: 600; }
+
+@media screen {
+  body { padding: 10mm; }
+  .page { box-shadow: 0 2mm 8mm rgba(0,0,0,.2); margin-bottom: 8mm; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1 (exterieur du depliant) ============ -->
+<div class="page">
+
+  <!-- Volet gauche : coupon + QR + contact (dos une fois plie) -->
+  <section class="panel">
+    <div class="coupon">
+      <h3>{{coupon.heading}}</h3>
+      <p class="intro">{{coupon.intro}}</p>
+      {{#coupon.options}}<div class="opt"><span class="box"></span>{{.}}</div>{{/coupon.options}}
+      <p style="margin-top:2.5mm;font-weight:600;">{{coupon.fieldsHeading}}</p>
+      {{#coupon.fields}}<div class="field">{{.}}</div>{{/coupon.fields}}
+    </div>
+
+    <div class="qr-block">
+      {{qrSvg}}
+      <div class="caption">{{qr.caption}}</div>
+    </div>
+
+    <div class="contact">
+      <div>{{contact.printedBy}}</div>
+      <div class="org">{{contact.org}}</div>
+      {{#contact.phones}}<div class="row"><span class="city">{{city}}</span> — {{numbers}}</div>{{/contact.phones}}
+      <div class="row">{{contact.emailLabel}} : {{contact.email}}</div>
+      <div class="row">{{contact.social}} · {{contact.website}}</div>
+    </div>
+  </section>
+
+  <!-- Volet central : invitation et priere (dernier lu) -->
+  <section class="panel">
+    <h2>{{invite.heading}}</h2>
+    <p class="intro">{{invite.intro}}</p>
+    <div class="prayer">{{invite.prayer}}</div>
+    <p>{{invite.afterPrayer}}</p>
+    <p class="blessing">{{invite.blessing}}</p>
+    <div class="verse">
+      {{verses.jean_6_37.text}}
+      <span class="ref">{{verses.jean_6_37.ref}}</span>
+    </div>
+    <div class="attribution">{{invite.attribution}}</div>
+  </section>
+
+  <!-- Volet droit : couverture -->
+  <section class="panel cover">
+    <div class="eyebrow">{{cover.eyebrow}}</div>
+    <h1>{{cover.title}}</h1>
+    <div class="rule"></div>
+    <div class="tagline">{{cover.tagline}}</div>
+    <div class="org">{{contact.org}}</div>
+  </section>
+
+</div>
+
+<!-- ============ PAGE 2 (interieur du depliant) ============ -->
+<div class="page">
+
+  <section class="panel">
+    <h2>{{light.heading}}</h2>
+    <p class="intro">{{light.intro}}</p>
+    <div class="verse">
+      {{verses.jean_8_12.text}}
+      <span class="ref">{{verses.jean_8_12.ref}}</span>
+    </div>
+    <div class="verse">
+      {{verses.actes_4_12.text}}
+      <span class="ref">{{verses.actes_4_12.ref}}</span>
+    </div>
+    <div class="verse">
+      {{verses.jean_3_16.text}}
+      <span class="ref">{{verses.jean_3_16.ref}}</span>
+    </div>
+    <p>{{light.closing}}</p>
+  </section>
+
+  <section class="panel">
+    <h2>{{abc.heading}}</h2>
+    <p class="intro">{{abc.intro}}</p>
+    {{#abc.items}}
+    <div class="step">
+      <span class="letter">{{letter}}</span><span class="word">{{word}}</span> {{text}}
+    </div>
+    {{/abc.items}}
+    <div class="verse">
+      {{verses.matthieu_11_28.text}}
+      <span class="ref">{{verses.matthieu_11_28.ref}}</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>{{salut.heading}}</h2>
+    <p class="intro">{{salut.intro}}</p>
+    {{#salut.items}}
+    <div class="step"><span class="word">{{word}}</span> {{text}}</div>
+    {{/salut.items}}
+  </section>
+
+</div>
+
+</body>
+</html>

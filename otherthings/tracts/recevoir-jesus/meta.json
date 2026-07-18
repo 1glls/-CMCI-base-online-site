@@ -1,0 +1,9 @@
+{
+  "slug": "recevoir-jesus",
+  "titleRef": "Comment recevoir Jésus-Christ ?",
+  "baseUrl": "https://www.cmcibelgique.org/t/recevoir-jesus",
+  "languages": [
+    { "code": "fr", "label": "Français", "dir": "ltr", "font": "noto-sans", "status": "source" }
+  ],
+  "_note": "Ajouter une langue = deposer content/<code>.json et une entree ici. Le gabarit ne change pas. `status` : source | draft | reviewed. Seules les langues `reviewed` doivent partir a l'impression."
+}
