@@ -228,9 +228,11 @@ const TRANSLATABLE = {
  * Traduit un enregistrement vers une langue et enregistre le resultat.
  * N'ecrase jamais une traduction relue par un humain (reviewed=true).
  */
-async function translateRecord(model, recordId, source, targetLang) {
-  const fields = TRANSLATABLE[model];
-  if (!fields) throw new Error(`Modele non traduisible : ${model}`);
+async function translateRecord(model, recordId, source, targetLang, onlyFields = null) {
+  const all = TRANSLATABLE[model];
+  if (!all) throw new Error(`Modele non traduisible : ${model}`);
+  const fields = onlyFields ? all.filter((f) => onlyFields.includes(f)) : all;
+  if (fields.length === 0) return { translated: 0, skipped: 0 };
 
   const existing = await prisma.contentTranslation.findMany({
     where: { model, recordId, language: targetLang }
@@ -282,7 +284,52 @@ async function applyTranslations(model, records, language) {
   return records.map((r) => ({ ...r, ...(byRecord.get(r.id) || {}) }));
 }
 
+
+/** Langues cibles du site. Le francais est la langue source. */
+const TARGET_LANGUAGES = ['en', 'nl'];
+
+/**
+ * Traduit un enregistrement en arriere-plan, sans bloquer la reponse HTTP
+ * ni la faire echouer : une panne de DeepL ne doit pas empecher un
+ * administrateur d'enregistrer son contenu.
+ *
+ * `changedFields` limite le travail aux champs reellement modifies. A la
+ * creation, passer null pour tout traduire.
+ */
+function autoTranslate(model, record, changedFields = null) {
+  if (!TRANSLATABLE[model] || !record?.id) return;
+
+  // Rien de traduisible n'a bouge : on ne consomme pas de quota et on
+  // n'ecrase pas d'eventuelles corrections humaines.
+  if (changedFields && changedFields.length === 0) return;
+
+  setImmediate(async () => {
+    for (const lang of TARGET_LANGUAGES) {
+      try {
+        await translateRecord(model, record.id, record, lang, changedFields);
+      } catch (e) {
+        console.error(`Traduction auto ${model}/${record.id}/${lang} :`, e.message);
+      }
+    }
+  });
+}
+
+/**
+ * Champs traduisibles dont le texte francais a change entre deux versions.
+ */
+function changedTranslatableFields(model, before, after) {
+  const fields = TRANSLATABLE[model] || [];
+  return fields.filter((f) => {
+    const a = before?.[f] ?? null;
+    const b = after?.[f] ?? null;
+    return b && a !== b;
+  });
+}
+
 module.exports = {
+  autoTranslate,
+  changedTranslatableFields,
+  TARGET_LANGUAGES,
   translateBatch,
   translateRecord,
   applyTranslations,

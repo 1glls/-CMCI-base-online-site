@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/auth.middleware');
-const { applyTranslations } = require('../services/translation.service');
+const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 
 const prisma = new PrismaClient();
 
@@ -78,6 +78,9 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     });
 
+    // Contenu neuf : traduction en arriere-plan, sans bloquer la reponse
+    autoTranslate('Assembly', assembly);
+
     res.status(201).json(assembly);
   } catch (error) {
     console.error('Error creating assembly:', error);
@@ -101,10 +104,17 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (email !== undefined) updateData.email = email;
     if (status !== undefined) updateData.status = status;
 
+    // Etat avant mise a jour : sert a ne retraduire que ce qui change
+    const avant = await prisma.assembly.findUnique({ where: { id: req.params.id } });
+
     const assembly = await prisma.assembly.update({
       where: { id },
       data: updateData
     });
+
+    // Ne retraduit que les champs dont le texte francais a change :
+    // evite de consommer du quota et d'ecraser des corrections relues.
+    autoTranslate('Assembly', assembly, changedTranslatableFields('Assembly', avant, assembly));
 
     res.json(assembly);
   } catch (error) {

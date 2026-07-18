@@ -4,7 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
-const { applyTranslations } = require('../services/translation.service');
+const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
 const prisma = new PrismaClient();
@@ -96,6 +96,9 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       }
     });
     
+    // Contenu neuf : traduction en arriere-plan, sans bloquer la reponse
+    autoTranslate('Ministry', ministry);
+
     res.status(201).json(ministry);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -120,10 +123,17 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
       updateData.image = `/uploads/ministries/${req.file.filename}`;
     }
     
+    // Etat avant mise a jour : sert a ne retraduire que ce qui change
+    const avant = await prisma.ministry.findUnique({ where: { id: req.params.id } });
+
     const ministry = await prisma.ministry.update({
       where: { id: req.params.id },
       data: updateData
     });
+
+    // Ne retraduit que les champs dont le texte francais a change :
+    // evite de consommer du quota et d'ecraser des corrections relues.
+    autoTranslate('Ministry', ministry, changedTranslatableFields('Ministry', avant, ministry));
     
     res.json(ministry);
   } catch (error) {

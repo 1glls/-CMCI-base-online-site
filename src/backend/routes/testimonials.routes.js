@@ -4,7 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
-const { applyTranslations } = require('../services/translation.service');
+const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
 const prisma = new PrismaClient();
@@ -82,6 +82,9 @@ router.post('/', authMiddleware, adminMiddleware, upload.single('image'), async 
       }
     });
 
+    // Contenu neuf : traduction en arriere-plan, sans bloquer la reponse
+    autoTranslate('Testimonial', testimonial);
+
     res.status(201).json(testimonial);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -101,10 +104,17 @@ router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), asyn
       updateData.image = imageUrl;
     }
 
+    // Etat avant mise a jour : sert a ne retraduire que ce qui change
+    const avant = await prisma.testimonial.findUnique({ where: { id: req.params.id } });
+
     const testimonial = await prisma.testimonial.update({
       where: { id: req.params.id },
       data: updateData
     });
+
+    // Ne retraduit que les champs dont le texte francais a change :
+    // evite de consommer du quota et d'ecraser des corrections relues.
+    autoTranslate('Testimonial', testimonial, changedTranslatableFields('Testimonial', avant, testimonial));
 
     res.json(testimonial);
   } catch (error) {
