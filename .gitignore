@@ -20,18 +20,29 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
+# env files (secrets)
+# Les gabarits et les variables NEXT_PUBLIC_ (publiques par nature,
+# embarquees dans le bundle client) sont versionnes.
 .env*
+!.env.example
+!.env.production
 src/backend/.env
 
-# Backend uploads
+# Backend uploads : donnees utilisateur, ne transitent jamais par git
 src/backend/uploads/
-src/backend/prisma/migrations/
 
-# Database
+# ATTENTION : prisma/migrations/ NE DOIT PAS etre ignore.
+# Les migrations sont du code : sans elles, `prisma migrate deploy`
+# n'a rien a appliquer sur le serveur et le schema derive silencieusement.
+
+# Database : le contenu reel vit sur le serveur, jamais dans le depot
 *.db
 *.sqlite
 *.sqlite3
+
+# Sauvegardes (donnees personnelles : abonnes, soumissions, hash admin)
+backups/
+src/backend/backups/
 
 # OS
 .DS_Store
