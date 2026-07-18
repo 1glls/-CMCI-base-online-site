@@ -5,6 +5,7 @@ const { authMiddleware, adminMiddleware } = require('../middleware/auth.middlewa
 const multer = require('multer');
 const path = require('path');
 const { processHeroImage, deleteHeroImages } = require('../utils/image-processor');
+const { applyTranslations } = require('../services/translation.service');
 
 const prisma = new PrismaClient();
 
@@ -30,17 +31,24 @@ const upload = multer({
 // GET all published hero slides (public)
 router.get('/', async (req, res) => {
   try {
-    const slides = await prisma.heroSlide.findMany({
+    const rawSlides = await prisma.heroSlide.findMany({
       where: { status: 'published' },
       orderBy: { order: 'asc' }
     });
 
+    // ?lang=en|nl : traduire les slides avant l'enrichissement
+    const lang = req.query.lang;
+    const slides = await applyTranslations('HeroSlide', rawSlides, lang);
+
     // Enrichir avec les données des événements liés
     const enrichedSlides = await Promise.all(slides.map(async (slide) => {
       if (slide.eventId) {
-        const event = await prisma.event.findUnique({
+        const rawEvent = await prisma.event.findUnique({
           where: { id: slide.eventId }
         });
+        // Le titre du slide provient alors de l'evenement : il faut donc
+        // traduire l'evenement, pas seulement le slide.
+        const [event] = rawEvent ? await applyTranslations('Event', [rawEvent], lang) : [null];
         if (event) {
           return {
             ...slide,
