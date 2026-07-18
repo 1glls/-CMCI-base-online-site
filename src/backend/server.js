@@ -27,6 +27,8 @@ app.use('/api/ministries', require('./routes/ministries.routes'));
 app.use('/api/forms', require('./routes/forms.routes'));
 app.use('/api/backup', require('./routes/backup.routes'));
 app.use('/api/translations', require('./routes/translations.routes'));
+app.use('/api/books', require('./routes/books.routes'));
+app.use('/api/tracts', require('./routes/tracts.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

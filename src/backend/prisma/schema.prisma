@@ -222,3 +222,61 @@ model ContentTranslation {
   @@index([model, recordId, language])
   @@map("content_translations")
 }
+
+// ---------------------------------------------------------------------------
+// Section « Livre & litterature »
+// ---------------------------------------------------------------------------
+
+model Book {
+  id           String   @id @default(uuid())
+  title        String
+  author       String?
+  description  String
+  cover        String?  // /uploads/books/covers/...
+  file         String?  // /uploads/books/files/...   PDF complet
+  preview      String?  // extrait PDF optionnel
+  externalLink String?
+  order        Int      @default(0)
+  status       String   @default("published")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("books")
+}
+
+model Tract {
+  id          String         @id @default(uuid())
+  slug        String         @unique   // "recevoir-jesus" — cible du QR-code
+  title       String
+  description String
+  cover       String?
+  order       Int            @default(0)
+  status      String         @default("published")
+  versions    TractVersion[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("tracts")
+}
+
+/// Une version linguistique d'un tract.
+/// `reviewed` conditionne la publication : une traduction non relue par un
+/// locuteur natif reste invisible, quel que soit son statut.
+model TractVersion {
+  id        String   @id @default(uuid())
+  tractId   String
+  tract     Tract    @relation(fields: [tractId], references: [id], onDelete: Cascade)
+  language  String                       // ISO 639-1/3
+  label     String                       // nom natif : "Kiswahili", "العربية"
+  dir       String   @default("ltr")
+  title     String
+  file      String?                      // PDF
+  previews  String?                      // JSON: ["/uploads/tracts/previews/...png"]
+  reviewed  Boolean  @default(false)
+  status    String   @default("draft")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tractId, language])
+  @@map("tract_versions")
+}
