@@ -17,7 +17,9 @@
     "upcomingEvents": "Prochains événements",
     "prevSlide": "Slide précédent",
     "nextSlide": "Slide suivant",
-    "goToSlide": "Aller au slide"
+    "goToSlide": "Aller au slide",
+    "verse": "Allez, faites de toutes les nations des disciples, les baptisant au nom du Père, du Fils et du Saint-Esprit.",
+    "verseRef": "Matthieu 28:19-20"
   },
   "about": {
     "label": "À propos",

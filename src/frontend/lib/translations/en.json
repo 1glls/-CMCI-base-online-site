@@ -17,7 +17,9 @@
     "upcomingEvents": "Upcoming events",
     "prevSlide": "Previous slide",
     "nextSlide": "Next slide",
-    "goToSlide": "Go to slide"
+    "goToSlide": "Go to slide",
+    "verse": "Go therefore and make disciples of all the nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.",
+    "verseRef": "Matthew 28:19-20"
   },
   "about": {
     "label": "About",

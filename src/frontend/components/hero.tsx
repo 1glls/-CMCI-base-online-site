@@ -176,8 +176,8 @@ export function Hero() {
 
           {/* Bible Verse */}
           <p className="italic text-base md:text-lg opacity-80 mb-10 max-w-2xl mx-auto animate-fade-in-up animation-delay-400">
-            &laquo; Allez, faites de toutes les nations des disciples, les baptisant au nom du Pere, du Fils et du Saint-Esprit. &raquo;
-            <span className="block mt-2 text-sm">- Matthieu 28:19-20</span>
+            &laquo; {t('hero.verse')} &raquo;
+            <span className="block mt-2 text-sm">- {t('hero.verseRef')}</span>
           </p>
 
           {/* CTA Buttons */}

@@ -214,11 +214,14 @@ function requestRaw(host, path, apiKey, payload) {
 
 /** Champs traduisibles par modele. Tout le reste est ignore. */
 const TRANSLATABLE = {
-  Event: ['title', 'description', 'location'],
+  // Les libelles de boutons sont saisis en admin : ils doivent suivre la
+  // langue comme le reste, sinon un « Je viens » francais subsiste au milieu
+  // d'une page neerlandaise.
+  Event: ['title', 'description', 'location', 'registrationButtonText', 'exploreButtonText'],
   Ministry: ['title', 'description'],
   Assembly: ['name', 'description', 'schedule'],
   Testimonial: ['quote', 'role'],
-  HeroSlide: ['title', 'subtitle']
+  HeroSlide: ['title', 'subtitle', 'buttonText']
 };
 
 /**
