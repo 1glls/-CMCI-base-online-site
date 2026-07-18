@@ -12,7 +12,8 @@ router.get('/', async (req, res) => {
       where: { status: 'published' },
       orderBy: { city: 'asc' }
     });
-    res.json(assemblies);
+    // ?lang=en|nl : repli sur le francais quand la traduction manque
+    res.json(await applyTranslations('Assembly', assemblies, req.query.lang));
   } catch (error) {
     console.error('Error fetching assemblies:', error);
     res.status(500).json({ error: 'Failed to fetch assemblies' });

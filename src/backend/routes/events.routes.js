@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
+const { applyTranslations } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
 const prisma = new PrismaClient();
@@ -42,7 +43,8 @@ router.get('/', async (req, res) => {
       where: { status: 'published' },
       orderBy: { createdAt: 'desc' }
     });
-    res.json(events);
+    // ?lang=en|nl : repli sur le francais quand la traduction manque
+    res.json(await applyTranslations('Event', events, req.query.lang));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

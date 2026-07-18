@@ -176,3 +176,49 @@ model FormSubmission {
 
   @@map("form_submissions")
 }
+
+// ---------------------------------------------------------------------------
+// Traduction assistee du contenu de la base
+// ---------------------------------------------------------------------------
+
+/// Un compte de service de traduction (DeepL, etc.).
+/// Plusieurs comptes peuvent coexister : quand le quota de l'un est epuise,
+/// le suivant prend le relais par ordre de priorite.
+model TranslationProvider {
+  id             String   @id @default(uuid())
+  name           String                        // libelle libre, ex. "DeepL principal"
+  service        String   @default("deepl")    // deepl | libretranslate | mymemory
+  apiKey         String                        // jamais renvoyee en entier par l'API
+  characterLimit Int      @default(500000)
+  charactersUsed Int      @default(0)          // cumul local, complete par /v2/usage
+  remoteUsed     Int?                          // dernier releve cote fournisseur
+  remoteLimit    Int?
+  lastCheckedAt  DateTime?
+  active         Boolean  @default(true)
+  exhausted      Boolean  @default(false)      // pose sur erreur 456 (quota depasse)
+  priority       Int      @default(0)          // le plus petit est essaye en premier
+  lastError      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("translation_providers")
+}
+
+/// Traduction d'un champ d'un enregistrement, dans une langue donnee.
+/// Table generique : evite d'ajouter des colonnes a chaque modele traduisible.
+model ContentTranslation {
+  id        String   @id @default(uuid())
+  model     String                        // Event | Ministry | Assembly | Testimonial | HeroSlide
+  recordId  String
+  language  String                        // en | nl
+  field     String                        // title | description | ...
+  value     String
+  reviewed  Boolean  @default(false)      // corrige par un humain
+  auto      Boolean  @default(true)       // issu d'une traduction automatique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([model, recordId, language, field])
+  @@index([model, recordId, language])
+  @@map("content_translations")
+}
