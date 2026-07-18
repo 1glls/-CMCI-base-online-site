@@ -23,7 +23,7 @@ interface Event {
 }
 
 export function Events() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -36,7 +36,7 @@ export function Events() {
     const fetchEvents = async () => {
       try {
         console.log("🔍 Fetching events from:", `${API_URL}/api/events`)
-        const response = await fetch(`${API_URL}/api/events`)
+        const response = await fetch(`${API_URL}/api/events?lang=${language}`)
         console.log("📡 Response status:", response.status)
         if (response.ok) {
           const data = await response.json()
@@ -53,7 +53,7 @@ export function Events() {
     }
 
     fetchEvents()
-  }, [])
+  }, [language])
 
   useEffect(() => {
     const handleResize = () => {

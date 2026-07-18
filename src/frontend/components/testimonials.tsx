@@ -16,7 +16,7 @@ interface Testimonial {
 }
 
 export function Testimonials() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -28,7 +28,7 @@ export function Testimonials() {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/testimonials`);
+        const response = await fetch(`${API_URL}/api/testimonials?lang=${language}`);
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
@@ -44,7 +44,7 @@ export function Testimonials() {
     };
 
     fetchTestimonials();
-  }, [])
+  }, [language])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -31,7 +31,7 @@ interface HeroSlide {
 }
 
 export function Hero() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [slides, setSlides] = useState<HeroSlide[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -40,7 +40,7 @@ export function Hero() {
     const fetchSlidesAndEvents = async () => {
       try {
         // Charger les slides hero personnalisés
-        const slidesResponse = await fetch(`${API_URL}/api/hero`)
+        const slidesResponse = await fetch(`${API_URL}/api/hero?lang=${language}`)
         const customSlides = await slidesResponse.json()
 
         console.log("✅ Hero slides chargées:", customSlides)
@@ -57,7 +57,7 @@ export function Hero() {
     }
 
     fetchSlidesAndEvents()
-  }, [])
+  }, [language])
 
   useEffect(() => {
     if (slides.length === 0) return

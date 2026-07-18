@@ -26,17 +26,17 @@ const iconMap: { [key: string]: any } = {
 };
 
 export default function Ministries() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchMinistries();
-  }, []);
+  }, [language]);
 
   const fetchMinistries = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/ministries`);
+      const response = await fetch(`${API_URL}/api/ministries?lang=${language}`);
       const data = await response.json();
       setMinistries(data);
     } catch (error) {

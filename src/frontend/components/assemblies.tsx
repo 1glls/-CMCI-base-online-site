@@ -23,7 +23,7 @@ interface Assembly {
 }
 
 export function Assemblies() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
   const [assemblies, setAssemblies] = useState<Assembly[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,7 +51,7 @@ export function Assemblies() {
   useEffect(() => {
     const fetchAssemblies = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/assemblies`)
+        const response = await fetch(`${API_URL}/api/assemblies?lang=${language}`)
         if (response.ok) {
           const data = await response.json()
           setAssemblies(data)
@@ -64,7 +64,7 @@ export function Assemblies() {
     }
 
     fetchAssemblies()
-  }, [])
+  }, [language])
 
   return (
     <section
