@@ -75,16 +75,16 @@ export function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/50">
         <p className="flex items-center gap-1">
-          © 2026 CMCI Belgique. Tous droits reserves. Fait avec{" "}
+          © 2026 CMCI Belgique. Tous droits réservés. Fait avec{" "}
           <Heart size={14} className="text-accent" /> pour la gloire de
           Dieu.
         </p>
         <div className="flex gap-6">
           <Link href="#" className="hover:text-white transition-colors">
-          Mentions legales
+          Mentions légales
           </Link>
           <Link href="#" className="hover:text-white transition-colors">
-          Politique de confidentialite
+          Politique de confidentialité
           </Link>
         </div>
         </div>
