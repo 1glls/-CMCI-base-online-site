@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { API_URL } from "@/lib/api"
+import { API_URL, getImageUrl } from "@/lib/api"
 
 interface Testimonial {
   id: string;
@@ -14,49 +14,13 @@ interface Testimonial {
   quote: string;
 }
 
-const defaultTestimonials = [
-  {
-    id: "1",
-    name: "Marie D.",
-    role: "Membre depuis 2020",
-    image: "/images/person-1.jpg",
-    quote:
-      "La CMCI a transforme ma vie spirituelle. J'ai decouvert ce que signifie vraiment etre disciple de Jesus. La chaleur de la communaute et la profondeur des enseignements m'ont permis de grandir comme jamais auparavant.",
-  },
-  {
-    id: "2",
-    name: "Jean-Pierre M.",
-    role: "Membre depuis 2018",
-    image: "/images/person-2.jpg",
-    quote:
-      "Rejoindre la CMCI Belgique a ete l'une des meilleures decisions de ma vie. J'ai trouve une famille spirituelle authentique et une vision claire pour servir Dieu dans ma generation.",
-  },
-  {
-    id: "3",
-    name: "Emmanuel K.",
-    role: "Responsable jeunesse",
-    image: "/images/person-3.jpg",
-    quote:
-      "La formation des disciples est au coeur de ce que nous faisons. Voir des jeunes se lever pour Christ et impacter leur entourage est notre plus grande joie. CMCI m'a donne les outils pour servir efficacement.",
-  },
-]
-
 export function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(defaultTestimonials)
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
-  // Helper function to get the correct image URL
-  const getImageUrl = (src?: string) => {
-    if (!src) return "/placeholder.svg";
-    // If it starts with /uploads, prepend backend URL
-    if (src.startsWith('/uploads')) {
-      return `${API_URL}${src}`;
-    }
-    // Otherwise return as is (external URL)
-    return src;
-  };
 
   // Fetch testimonials from backend
   useEffect(() => {
@@ -65,13 +29,15 @@ export function Testimonials() {
         const response = await fetch(`${API_URL}/api/testimonials`);
         if (response.ok) {
           const data = await response.json();
-          if (data.length > 0) {
+          if (Array.isArray(data)) {
             setTestimonials(data);
           }
         }
       } catch (error) {
         console.error('Error fetching testimonials:', error);
-        // Keep default testimonials on error
+        // Aucun contenu de repli : mieux vaut ne rien afficher qu'un faux temoignage
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -96,10 +62,12 @@ export function Testimonials() {
   }, [])
 
   const nextTestimonial = () => {
+    if (testimonials.length === 0) return
     setCurrentIndex((prev) => (prev + 1) % testimonials.length)
   }
 
   const prevTestimonial = () => {
+    if (testimonials.length === 0) return
     setCurrentIndex(
       (prev) => (prev - 1 + testimonials.length) % testimonials.length
     )
@@ -128,7 +96,19 @@ export function Testimonials() {
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
 
+        {/* Etats vides : ni squelette trompeur, ni faux contenu */}
+        {loading && (
+          <p className="text-center text-white/70">Chargement des temoignages...</p>
+        )}
+
+        {!loading && testimonials.length === 0 && (
+          <p className="text-center text-white/70">
+            Aucun temoignage disponible pour le moment.
+          </p>
+        )}
+
         {/* Testimonial Slider */}
+        {!loading && testimonials.length > 0 && (
         <div
           className={cn(
             "max-w-4xl mx-auto transition-all duration-700",
@@ -212,6 +192,7 @@ export function Testimonials() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </section>
   )

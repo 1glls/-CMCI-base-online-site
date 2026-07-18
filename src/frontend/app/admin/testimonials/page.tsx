@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, User } from 'lucide-react';
-import { API_URL } from '@/lib/api';
+import { API_URL, getImageUrl } from '@/lib/api';
 
 interface Testimonial {
   id: string;
@@ -35,16 +35,6 @@ export default function TestimonialsPage() {
     status: 'published'
   });
 
-  // Helper function to get the correct image URL
-  const getImageUrl = (src: string) => {
-    if (!src) return '';
-    // If it starts with /uploads, prepend backend URL
-    if (src.startsWith('/uploads')) {
-      return `${API_URL}${src}`;
-    }
-    // Otherwise return as is (external URL)
-    return src;
-  };
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');

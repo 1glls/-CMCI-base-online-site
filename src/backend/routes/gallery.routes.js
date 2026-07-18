@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
+const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
 const prisma = new PrismaClient();
 
@@ -115,9 +116,16 @@ router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), asyn
 // DELETE gallery image (admin)
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
+    const image = await prisma.galleryImage.findUnique({
+      where: { id: req.params.id }
+    });
+
     await prisma.galleryImage.delete({
       where: { id: req.params.id }
     });
+
+    await deleteUploadedFile(image?.src);
+
     res.json({ message: 'Gallery image deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });

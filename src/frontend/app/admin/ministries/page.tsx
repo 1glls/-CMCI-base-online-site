@@ -22,7 +22,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { API_URL } from '@/lib/api';
+import { API_URL, getImageUrl } from '@/lib/api';
 
 interface Ministry {
   id: string;
@@ -50,14 +50,26 @@ export default function AdminMinistriesPage() {
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     icon: 'BookOpen',
+    image: '',
     order: 0,
     status: 'published',
     link: '#contact'
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -92,13 +104,30 @@ export default function AdminMinistriesPage() {
         ? `${API_URL}/api/ministries/${editingId}`
         : `${API_URL}/api/ministries`;
       
+      // FormData si un fichier est joint, JSON sinon
+      let body: BodyInit;
+      const headers: HeadersInit = { Authorization: `Bearer ${token}` };
+
+      if (imageFile) {
+        const formDataToSend = new FormData();
+        formDataToSend.append('title', formData.title);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('icon', formData.icon);
+        formDataToSend.append('order', String(formData.order));
+        formDataToSend.append('status', formData.status);
+        formDataToSend.append('link', formData.link);
+        formDataToSend.append('image', imageFile);
+        body = formDataToSend;
+        // Pas de Content-Type manuel : le navigateur pose la boundary
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(formData);
+      }
+
       const response = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
+        headers,
+        body
       });
 
       if (response.ok) {
@@ -123,10 +152,13 @@ export default function AdminMinistriesPage() {
       title: ministry.title,
       description: ministry.description,
       icon: ministry.icon,
+      image: ministry.image || '',
       order: ministry.order,
       status: ministry.status,
       link: ministry.link || '#contact'
     });
+    setImageFile(null);
+    setImagePreview('');
     setEditingId(ministry.id);
     setIsEditing(true);
   };
@@ -162,10 +194,13 @@ export default function AdminMinistriesPage() {
       title: '',
       description: '',
       icon: 'BookOpen',
+      image: '',
       order: 0,
       status: 'published',
       link: '#contact'
     });
+    setImageFile(null);
+    setImagePreview('');
     setEditingId(null);
     setIsEditing(false);
   };
@@ -234,6 +269,36 @@ export default function AdminMinistriesPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="image">Image</Label>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Ou renseignez une URL externe ci-dessous. 15 Mo maximum.
+                  </p>
+                  <Input
+                    className="mt-2"
+                    value={formData.image}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    placeholder="https://exemple.com/image.jpg"
+                    disabled={!!imageFile}
+                  />
+                  {(imagePreview || formData.image) && (
+                    <div className="mt-2">
+                      <p className="text-xs text-gray-600 mb-1">Aperçu :</p>
+                      <img
+                        src={imagePreview || getImageUrl(formData.image)}
+                        alt="Aperçu"
+                        className="w-full max-w-md h-40 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

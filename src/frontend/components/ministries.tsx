@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Users, BookOpen, Book, Heart, Library, ArrowRight } from 'lucide-react';
-import { API_URL } from '@/lib/api';
+import { API_URL, getImageUrl } from '@/lib/api';
 
 interface Ministry {
   id: string;
@@ -93,7 +93,7 @@ export default function Ministries() {
               {ministry.image && (
                 <div className="relative h-48 w-full overflow-hidden">
                   <img 
-                    src={ministry.image} 
+                    src={getImageUrl(ministry.image)} 
                     alt={ministry.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />

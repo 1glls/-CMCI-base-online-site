@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
+const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
 const prisma = new PrismaClient();
 
@@ -134,9 +135,16 @@ router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), asyn
 // DELETE event (admin)
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
+    const event = await prisma.event.findUnique({
+      where: { id: req.params.id }
+    });
+
     await prisma.event.delete({
       where: { id: req.params.id }
     });
+
+    await deleteUploadedFile(event?.image);
+
     res.json({ message: 'Event deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });

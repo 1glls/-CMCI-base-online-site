@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { API_URL } from "@/lib/api"
+import { API_URL, getImageUrl } from "@/lib/api"
 
 interface GalleryItem {
   id: string;
@@ -13,63 +13,15 @@ interface GalleryItem {
   category: string;
 }
 
-const defaultGalleryItems: GalleryItem[] = [
-  {
-    id: "1",
-    src: "/images/gallery-1.jpg",
-    alt: "Culte dominical",
-    category: "Cultes",
-  },
-  {
-    id: "2",
-    src: "/images/gallery-2.jpg",
-    alt: "Etude biblique jeunesse",
-    category: "Jeunesse",
-  },
-  {
-    id: "3",
-    src: "/images/gallery-3.jpg",
-    alt: "Mission de rue",
-    category: "Missions",
-  },
-  {
-    id: "4",
-    src: "/images/gallery-4.jpg",
-    alt: "Bapteme",
-    category: "Evenements",
-  },
-  {
-    id: "5",
-    src: "/images/gallery-5.jpg",
-    alt: "Chorale",
-    category: "Cultes",
-  },
-  {
-    id: "6",
-    src: "/images/gallery-6.jpg",
-    alt: "Repas communautaire",
-    category: "Evenements",
-  },
-]
-
 export function Gallery() {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(defaultGalleryItems)
-  const [categories, setCategories] = useState<string[]>(["Tous", "Cultes", "Jeunesse", "Missions", "Evenements"])
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
+  const [categories, setCategories] = useState<string[]>(["Tous"])
+  const [loading, setLoading] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
   const [activeCategory, setActiveCategory] = useState("Tous")
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
-  // Helper function to get the correct image URL
-  const getImageUrl = (src: string) => {
-    if (!src) return "/placeholder.svg";
-    // If it starts with /uploads, prepend backend URL
-    if (src.startsWith('/uploads')) {
-      return `${API_URL}${src}`;
-    }
-    // Otherwise return as is (external URL)
-    return src;
-  };
 
   // Fetch gallery images from backend
   useEffect(() => {
@@ -78,9 +30,9 @@ export function Gallery() {
         const response = await fetch(`${API_URL}/api/gallery`);
         if (response.ok) {
           const data = await response.json();
-          if (data.length > 0) {
+          if (Array.isArray(data)) {
             setGalleryItems(data);
-            
+
             // Extract unique categories from data
             const uniqueCategories = Array.from(new Set(data.map((item: GalleryItem) => item.category)));
             setCategories(["Tous", ...uniqueCategories]);
@@ -88,7 +40,9 @@ export function Gallery() {
         }
       } catch (error) {
         console.error('Error fetching gallery images:', error);
-        // Keep default gallery items on error
+        // Aucun contenu de repli : la galerie affichee doit refleter la base
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -135,6 +89,18 @@ export function Gallery() {
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
 
+        {loading && (
+          <p className="text-center text-muted-foreground">Chargement de la galerie...</p>
+        )}
+
+        {!loading && galleryItems.length === 0 && (
+          <p className="text-center text-muted-foreground">
+            Aucune photo disponible pour le moment.
+          </p>
+        )}
+
+        {!loading && galleryItems.length > 0 && (
+        <>
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {categories.map((category) => (
@@ -190,6 +156,8 @@ export function Gallery() {
             Voir plus de photos
           </button>
         </div>
+        </>
+        )}
       </div>
 
       {/* Lightbox */}

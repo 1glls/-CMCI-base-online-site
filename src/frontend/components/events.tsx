@@ -217,7 +217,7 @@ export function Events() {
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={getImageUrl(event.image)}
+                      src={getImageUrl(event.image, '/images/event-conference.jpg')}
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

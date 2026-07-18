@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
+const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
 const prisma = new PrismaClient();
 
@@ -131,10 +132,18 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
 // DELETE ministry (admin)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
+    const ministry = await prisma.ministry.findUnique({
+      where: { id: req.params.id }
+    });
+
     await prisma.ministry.delete({
       where: { id: req.params.id }
     });
-    
+
+    // Apres la suppression en base : un fichier orphelin est moins grave
+    // qu'un enregistrement dont le fichier a disparu.
+    await deleteUploadedFile(ministry?.image);
+
     res.json({ message: 'Ministry deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
