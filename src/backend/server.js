@@ -25,6 +25,7 @@ app.use('/api/newsletter', require('./routes/newsletter.routes'));
 app.use('/api/assemblies', require('./routes/assemblies.routes'));
 app.use('/api/ministries', require('./routes/ministries.routes'));
 app.use('/api/forms', require('./routes/forms.routes'));
+app.use('/api/backup', require('./routes/backup.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

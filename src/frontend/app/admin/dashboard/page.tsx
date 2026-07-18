@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList } from "lucide-react"
+import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup } from "lucide-react"
 import { API_URL } from "@/lib/api"
 
 export default function AdminDashboard() {
@@ -162,6 +162,12 @@ export default function AdminDashboard() {
       description: "Configuration",
       icon: Settings,
       href: "/admin/settings",
+    },
+    {
+      title: "Sauvegardes",
+      description: "Sauvegarder la base de données",
+      icon: DatabaseBackup,
+      href: "/admin/backup",
     },
   ]
 
