@@ -62,7 +62,7 @@ export function Header() {
             isScrolled ? "text-foreground" : "text-white"
           )}>
             <span className="font-serif font-bold text-lg">CMCI</span>
-            <span className="block text-xs opacity-80">Belgique</span>
+            <span className="block text-xs opacity-80">{t('nav.country')}</span>
           </div>
         </Link>
 
@@ -91,7 +91,7 @@ export function Header() {
             asChild
             className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
           >
-            <Link href="#contact">Nous rejoindre</Link>
+            <Link href="#contact">{t('nav.join')}</Link>
           </Button>
         </div>
 

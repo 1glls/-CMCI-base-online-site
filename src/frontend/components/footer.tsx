@@ -12,14 +12,6 @@ import {
   Heart,
 } from "lucide-react"
 
-const quickLinks = [
-  { href: "#accueil", label: "Accueil" },
-  { href: "#vision", label: "Notre Vision" },
-  { href: "#valeurs", label: "Nos Valeurs" },
-  { href: "#evenements", label: "Événements" },
-  { href: "#assemblees", label: "Assemblées" },
-  { href: "#galerie", label: "Galerie" },
-]
 
 const socialLinks = [
   { href: "https://facebook.com", icon: Facebook, label: "Facebook" },
@@ -29,6 +21,18 @@ const socialLinks = [
 
 export function Footer() {
   const { t } = useLanguage()
+
+  // Defini a l'interieur du composant : hors du cycle de rendu, les libelles
+  // resteraient en francais au changement de langue.
+  const quickLinks = [
+    { href: "#accueil", label: t('nav.home') },
+    { href: "#vision", label: t('nav.vision') },
+    { href: "#valeurs", label: t('nav.values') },
+    { href: "#evenements", label: t('nav.events') },
+    { href: "#assemblees", label: t('nav.assemblies') },
+    { href: "#galerie", label: t('nav.gallery') },
+  ]
+
   return (
     <footer className="bg-dark text-white">
       <div className="container mx-auto px-4 py-16">
@@ -41,19 +45,17 @@ export function Footer() {
           </div>
           <div>
           <span className="font-serif font-bold text-lg">CMCI</span>
-          <span className="block text-sm text-white/60">Belgique</span>
+          <span className="block text-sm text-white/60">{t('nav.country')}</span>
           </div>
         </div>
         <p className="text-white/70 leading-relaxed mb-6">
-          La Communauté Missionnaire Chrétienne Internationale en Belgique -
-          une famille de disciples dévoués à Jésus-Christ, notre modèle en
-          toutes choses.
+          {t('footer.aboutText')}
         </p>
         </div>
 
         {/* Column 2: Quick Links */}
         <div>
-        <h3 className="font-serif font-bold text-lg mb-6">Liens Rapides</h3>
+        <h3 className="font-serif font-bold text-lg mb-6">{t('footer.quickLinks')}</h3>
         <ul className="space-y-3">
           {quickLinks.map((link) => (
           <li key={link.href}>
