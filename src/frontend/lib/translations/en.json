@@ -3,14 +3,21 @@
     "home": "Home",
     "about": "About",
     "vision": "Vision",
+    "values": "Our Values",
     "ministries": "Ministries",
     "events": "Events",
     "assemblies": "Assemblies",
+    "gallery": "Gallery",
     "testimonials": "Testimonials",
     "contact": "Contact"
   },
   "hero": {
-    "discover": "Discover"
+    "discover": "Discover",
+    "discoverVision": "Discover our vision",
+    "upcomingEvents": "Upcoming events",
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "goToSlide": "Go to slide"
   },
   "about": {
     "label": "About",
@@ -27,83 +34,99 @@
     "assemblies": "assemblies"
   },
   "values": {
-    "label": "Our values",
-    "title": "What we believe in",
-    "subtitle": "Our core values guide our life and mission",
-    "faith": {
-      "title": "Living faith",
-      "description": "An authentic faith that transforms and inspires, based on God's Word"
-    },
+    "label": "Our Pillars",
+    "title": "Our Core Values",
     "community": {
-      "title": "Fellowship",
-      "description": "A spiritual family united by Christ's love and mutual support"
+      "title": "Community",
+      "description": "We are a spiritual family united by the love of Christ, living in fellowship and mutual support."
     },
-    "service": {
-      "title": "Devoted service",
-      "description": "Serving God and our neighbor with excellence and dedication"
+    "missionary": {
+      "title": "Missionary",
+      "description": "We are called to carry the Gospel everywhere, making disciples in all nations according to the commandment of Jesus."
     },
-    "growth": {
-      "title": "Continuous growth",
-      "description": "Constant spiritual development to fulfill our destiny"
-    }
+    "christian": {
+      "title": "Christian",
+      "description": "Christ is our foundation, our model and our goal. We live by His Word and walk by His Spirit."
+    },
+    "international": {
+      "title": "International",
+      "description": "We welcome every nation in the love of God, reflecting the diversity of the Kingdom of heaven on earth."
+    },
+    "closing": "C.M.C.I. - Four letters, one mission: to transform the world through the power of the Gospel."
   },
   "vision": {
-    "label": "Our vision",
-    "title": "Training disciples to impact nations",
-    "subtitle": "Our vision is clear: equip every believer to fully live their faith",
+    "label": "Our Vision",
+    "title": "Transforming the world through the Gospel",
     "item1": {
-      "title": "Biblical training",
-      "description": "Equipping disciples through solid and practical teaching of the Word"
+      "title": "Evangelise the world",
+      "description": "To reach 10 billion people with the Gospel in the power of the Holy Spirit, proclaiming the message of salvation to all nations."
     },
     "item2": {
-      "title": "Missionary impact",
-      "description": "Reaching nations with the Gospel and transforming communities"
+      "title": "Make disciples",
+      "description": "1 billion disciples in 250 nations organised into 25 million house churches by 2065, following the model of Jesus."
     },
     "item3": {
-      "title": "Leadership",
-      "description": "Training leaders according to Christ's model to serve the Church"
+      "title": "Pray for revival",
+      "description": "To cooperate with God through fasting and intercession for worldwide revival, preparing the glorious return of our Lord."
     }
   },
   "ministries": {
-    "label": "Our ministries",
-    "title": "Serving together",
-    "subtitle": "Discover our different ministries and find your place to serve"
+    "label": "Our Ministries",
+    "title": "Our Ministries at CMCI",
+    "subtitle": "Discover the main ministries currently active in our church. If you would like to get involved in one of them, please do not hesitate to contact us.",
+    "loading": "Loading...",
+    "noMinistries": "No ministry available at the moment.",
+    "learnMore": "Learn more",
+    "joinTitle": "Join one of our ministries",
+    "joinText": "We would be delighted to welcome you into one of our ministries.",
+    "joinButton": "Contact us"
   },
   "events": {
-    "label": "Events",
-    "title": "Our upcoming events",
-    "subtitle": "Join us for moments of fellowship, worship and teaching",
+    "label": "Agenda",
+    "title": "Upcoming Events",
+    "loading": "Loading events...",
+    "noEvents": "No upcoming events at the moment.",
     "moreInfo": "More info",
-    "noEvents": "No upcoming events at the moment."
+    "register": "Register",
+    "prevEvent": "Previous event",
+    "nextEvent": "Next event"
   },
   "assemblies": {
-    "label": "Our assemblies",
-    "title": "Find an assembly near you",
-    "subtitle": "We are present in several cities in Belgium. Join a community near you",
-    "viewAll": "View all our assemblies",
+    "label": "Find Us",
+    "title": "Our Assemblies in Belgium",
+    "subtitle": "Join us in one of our assemblies to experience fellowship and grow together in faith.",
+    "viewAll": "See all our assemblies",
     "loading": "Loading assemblies...",
-    "schedule": "Service schedules",
+    "noAssemblies": "No assembly available at the moment.",
+    "schedule": "Service times",
     "address": "Address",
     "contact": "Contact"
   },
   "testimonials": {
     "label": "Testimonials",
-    "title": "They testify",
-    "subtitle": "Discover how God transforms lives through our community",
-    "noTestimonials": "No testimonials available at the moment."
+    "title": "What our members say",
+    "loading": "Loading testimonials...",
+    "noTestimonials": "No testimonial available at the moment.",
+    "prevTestimonial": "Previous testimonial",
+    "nextTestimonial": "Next testimonial",
+    "goToTestimonial": "Go to testimonial"
   },
   "gallery": {
-    "label": "Gallery",
-    "title": "Our moments in pictures",
-    "subtitle": "Discover the life of our community through these shared moments"
+    "label": "Memories",
+    "title": "Our Photo Gallery",
+    "loading": "Loading gallery...",
+    "noPhotos": "No photo available at the moment.",
+    "seeMore": "See more photos",
+    "allCategories": "All",
+    "enlargedImage": "Enlarged image"
   },
   "contact": {
     "title": "Contact us",
-    "subtitle": "We are here to accompany you in your spiritual journey.",
+    "subtitle": "We are here to walk with you on your spiritual journey.",
     "phone": "Phone",
     "email": "Email",
     "address": "Address",
-    "hours": "Hours",
+    "hours": "Opening hours",
     "newsletter": {
       "title": "Newsletter",
       "description": "Receive our latest news, events and inspiring messages.",
@@ -115,15 +138,18 @@
     },
     "social": {
       "title": "Stay connected with us on social media",
-      "subtitle": "Follow us to not miss any of our activities, events and inspiring messages."
+      "subtitle": "Follow us so you never miss our activities, events and inspiring messages."
     }
   },
   "footer": {
     "about": "About",
-    "aboutText": "CMCI Belgium is a Christian community dedicated to training disciples of Jesus Christ and impacting nations with the Gospel.",
+    "aboutText": "The International Christian Missionary Community in Belgium - a family of disciples devoted to Jesus Christ, our model in all things.",
     "quickLinks": "Quick links",
     "followUs": "Follow us",
     "rights": "All rights reserved. Made with",
-    "by": "by"
+    "forGlory": "for the glory of God.",
+    "by": "by",
+    "legal": "Legal notice",
+    "privacy": "Privacy policy"
   }
 }

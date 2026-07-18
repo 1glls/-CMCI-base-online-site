@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { API_URL } from "@/lib/api"
 
 interface HeroSlide {
@@ -30,6 +31,7 @@ interface HeroSlide {
 }
 
 export function Hero() {
+  const { t } = useLanguage()
   const [slides, setSlides] = useState<HeroSlide[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -82,7 +84,7 @@ export function Hero() {
     return (
       <section id="accueil" className="relative h-screen min-h-[600px] overflow-hidden bg-primary">
         <div className="absolute inset-0 flex items-center justify-center text-white">
-          <p>Chargement...</p>
+          <p>{t('ministries.loading')}</p>
         </div>
       </section>
     )
@@ -188,7 +190,7 @@ export function Hero() {
                 element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
             >
-              Découvrir notre vision
+              {t('hero.discoverVision')}
             </Button>
             <Button
               size="lg"
@@ -199,7 +201,7 @@ export function Hero() {
                 element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
             >
-              Prochains événements
+              {t('hero.upcomingEvents')}
             </Button>
           </div>
         </div>
@@ -209,14 +211,14 @@ export function Hero() {
       <button
         onClick={prevSlide}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-white/20 hover:bg-white/40 transition-colors text-white"
-        aria-label="Slide précédent"
+        aria-label={t("hero.prevSlide")}
       >
         <ChevronLeft size={24} />
       </button>
       <button
         onClick={nextSlide}
         className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-white/20 hover:bg-white/40 transition-colors text-white"
-        aria-label="Slide suivant"
+        aria-label={t("hero.nextSlide")}
       >
         <ChevronRight size={24} />
       </button>
@@ -233,7 +235,7 @@ export function Hero() {
                 ? "bg-accent w-8"
                 : "bg-white/50 hover:bg-white/80"
             )}
-            aria-label={`Aller au slide ${index + 1}`}
+            aria-label={`${t("hero.goToSlide")} ${index + 1}`}
           />
         ))}
       </div>

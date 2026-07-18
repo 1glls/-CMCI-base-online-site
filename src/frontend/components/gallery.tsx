@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { API_URL, getImageUrl } from "@/lib/api"
 
 interface GalleryItem {
@@ -14,11 +15,12 @@ interface GalleryItem {
 }
 
 export function Gallery() {
+  const { t } = useLanguage()
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
-  const [categories, setCategories] = useState<string[]>(["Tous"])
+  const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
-  const [activeCategory, setActiveCategory] = useState("Tous")
+  const [activeCategory, setActiveCategory] = useState("__all__")
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -35,7 +37,7 @@ export function Gallery() {
 
             // Extract unique categories from data
             const uniqueCategories = Array.from(new Set(data.map((item: GalleryItem) => item.category)));
-            setCategories(["Tous", ...uniqueCategories]);
+            setCategories(["__all__", ...uniqueCategories]);
           }
         }
       } catch (error) {
@@ -67,7 +69,7 @@ export function Gallery() {
   }, [])
 
   const filteredItems =
-    activeCategory === "Tous"
+    activeCategory === "__all__"
       ? galleryItems
       : galleryItems.filter((item) => item.category === activeCategory)
 
@@ -81,21 +83,21 @@ export function Gallery() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-            Souvenirs
+            {t('gallery.label')}
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Notre Galerie Photo
+            {t('gallery.title')}
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
 
         {loading && (
-          <p className="text-center text-muted-foreground">Chargement de la galerie...</p>
+          <p className="text-center text-muted-foreground">{t('gallery.loading')}</p>
         )}
 
         {!loading && galleryItems.length === 0 && (
           <p className="text-center text-muted-foreground">
-            Aucune photo disponible pour le moment.
+            {t('gallery.noPhotos')}
           </p>
         )}
 
@@ -114,7 +116,7 @@ export function Gallery() {
                   : "bg-white text-muted-foreground hover:bg-primary/10"
               )}
             >
-              {category}
+              {category === "__all__" ? t('gallery.allCategories') : category}
             </button>
           ))}
         </div>
@@ -153,7 +155,7 @@ export function Gallery() {
         {/* See More Button */}
         <div className="text-center mt-10">
           <button className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary rounded-full font-medium hover:bg-primary hover:text-white transition-colors">
-            Voir plus de photos
+            {t('gallery.seeMore')}
           </button>
         </div>
         </>
@@ -176,7 +178,7 @@ export function Gallery() {
           <div className="relative max-w-5xl w-full aspect-[16/10]">
             <Image
               src={lightboxImage || "/placeholder.svg"}
-              alt="Image agrandie"
+              alt={t("gallery.enlargedImage")}
               fill
               className="object-contain"
               onClick={(e) => e.stopPropagation()}

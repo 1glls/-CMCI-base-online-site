@@ -3,14 +3,21 @@
     "home": "Home",
     "about": "Over ons",
     "vision": "Visie",
+    "values": "Onze Waarden",
     "ministries": "Ministeries",
     "events": "Evenementen",
     "assemblies": "Gemeentes",
+    "gallery": "Galerij",
     "testimonials": "Getuigenissen",
     "contact": "Contact"
   },
   "hero": {
-    "discover": "Ontdekken"
+    "discover": "Ontdekken",
+    "discoverVision": "Ontdek onze visie",
+    "upcomingEvents": "Komende evenementen",
+    "prevSlide": "Vorige slide",
+    "nextSlide": "Volgende slide",
+    "goToSlide": "Ga naar slide"
   },
   "about": {
     "label": "Over ons",
@@ -27,103 +34,122 @@
     "assemblies": "gemeentes"
   },
   "values": {
-    "label": "Onze waarden",
-    "title": "Waar we in geloven",
-    "subtitle": "Onze kernwaarden leiden ons leven en onze missie",
-    "faith": {
-      "title": "Levend geloof",
-      "description": "Een authentiek geloof dat transformeert en inspireert, gebaseerd op Gods Woord"
-    },
+    "label": "Onze Pijlers",
+    "title": "Onze Kernwaarden",
     "community": {
-      "title": "Broederschap",
-      "description": "Een spirituele familie verenigd door Christus' liefde en wederzijdse steun"
+      "title": "Gemeenschap",
+      "description": "Wij zijn een geestelijke familie, verenigd door de liefde van Christus, levend in broederlijke gemeenschap en onderlinge steun."
     },
-    "service": {
-      "title": "Toegewijde dienst",
-      "description": "God en onze naaste dienen met uitmuntendheid en toewijding"
+    "missionary": {
+      "title": "Missionair",
+      "description": "Wij zijn geroepen om het Evangelie overal te brengen en discipelen te maken in alle naties, volgens het gebod van Jezus."
     },
-    "growth": {
-      "title": "Continue groei",
-      "description": "Constante spirituele ontwikkeling om onze bestemming te vervullen"
-    }
+    "christian": {
+      "title": "Christelijk",
+      "description": "Christus is ons fundament, ons model en ons doel. Wij leven naar Zijn Woord en wandelen door Zijn Geest."
+    },
+    "international": {
+      "title": "Internationaal",
+      "description": "Wij verwelkomen alle naties in de liefde van God en weerspiegelen zo de diversiteit van het Koninkrijk der hemelen op aarde."
+    },
+    "closing": "C.M.C.I. - Vier letters, één missie: de wereld transformeren door de kracht van het Evangelie."
   },
   "vision": {
-    "label": "Onze visie",
-    "title": "Discipelen vormen om naties te beïnvloeden",
-    "subtitle": "Onze visie is duidelijk: elk gelovige uitrusten om hun geloof ten volle te leven",
+    "label": "Onze Visie",
+    "title": "De wereld transformeren door het Evangelie",
     "item1": {
-      "title": "Bijbelse vorming",
-      "description": "Discipelen uitrusten door solide en praktisch onderwijs van het Woord"
+      "title": "De wereld evangeliseren",
+      "description": "10 miljard mensen bereiken met het Evangelie in de kracht van de Heilige Geest, en de boodschap van redding verkondigen aan alle naties."
     },
     "item2": {
-      "title": "Missionaire impact",
-      "description": "Naties bereiken met het Evangelie en gemeenschappen transformeren"
+      "title": "Discipelen vormen",
+      "description": "1 miljard discipelen in 250 naties, georganiseerd in 25 miljoen huisgemeenten tegen 2065, naar het model van Jezus."
     },
     "item3": {
-      "title": "Leiderschap",
-      "description": "Leiders vormen volgens het model van Christus om de Kerk te dienen"
+      "title": "Bidden voor opwekking",
+      "description": "Samenwerken met God door vasten en voorbede voor wereldwijde opwekking, ter voorbereiding op de glorieuze terugkeer van onze Heer."
     }
   },
   "ministries": {
-    "label": "Onze ministeries",
-    "title": "Samen dienen",
-    "subtitle": "Ontdek onze verschillende ministeries en vind je plaats om te dienen"
+    "label": "Onze Ministeries",
+    "title": "Onze Ministeries bij CMCI",
+    "subtitle": "Ontdek de belangrijkste ministeries die momenteel actief zijn in onze kerk. Wilt u zich bij een ervan aansluiten, neem dan gerust contact met ons op.",
+    "loading": "Laden...",
+    "noMinistries": "Momenteel geen ministerie beschikbaar.",
+    "learnMore": "Meer informatie",
+    "joinTitle": "Sluit u aan bij een van onze ministeries",
+    "joinText": "Wij verwelkomen u graag in een van onze ministeries.",
+    "joinButton": "Contact opnemen"
   },
   "events": {
-    "label": "Evenementen",
-    "title": "Onze komende evenementen",
-    "subtitle": "Sluit je bij ons aan voor momenten van gemeenschap, aanbidding en onderwijs",
+    "label": "Agenda",
+    "title": "Komende Evenementen",
+    "loading": "Evenementen laden...",
+    "noEvents": "Momenteel geen komende evenementen.",
     "moreInfo": "Meer info",
-    "noEvents": "Momenteel geen komende evenementen."
+    "register": "Inschrijven",
+    "prevEvent": "Vorig evenement",
+    "nextEvent": "Volgend evenement"
   },
   "assemblies": {
-    "label": "Onze gemeentes",
-    "title": "Vind een gemeente bij jou in de buurt",
-    "subtitle": "We zijn aanwezig in verschillende steden in België. Sluit je aan bij een gemeenschap bij jou in de buurt",
+    "label": "Ons Vinden",
+    "title": "Onze Gemeentes in België",
+    "subtitle": "Sluit u aan bij een van onze gemeentes om broederlijke gemeenschap te beleven en samen te groeien in geloof.",
     "viewAll": "Bekijk al onze gemeentes",
     "loading": "Gemeentes laden...",
-    "schedule": "Dienstroosters",
+    "noAssemblies": "Momenteel geen gemeente beschikbaar.",
+    "schedule": "Tijden van de diensten",
     "address": "Adres",
     "contact": "Contact"
   },
   "testimonials": {
     "label": "Getuigenissen",
-    "title": "Zij getuigen",
-    "subtitle": "Ontdek hoe God levens transformeert door onze gemeenschap",
-    "noTestimonials": "Momenteel geen getuigenissen beschikbaar."
+    "title": "Wat onze leden zeggen",
+    "loading": "Getuigenissen laden...",
+    "noTestimonials": "Momenteel geen getuigenis beschikbaar.",
+    "prevTestimonial": "Vorige getuigenis",
+    "nextTestimonial": "Volgende getuigenis",
+    "goToTestimonial": "Ga naar getuigenis"
   },
   "gallery": {
-    "label": "Galerij",
-    "title": "Onze momenten in beeld",
-    "subtitle": "Ontdek het leven van onze gemeenschap door deze gedeelde momenten"
+    "label": "Herinneringen",
+    "title": "Onze Fotogalerij",
+    "loading": "Galerij laden...",
+    "noPhotos": "Momenteel geen foto beschikbaar.",
+    "seeMore": "Meer foto's bekijken",
+    "allCategories": "Alle",
+    "enlargedImage": "Vergrote afbeelding"
   },
   "contact": {
-    "title": "Contacteer ons",
-    "subtitle": "We zijn hier om je te begeleiden in je spirituele reis.",
+    "title": "Neem contact op",
+    "subtitle": "Wij staan klaar om u te begeleiden op uw geestelijke weg.",
     "phone": "Telefoon",
     "email": "E-mail",
     "address": "Adres",
-    "hours": "Uren",
+    "hours": "Openingstijden",
     "newsletter": {
       "title": "Nieuwsbrief",
       "description": "Ontvang ons laatste nieuws, evenementen en inspirerende boodschappen.",
       "placeholder": "Uw e-mailadres",
-      "subscribe": "Abonneren",
-      "subscribing": "Abonneren...",
-      "success": "Bedankt! Je bent nu geabonneerd op onze nieuwsbrief.",
-      "accept": "Door je te abonneren, ga je akkoord met het ontvangen van onze communicatie."
+      "subscribe": "Inschrijven",
+      "subscribing": "Bezig met inschrijven...",
+      "success": "Bedankt! U bent nu ingeschreven voor onze nieuwsbrief.",
+      "accept": "Door u in te schrijven gaat u akkoord met het ontvangen van onze communicatie."
     },
     "social": {
-      "title": "Blijf verbonden met ons op sociale media",
-      "subtitle": "Volg ons om geen van onze activiteiten, evenementen en inspirerende berichten te missen."
+      "title": "Blijf met ons verbonden op sociale media",
+      "subtitle": "Volg ons zodat u niets mist van onze activiteiten, evenementen en inspirerende boodschappen."
     }
   },
   "footer": {
     "about": "Over ons",
-    "aboutText": "CMCI België is een christelijke gemeenschap toegewijd aan het vormen van discipelen van Jezus Christus en het beïnvloeden van naties met het Evangelie.",
+    "aboutText": "De Internationale Christelijke Missionaire Gemeenschap in België - een familie van discipelen toegewijd aan Jezus Christus, ons model in alle dingen.",
     "quickLinks": "Snelle links",
     "followUs": "Volg ons",
     "rights": "Alle rechten voorbehouden. Gemaakt met",
-    "by": "door"
+    "forGlory": "tot eer van God.",
+    "by": "door",
+    "legal": "Juridische kennisgeving",
+    "privacy": "Privacybeleid"
   }
 }

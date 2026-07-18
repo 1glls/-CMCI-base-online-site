@@ -3,14 +3,21 @@
     "home": "Accueil",
     "about": "À propos",
     "vision": "Vision",
+    "values": "Nos Valeurs",
     "ministries": "Ministères",
     "events": "Événements",
     "assemblies": "Assemblées",
+    "gallery": "Galerie",
     "testimonials": "Témoignages",
     "contact": "Contact"
   },
   "hero": {
-    "discover": "Découvrir"
+    "discover": "Découvrir",
+    "discoverVision": "Découvrir notre vision",
+    "upcomingEvents": "Prochains événements",
+    "prevSlide": "Slide précédent",
+    "nextSlide": "Slide suivant",
+    "goToSlide": "Aller au slide"
   },
   "about": {
     "label": "À propos",
@@ -27,75 +34,91 @@
     "assemblies": "assemblées"
   },
   "values": {
-    "label": "Nos valeurs",
-    "title": "Ce en quoi nous croyons",
-    "subtitle": "Nos valeurs fondamentales guident notre vie et notre mission",
-    "faith": {
-      "title": "Foi vivante",
-      "description": "Une foi authentique qui transforme et inspire, fondée sur la Parole de Dieu"
-    },
+    "label": "Nos Piliers",
+    "title": "Nos Valeurs Fondamentales",
     "community": {
-      "title": "Communion fraternelle",
-      "description": "Une famille spirituelle unie par l'amour du Christ et le soutien mutuel"
+      "title": "Communauté",
+      "description": "Nous sommes une famille spirituelle unie par l'amour du Christ, vivant dans la communion fraternelle et le soutien mutuel."
     },
-    "service": {
-      "title": "Service dévoué",
-      "description": "Servir Dieu et notre prochain avec excellence et dévouement"
+    "missionary": {
+      "title": "Missionnaire",
+      "description": "Nous sommes appelés à porter l'Évangile partout, faisant des disciples dans toutes les nations selon le commandement de Jésus."
     },
-    "growth": {
-      "title": "Croissance continue",
-      "description": "Un développement spirituel constant pour accomplir notre destinée"
-    }
+    "christian": {
+      "title": "Chrétienne",
+      "description": "Christ est notre fondement, notre modèle et notre but. Nous vivons selon Sa Parole et marchons par Son Esprit."
+    },
+    "international": {
+      "title": "Internationale",
+      "description": "Nous accueillons toutes les nations dans l'amour de Dieu, reflétant la diversité du Royaume des cieux sur terre."
+    },
+    "closing": "C.M.C.I. - Quatre lettres, une mission : transformer le monde par la puissance de l'Évangile."
   },
   "vision": {
-    "label": "Notre vision",
-    "title": "Former des disciples pour impacter les nations",
-    "subtitle": "Notre vision est claire : équiper chaque croyant pour vivre pleinement sa foi",
+    "label": "Notre Vision",
+    "title": "Transformer le monde par l'Évangile",
     "item1": {
-      "title": "Formation biblique",
-      "description": "Équiper les disciples à travers un enseignement solide et pratique de la Parole"
+      "title": "Évangéliser le monde",
+      "description": "Atteindre 10 milliards de personnes par l'Évangile dans la puissance du Saint-Esprit, proclamant le message de salut à toutes les nations."
     },
     "item2": {
-      "title": "Impact missionnaire",
-      "description": "Atteindre les nations avec l'Évangile et transformer les communautés"
+      "title": "Former des disciples",
+      "description": "1 milliard de disciples dans 250 nations organisés en 25 millions d'églises de maison d'ici 2065, suivant le modèle de Jésus."
     },
     "item3": {
-      "title": "Leadership",
-      "description": "Former des leaders selon le modèle de Christ pour servir l'Église"
+      "title": "Prier pour le réveil",
+      "description": "Coopérer avec Dieu par le jeûne et l'intercession pour le réveil mondial, préparant le retour glorieux de notre Seigneur."
     }
   },
   "ministries": {
-    "label": "Nos ministères",
-    "title": "Servir ensemble",
-    "subtitle": "Découvrez nos différents ministères et trouvez votre place pour servir"
+    "label": "Nos Ministères",
+    "title": "Nos Ministères à la CMCI",
+    "subtitle": "Découvrez nos principaux ministères actuellement en place dans notre église. Si vous souhaitez vous impliquer dans l'un de ces ministères, n'hésitez pas à nous contacter.",
+    "loading": "Chargement...",
+    "noMinistries": "Aucun ministère disponible pour le moment.",
+    "learnMore": "En savoir plus",
+    "joinTitle": "Rejoignez l'un de nos ministères",
+    "joinText": "Nous serions ravis de vous accueillir dans l'un de nos ministères.",
+    "joinButton": "Nous contacter"
   },
   "events": {
-    "label": "Événements",
-    "title": "Nos prochains événements",
-    "subtitle": "Rejoignez-nous pour des moments de communion, d'adoration et d'enseignement",
+    "label": "Agenda",
+    "title": "Prochains Événements",
+    "loading": "Chargement des événements...",
+    "noEvents": "Aucun événement à venir pour le moment.",
     "moreInfo": "Plus d'infos",
-    "noEvents": "Aucun événement à venir pour le moment."
+    "register": "S'inscrire",
+    "prevEvent": "Événement précédent",
+    "nextEvent": "Événement suivant"
   },
   "assemblies": {
-    "label": "Nos assemblées",
-    "title": "Trouvez une assemblée près de chez vous",
-    "subtitle": "Nous sommes présents dans plusieurs villes de Belgique. Rejoignez une communauté près de chez vous",
+    "label": "Nous Trouver",
+    "title": "Nos Assemblées en Belgique",
+    "subtitle": "Rejoignez-nous dans l'une de nos assemblées pour vivre la communion fraternelle et grandir ensemble dans la foi.",
     "viewAll": "Voir toutes nos assemblées",
     "loading": "Chargement des assemblées...",
+    "noAssemblies": "Aucune assemblée disponible pour le moment.",
     "schedule": "Horaires des cultes",
     "address": "Adresse",
     "contact": "Contact"
   },
   "testimonials": {
     "label": "Témoignages",
-    "title": "Ils témoignent",
-    "subtitle": "Découvrez comment Dieu transforme des vies à travers notre communauté",
-    "noTestimonials": "Aucun témoignage disponible pour le moment."
+    "title": "Ce que disent nos membres",
+    "loading": "Chargement des témoignages...",
+    "noTestimonials": "Aucun témoignage disponible pour le moment.",
+    "prevTestimonial": "Témoignage précédent",
+    "nextTestimonial": "Témoignage suivant",
+    "goToTestimonial": "Aller au témoignage"
   },
   "gallery": {
-    "label": "Galerie",
-    "title": "Nos moments en images",
-    "subtitle": "Découvrez la vie de notre communauté à travers ces moments partagés"
+    "label": "Souvenirs",
+    "title": "Notre Galerie Photo",
+    "loading": "Chargement de la galerie...",
+    "noPhotos": "Aucune photo disponible pour le moment.",
+    "seeMore": "Voir plus de photos",
+    "allCategories": "Tous",
+    "enlargedImage": "Image agrandie"
   },
   "contact": {
     "title": "Contactez-nous",
@@ -120,10 +143,13 @@
   },
   "footer": {
     "about": "À propos",
-    "aboutText": "La CMCI Belgique est une communauté chrétienne dédiée à former des disciples de Jésus-Christ et à impacter les nations avec l'Évangile.",
+    "aboutText": "La Communauté Missionnaire Chrétienne Internationale en Belgique - une famille de disciples dévoués à Jésus-Christ, notre modèle en toutes choses.",
     "quickLinks": "Liens rapides",
     "followUs": "Suivez-nous",
     "rights": "Tous droits réservés. Fait avec",
-    "by": "par"
+    "forGlory": "pour la gloire de Dieu.",
+    "by": "par",
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité"
   }
 }

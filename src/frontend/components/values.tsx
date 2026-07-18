@@ -3,39 +3,21 @@
 import { useEffect, useRef, useState } from "react"
 import { Heart, Compass, Cross, Globe2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/LanguageContext"
 
-const values = [
-  {
-    number: "01",
-    title: "Communauté",
-    icon: Heart,
-    description:
-      "Nous sommes une famille spirituelle unie par l'amour du Christ, vivant dans la communion fraternelle et le soutien mutuel.",
-  },
-  {
-    number: "02",
-    title: "Missionnaire",
-    icon: Compass,
-    description:
-      "Nous sommes appelés à porter l'Évangile partout, faisant des disciples dans toutes les nations selon le commandement de Jésus.",
-  },
-  {
-    number: "03",
-    title: "Chrétienne",
-    icon: Cross,
-    description:
-      "Christ est notre fondement, notre modèle et notre but. Nous vivons selon Sa Parole et marchons par Son Esprit.",
-  },
-  {
-    number: "04",
-    title: "Internationale",
-    icon: Globe2,
-    description:
-      "Nous accueillons toutes les nations dans l'amour de Dieu, reflétant la diversité du Royaume des cieux sur terre.",
-  },
-]
 
 export function Values() {
+  const { t } = useLanguage()
+
+  // Defini a l'interieur du composant : hors du cycle de rendu, les libelles
+  // ne reagiraient pas au changement de langue.
+  const values = [
+    { number: "01", key: "community", icon: Heart },
+    { number: "02", key: "missionary", icon: Compass },
+    { number: "03", key: "christian", icon: Cross },
+    { number: "04", key: "international", icon: Globe2 },
+  ]
+
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -72,10 +54,10 @@ export function Values() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-            Nos Piliers
+            {t('values.label')}
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mt-3 mb-4">
-            Nos Valeurs Fondamentales
+            {t('values.title')}
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
@@ -84,7 +66,7 @@ export function Values() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {values.map((value, index) => (
             <div
-              key={value.title}
+              key={value.key}
               className={cn(
                 "bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-500 group",
                 isVisible
@@ -108,11 +90,11 @@ export function Values() {
                   <div className="flex items-center gap-3 mb-3">
                     <value.icon className="w-6 h-6 text-accent" />
                     <h3 className="font-serif text-xl font-bold text-white">
-                      {value.title}
+                      {t(`values.${value.key}.title`)}
                     </h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
-                    {value.description}
+                    {t(`values.${value.key}.description`)}
                   </p>
                 </div>
               </div>
@@ -123,8 +105,7 @@ export function Values() {
         {/* Bottom Quote */}
         <div className="text-center mt-16">
           <p className="text-white/60 italic text-lg max-w-2xl mx-auto">
-            C.M.C.I. - Quatre lettres, une mission : transformer le monde par la
-            puissance de l'Évangile.
+            {t('values.closing')}
           </p>
         </div>
       </div>

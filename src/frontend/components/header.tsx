@@ -17,11 +17,11 @@ export function Header() {
   const navLinks = [
     { href: "#accueil", label: t('nav.home') },
     { href: "#vision", label: t('nav.vision') },
-    { href: "#valeurs", label: t('values.label') },
+    { href: "#valeurs", label: t('nav.values') },
     { href: "#ministeres", label: t('nav.ministries') },
     { href: "#evenements", label: t('nav.events') },
     { href: "#assemblees", label: t('nav.assemblies') },
-    { href: "#galerie", label: t('gallery.label') },
+    { href: "#galerie", label: t('nav.gallery') },
     { href: "#contact", label: t('nav.contact') },
   ]
 

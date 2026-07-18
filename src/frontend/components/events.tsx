@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Calendar, MapPin, Clock, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { API_URL, getImageUrl } from "@/lib/api"
 
 interface Event {
@@ -22,6 +23,7 @@ interface Event {
 }
 
 export function Events() {
+  const { t } = useLanguage()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -122,7 +124,7 @@ export function Events() {
     return (
       <section id="evenements" className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-muted-foreground">Chargement des événements...</p>
+          <p className="text-muted-foreground">{t('events.loading')}</p>
         </div>
       </section>
     )
@@ -134,13 +136,13 @@ export function Events() {
         <div className="container mx-auto px-4 text-center">
           <div>
             <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-              Agenda
+              {t('events.label')}
             </span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-2">
-              Prochains Événements
+              {t('events.title')}
             </h2>
             <div className="w-20 h-1 bg-accent mx-auto mb-6" />
-            <p className="text-muted-foreground">Aucun événement à venir pour le moment.</p>
+            <p className="text-muted-foreground">{t('events.noEvents')}</p>
           </div>
         </div>
       </section>
@@ -158,10 +160,10 @@ export function Events() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-              Agenda
+              {t('events.label')}
             </span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-2">
-              Prochains Événements
+              {t('events.title')}
             </h2>
             <div className="w-20 h-1 bg-accent" />
           </div>
@@ -172,7 +174,7 @@ export function Events() {
               onClick={prevSlide}
               disabled={currentIndex === 0}
               className="p-3 rounded-full border border-primary/20 hover:bg-primary hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Événement précédent"
+              aria-label={t("events.prevEvent")}
             >
               <ChevronLeft size={20} />
             </button>
@@ -180,7 +182,7 @@ export function Events() {
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
               className="p-3 rounded-full border border-primary/20 hover:bg-primary hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Événement suivant"
+              aria-label={t("events.nextEvent")}
             >
               <ChevronRight size={20} />
             </button>
@@ -256,7 +258,7 @@ export function Events() {
                           onClick={() => window.open(event.registrationUrl!, '_blank', 'noopener,noreferrer')}
                         >
                           <ExternalLink size={16} className="mr-2" />
-                          {event.registrationButtonText || "S'inscrire"}
+                          {event.registrationButtonText || t("events.register")}
                         </Button>
                       )}
                       <Button 

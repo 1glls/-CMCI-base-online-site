@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { MapPin, Clock, Phone, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { API_URL } from "@/lib/api"
 import dynamic from "next/dynamic"
 
@@ -22,6 +23,7 @@ interface Assembly {
 }
 
 export function Assemblies() {
+  const { t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
   const [assemblies, setAssemblies] = useState<Assembly[]>([])
   const [loading, setLoading] = useState(true)
@@ -74,15 +76,14 @@ export function Assemblies() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-            Nous Trouver
+            {t('assemblies.label')}
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Nos Assemblées en Belgique
+            {t('assemblies.title')}
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto mb-6" />
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Rejoignez-nous dans l'une de nos assemblées pour vivre la communion
-            fraternelle et grandir ensemble dans la foi.
+            {t('assemblies.subtitle')}
           </p>
         </div>
 
@@ -112,7 +113,7 @@ export function Assemblies() {
                 )}
               >
                 <MapPin size={20} />
-                Voir toutes nos assemblées
+                {t('assemblies.viewAll')}
               </button>
             )}
           </div>
@@ -121,12 +122,12 @@ export function Assemblies() {
           <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-accent/30 scrollbar-track-transparent hover:scrollbar-thumb-accent/50">
             {loading ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">Chargement des assemblées...</p>
+                <p className="text-muted-foreground">{t('assemblies.loading')}</p>
               </div>
             ) : assemblies.length === 0 ? (
               <div className="text-center py-8">
                 <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">Aucune assemblée disponible pour le moment</p>
+                <p className="text-muted-foreground">{t('assemblies.noAssemblies')}</p>
               </div>
             ) : (
               assemblies.map((assembly, index) => (

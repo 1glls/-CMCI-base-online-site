@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useLanguage } from "@/contexts/LanguageContext"
 import {
   Facebook,
   Youtube,
@@ -27,6 +28,7 @@ const socialLinks = [
 ]
 
 export function Footer() {
+  const { t } = useLanguage()
   return (
     <footer className="bg-dark text-white">
       <div className="container mx-auto px-4 py-16">
@@ -75,16 +77,15 @@ export function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/50">
         <p className="flex items-center gap-1">
-          © 2026 CMCI Belgique. Tous droits réservés. Fait avec{" "}
-          <Heart size={14} className="text-accent" /> pour la gloire de
-          Dieu.
+          © 2026 CMCI Belgique. {t('footer.rights')}{" "}
+          <Heart size={14} className="text-accent" /> {t('footer.forGlory')}
         </p>
         <div className="flex gap-6">
           <Link href="#" className="hover:text-white transition-colors">
-          Mentions légales
+          {t('footer.legal')}
           </Link>
           <Link href="#" className="hover:text-white transition-colors">
-          Politique de confidentialité
+          {t('footer.privacy')}
           </Link>
         </div>
         </div>

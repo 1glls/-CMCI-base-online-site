@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Music, Users, BookOpen, Book, Heart, Library, ArrowRight } from 'lucide-react';
 import { API_URL, getImageUrl } from '@/lib/api';
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface Ministry {
   id: string;
@@ -25,6 +26,7 @@ const iconMap: { [key: string]: any } = {
 };
 
 export default function Ministries() {
+  const { t } = useLanguage()
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,12 +56,12 @@ export default function Ministries() {
       <section id="ministeres" className="py-20 bg-gradient-to-br from-purple-50 to-blue-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <p className="text-emerald-600 uppercase tracking-wider font-semibold mb-3">MINISTRY</p>
+            <p className="text-emerald-600 uppercase tracking-wider font-semibold mb-3">{t('ministries.label')}</p>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Nos Ministères
+              {t('ministries.label')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Chargement...
+              {t('ministries.loading')}
             </p>
           </div>
         </div>
@@ -74,11 +76,10 @@ export default function Ministries() {
         <div className="text-center mb-16">
           <p className="text-emerald-600 uppercase tracking-wider font-semibold mb-3">MINISTRY</p>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Nos Ministères à la CMCI
+            {t('ministries.title')}
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Découvrez nos principaux ministères actuellement en place dans notre église. 
-            Si vous souhaitez vous impliquer dans l'un de ces ministères, n'hésitez pas à nous contacter.
+            {t('ministries.subtitle')}
           </p>
         </div>
 
@@ -124,7 +125,7 @@ export default function Ministries() {
                       variant="ghost" 
                       className="w-full group-hover:bg-emerald-600 group-hover:text-white transition-all"
                     >
-                      En savoir plus
+                      {t('ministries.learnMore')}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </a>
@@ -138,15 +139,14 @@ export default function Ministries() {
         <div className="mt-16 text-center">
           <div className="inline-block p-8 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-2xl shadow-xl">
             <h3 className="text-2xl font-bold text-white mb-3">
-              Rejoignez l'un de nos ministères
+              {t('ministries.joinTitle')}
             </h3>
             <p className="text-white/90 mb-6 max-w-xl">
-              Nous serions ravis de vous accueillir dans l'un de nos ministères. 
-              Contactez-nous pour plus d'informations.
+              {t('ministries.joinText')}
             </p>
             <a href="#contact">
               <Button size="lg" variant="secondary" className="font-semibold">
-                Nous Contacter
+                {t('ministries.joinButton')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </a>

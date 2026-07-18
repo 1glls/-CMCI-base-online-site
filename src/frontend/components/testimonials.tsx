@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { API_URL, getImageUrl } from "@/lib/api"
 
 interface Testimonial {
@@ -15,6 +16,7 @@ interface Testimonial {
 }
 
 export function Testimonials() {
+  const { t } = useLanguage()
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -88,22 +90,22 @@ export function Testimonials() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-            Témoignages
+            {t('testimonials.label')}
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mt-3 mb-4">
-            Ce que disent nos membres
+            {t('testimonials.title')}
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
 
         {/* Etats vides : ni squelette trompeur, ni faux contenu */}
         {loading && (
-          <p className="text-center text-white/70">Chargement des témoignages...</p>
+          <p className="text-center text-white/70">{t('testimonials.loading')}</p>
         )}
 
         {!loading && testimonials.length === 0 && (
           <p className="text-center text-white/70">
-            Aucun témoignage disponible pour le moment.
+            {t('testimonials.noTestimonials')}
           </p>
         )}
 
@@ -160,7 +162,7 @@ export function Testimonials() {
               <button
                 onClick={prevTestimonial}
                 className="p-3 rounded-full border border-white/30 hover:bg-white/20 transition-colors text-white"
-                aria-label="Témoignage précédent"
+                aria-label={t("testimonials.prevTestimonial")}
               >
                 <ChevronLeft size={20} />
               </button>
@@ -177,7 +179,7 @@ export function Testimonials() {
                         ? "bg-accent w-6"
                         : "bg-white/40 hover:bg-white/60"
                     )}
-                    aria-label={`Aller au témoignage ${index + 1}`}
+                    aria-label={`${t("testimonials.goToTestimonial")} ${index + 1}`}
                   />
                 ))}
               </div>
@@ -185,7 +187,7 @@ export function Testimonials() {
               <button
                 onClick={nextTestimonial}
                 className="p-3 rounded-full border border-white/30 hover:bg-white/20 transition-colors text-white"
-                aria-label="Témoignage suivant"
+                aria-label={t("testimonials.nextTestimonial")}
               >
                 <ChevronRight size={20} />
               </button>

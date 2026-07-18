@@ -3,31 +3,20 @@
 import { useEffect, useRef, useState } from "react"
 import { Globe, Users, HandHeart } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-const visionCards = [
-  {
-    icon: Globe,
-    title: "Évangéliser le monde",
-    description:
-      "Atteindre 10 milliards de personnes par l'Évangile dans la puissance du Saint-Esprit, proclamant le message de salut à toutes les nations.",
-  },
-  {
-    icon: Users,
-    title: "Former des disciples",
-    description:
-      "1 milliard de disciples dans 250 nations organisés en 25 millions d'églises de maison d'ici 2065, suivant le modèle de Jésus.",
-  },
-  {
-    icon: HandHeart,
-    title: "Prier pour le réveil",
-    description:
-      "Coopérer avec Dieu par le jeûne et l'intercession pour le réveil mondial, préparant le retour glorieux de notre Seigneur.",
-  },
-]
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export function Vision() {
+  const { t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
+
+  // Defini a l'interieur du composant : hors du cycle de rendu, les libelles
+  // ne reagiraient pas au changement de langue.
+  const visionCards = [
+    { icon: Globe, key: 'item1' },
+    { icon: Users, key: 'item2' },
+    { icon: HandHeart, key: 'item3' },
+  ]
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,10 +45,10 @@ export function Vision() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
-            Notre Vision
+            {t('vision.label')}
           </span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary mt-3 mb-4">
-            Transformer le monde par l'Évangile
+            {t('vision.title')}
           </h2>
           <div className="w-20 h-1 bg-accent mx-auto" />
         </div>
@@ -68,7 +57,7 @@ export function Vision() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {visionCards.map((card, index) => (
             <div
-              key={card.title}
+              key={card.key}
               className={cn(
                 "bg-card rounded-xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 group",
                 isVisible
@@ -83,10 +72,10 @@ export function Vision() {
                 <card.icon className="w-8 h-8 text-primary group-hover:text-accent transition-colors" />
               </div>
               <h3 className="font-serif text-xl font-bold text-primary mb-4">
-                {card.title}
+                {t(`vision.${card.key}.title`)}
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                {card.description}
+                {t(`vision.${card.key}.description`)}
               </p>
             </div>
           ))}
