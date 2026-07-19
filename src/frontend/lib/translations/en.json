@@ -11,7 +11,8 @@
     "testimonials": "Testimonials",
     "contact": "Contact",
     "join": "Join us",
-    "country": "Belgium"
+    "country": "Belgium",
+    "books": "Publications"
   },
   "hero": {
     "discover": "Discover",
@@ -155,5 +156,25 @@
     "by": "by",
     "legal": "Legal notice",
     "privacy": "Privacy policy"
+  },
+  "books": {
+    "label": "Books & literature",
+    "title": "Our publications",
+    "subtitle": "Books and tracts from our ministry, to read and to share.",
+    "featured": "Discover",
+    "booksTitle": "Our books",
+    "booksSubtitle": "Books from our ministry.",
+    "tractsTitle": "Our tracts",
+    "tractsSubtitle": "Short messages to read, download and share.",
+    "loading": "Loading...",
+    "noBooks": "No publication at the moment.",
+    "noTracts": "No tract at the moment.",
+    "download": "Download",
+    "preview": "Preview",
+    "read": "Read",
+    "by": "by",
+    "languages": "language(s)",
+    "close": "Close",
+    "viewTract": "View tract"
   }
 }

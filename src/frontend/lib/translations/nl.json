@@ -11,7 +11,8 @@
     "testimonials": "Getuigenissen",
     "contact": "Contact",
     "join": "Sluit u aan",
-    "country": "België"
+    "country": "België",
+    "books": "Publicaties"
   },
   "hero": {
     "discover": "Ontdekken",
@@ -155,5 +156,25 @@
     "by": "door",
     "legal": "Juridische kennisgeving",
     "privacy": "Privacybeleid"
+  },
+  "books": {
+    "label": "Boeken & literatuur",
+    "title": "Onze publicaties",
+    "subtitle": "Boeken en traktaten van onze bediening, om te lezen en te delen.",
+    "featured": "Ontdekken",
+    "booksTitle": "Onze boeken",
+    "booksSubtitle": "Boeken van onze bediening.",
+    "tractsTitle": "Onze traktaten",
+    "tractsSubtitle": "Korte boodschappen om te lezen, downloaden en delen.",
+    "loading": "Laden...",
+    "noBooks": "Momenteel geen publicatie.",
+    "noTracts": "Momenteel geen traktaat.",
+    "download": "Downloaden",
+    "preview": "Voorbeeld",
+    "read": "Lezen",
+    "by": "door",
+    "languages": "taal/talen",
+    "close": "Sluiten",
+    "viewTract": "Traktaat bekijken"
   }
 }

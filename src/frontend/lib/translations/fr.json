@@ -11,7 +11,8 @@
     "testimonials": "Témoignages",
     "contact": "Contact",
     "join": "Nous rejoindre",
-    "country": "Belgique"
+    "country": "Belgique",
+    "books": "Publications"
   },
   "hero": {
     "discover": "Découvrir",
@@ -155,5 +156,25 @@
     "by": "par",
     "legal": "Mentions légales",
     "privacy": "Politique de confidentialité"
+  },
+  "books": {
+    "label": "Livre & littérature",
+    "title": "Nos publications",
+    "subtitle": "Les ouvrages et tracts de notre ministère, à lire et à partager.",
+    "featured": "À découvrir",
+    "booksTitle": "Nos livres",
+    "booksSubtitle": "Les ouvrages de notre ministère.",
+    "tractsTitle": "Nos tracts",
+    "tractsSubtitle": "Des messages courts à lire, télécharger et partager.",
+    "loading": "Chargement...",
+    "noBooks": "Aucune publication pour le moment.",
+    "noTracts": "Aucun tract pour le moment.",
+    "download": "Télécharger",
+    "preview": "Prévisualiser",
+    "read": "Lire",
+    "by": "par",
+    "languages": "langue(s)",
+    "close": "Fermer",
+    "viewTract": "Voir le tract"
   }
 }

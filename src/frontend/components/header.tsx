@@ -22,6 +22,7 @@ export function Header() {
     { href: "#evenements", label: t('nav.events') },
     { href: "#assemblees", label: t('nav.assemblies') },
     { href: "#galerie", label: t('nav.gallery') },
+    { href: "/livres", label: t('nav.books') },
     { href: "#contact", label: t('nav.contact') },
   ]
 
