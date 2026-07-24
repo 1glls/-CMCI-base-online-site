@@ -65,3 +65,6 @@ Thumbs.db
 next-env.d.ts
 # Tracts : sorties generees (HTML, PDF, apercus) — reproductibles par build.mjs
 otherthings/tracts/*/dist/
+# Tracts sources (PDF volumineux, non versionnes)
+otherthings/tracts/*.pdf
+otherthings/tracts/*.html

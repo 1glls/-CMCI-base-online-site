@@ -1,0 +1,87 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link [ref=e4] [cursor=pointer]:
+        - /url: "#accueil"
+        - img "CMCI Logo" [ref=e6]
+      - button "Toggle menu" [ref=e7]
+    - navigation [ref=e9]:
+      - link "Accueil" [ref=e10] [cursor=pointer]:
+        - /url: "#accueil"
+      - link "Vision" [ref=e11] [cursor=pointer]:
+        - /url: "#vision"
+      - link "Nos Valeurs" [ref=e12] [cursor=pointer]:
+        - /url: "#valeurs"
+      - link "Ministères" [ref=e13] [cursor=pointer]:
+        - /url: "#ministeres"
+      - link "Événements" [ref=e14] [cursor=pointer]:
+        - /url: "#evenements"
+      - link "Assemblées" [ref=e15] [cursor=pointer]:
+        - /url: "#assemblees"
+      - link "Galerie" [ref=e16] [cursor=pointer]:
+        - /url: "#galerie"
+      - link "Publications" [ref=e17] [cursor=pointer]:
+        - /url: /livres
+      - link "Contact" [ref=e18] [cursor=pointer]:
+        - /url: "#contact"
+      - button "Select language" [ref=e21]:
+        - generic [ref=e25]: fr
+      - link "Contact" [ref=e26] [cursor=pointer]:
+        - /url: "#contact"
+  - main [ref=e28]:
+    - generic [ref=e29]:
+      - heading "Le chemin du salut" [level=1] [ref=e30]
+      - paragraph [ref=e31]: Comment recevoir le salut de Dieu et commencer une vie nouvelle en Jésus-Christ.
+    - paragraph [ref=e32]:
+      - text: Vous avez ce tract en
+      - strong [ref=e33]: Français
+      - text: .
+    - link "Télécharger le PDF" [ref=e34] [cursor=pointer]:
+      - /url: https://api.cmcibelgique.org/uploads/tracts/files/tract-file-1784854756384-30877450.pdf
+    - generic [ref=e38]:
+      - heading "Aperçu" [level=2] [ref=e39]
+      - generic [ref=e40]:
+        - button [ref=e41]:
+          - img "Le chemin du salut — page 1" [ref=e42]
+        - button [ref=e43]:
+          - img "Le chemin du salut — page 2" [ref=e44]
+    - link "Nos livres et publications" [ref=e46] [cursor=pointer]:
+      - /url: /livres
+  - contentinfo [ref=e49]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]: CMCI
+          - generic [ref=e55]:
+            - text: CMCI
+            - generic [ref=e56]: Belgique
+        - paragraph [ref=e57]: La Communauté Missionnaire Chrétienne Internationale en Belgique - une famille de disciples dévoués à Jésus-Christ, notre modèle en toutes choses.
+      - generic [ref=e58]:
+        - heading "Liens rapides" [level=3] [ref=e59]
+        - list [ref=e60]:
+          - listitem [ref=e61]:
+            - link "Accueil" [ref=e62] [cursor=pointer]:
+              - /url: "#accueil"
+          - listitem [ref=e63]:
+            - link "Vision" [ref=e64] [cursor=pointer]:
+              - /url: "#vision"
+          - listitem [ref=e65]:
+            - link "Nos Valeurs" [ref=e66] [cursor=pointer]:
+              - /url: "#valeurs"
+          - listitem [ref=e67]:
+            - link "Événements" [ref=e68] [cursor=pointer]:
+              - /url: "#evenements"
+          - listitem [ref=e69]:
+            - link "Assemblées" [ref=e70] [cursor=pointer]:
+              - /url: "#assemblees"
+          - listitem [ref=e71]:
+            - link "Galerie" [ref=e72] [cursor=pointer]:
+              - /url: "#galerie"
+    - generic [ref=e75]:
+      - paragraph [ref=e76]: © 2026 CMCI Belgique. Tous droits réservés. Fait avec pour la gloire de Dieu.
+      - generic [ref=e79]:
+        - link "Mentions légales" [ref=e80] [cursor=pointer]:
+          - /url: "#"
+        - link "Politique de confidentialité" [ref=e81] [cursor=pointer]:
+          - /url: "#"
+  - alert [ref=e82]
