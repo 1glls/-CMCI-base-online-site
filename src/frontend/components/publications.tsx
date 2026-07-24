@@ -184,20 +184,31 @@ export function Publications() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const [b, tr, c] = await Promise.all([
-          fetch(`${API_URL}/api/books?lang=${language}`).then((r) => r.json()),
-          fetch(`${API_URL}/api/tracts?lang=${language}`).then((r) => r.json()),
-          fetch(`${API_URL}/api/categories?lang=${language}`).then((r) => r.json())
-        ]);
-        if (Array.isArray(b)) setBooks(b);
-        if (Array.isArray(tr)) setTracts(tr);
-        if (Array.isArray(c)) setCategories(c);
-      } catch (e) {
-        console.error('Publications:', e);
-      } finally {
-        setLoading(false);
-      }
+      // Promise.allSettled et non Promise.all : une ressource indisponible
+      // (categories absentes d'un backend plus ancien, par exemple) ne doit
+      // pas vider toute la page. Chaque bloc se charge independamment.
+      const get = async (path: string) => {
+        const r = await fetch(`${API_URL}/api/${path}?lang=${language}`);
+        if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
+        const d = await r.json();
+        return Array.isArray(d) ? d : [];
+      };
+
+      const [b, tr, c] = await Promise.allSettled([
+        get('books'), get('tracts'), get('categories')
+      ]);
+
+      if (b.status === 'fulfilled') setBooks(b.value);
+      else console.error('Publications, livres :', b.reason);
+
+      if (tr.status === 'fulfilled') setTracts(tr.value);
+      else console.error('Publications, tracts :', tr.reason);
+
+      // Sans categories, les filtres disparaissent mais le catalogue reste
+      if (c.status === 'fulfilled') setCategories(c.value);
+      else console.error('Publications, categories :', c.reason);
+
+      setLoading(false);
     })();
   }, [language]);
 
