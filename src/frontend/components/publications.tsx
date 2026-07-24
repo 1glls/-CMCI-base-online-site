@@ -5,15 +5,16 @@ import Link from 'next/link';
 import { Download, Eye, X, ChevronLeft, ChevronRight, Languages, ExternalLink } from 'lucide-react';
 import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 interface Book {
   id: string; title: string; author: string | null; description: string;
   cover: string | null; file: string | null; preview: string | null;
-  externalLink: string | null;
+  externalLink: string | null; featured?: boolean;
 }
 interface Tract {
   id: string; slug: string; title: string; description: string;
-  cover: string | null; languageCount: number;
+  cover: string | null; languageCount: number; featured?: boolean;
 }
 
 /* -------------------------------------------------------------------------
@@ -24,122 +25,145 @@ interface Tract {
 type Slide = {
   key: string; kind: 'book' | 'tract';
   title: string; subtitle: string | null; description: string;
-  cover: string | null; file: string | null; preview: string | null;
+  image: string | null;   // illustration, ou premier apercu, ou null -> degrade
+  file: string | null; preview: string | null;
   href: string | null; book: Book | null;
 };
 
-function FeaturedCarousel({ books, onPreview }: { books: Slide[]; onPreview: (b: Book) => void }) {
+function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (b: Book) => void }) {
   const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (paused || books.length <= 1) return;
-    timer.current = setInterval(() => setIndex((i) => (i + 1) % books.length), 6000);
+    if (paused || slides.length <= 1) return;
+    timer.current = setInterval(() => setIndex((i) => (i + 1) % slides.length), 7000);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [paused, books.length]);
+  }, [paused, slides.length]);
 
-  if (books.length === 0) return null;
+  if (slides.length === 0) return null;
 
   const go = (d: number) => {
     setPaused(true);
-    setIndex((i) => (i + d + books.length) % books.length);
+    setIndex((i) => (i + d + slides.length) % slides.length);
   };
 
   return (
-    <div
-      className="relative overflow-hidden rounded-2xl bg-primary text-white"
+    <section
+      className="relative h-[60vh] max-h-[560px] min-h-[420px] w-full overflow-hidden bg-primary"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div
-        className="flex transition-transform duration-700 ease-out"
-        style={{ transform: `translateX(-${index * 100}%)` }}
-      >
-        {books.map((b) => (
-          <div key={b.key} className="w-full shrink-0">
-            <div className="grid items-center gap-6 p-6 sm:p-10 md:grid-cols-[auto_1fr]">
-              <div className="mx-auto w-44 shrink-0 md:w-56">
-                {b.cover ? (
-                  <img
-                    src={getFileUrl(b.cover)} alt={b.title}
-                    className="w-full rounded-lg shadow-2xl"
-                  />
-                ) : (
-                  <div className="flex aspect-[3/4] items-center justify-center rounded-lg bg-white/10 p-4 text-center text-sm text-white/60">
-                    {b.title}
-                  </div>
-                )}
-              </div>
-              <div className="text-center md:text-start">
-                <span className="text-xs font-semibold uppercase tracking-wider text-accent">
-                  {b.kind === 'tract' ? t('books.tractsTitle') : t('books.featured')}
-                </span>
-                <h3 className="mt-2 font-serif text-2xl font-bold sm:text-3xl">{b.title}</h3>
-                {b.subtitle && <p className="mt-1 text-white/70">{b.subtitle}</p>}
-                <p className="mt-3 line-clamp-3 text-white/85">{b.description}</p>
-                <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
-                  {b.href && (
-                    <Link
-                      href={b.href}
-                      className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-accent-foreground hover:bg-accent/90"
-                    >
-                      <Eye className="h-4 w-4" />{t('books.viewTract')}
-                    </Link>
-                  )}
-                  {b.book && (b.book.preview || b.book.file) && (
-                    <button
-                      onClick={() => onPreview(b.book!)}
-                      className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-accent-foreground hover:bg-accent/90"
-                    >
-                      <Eye className="h-4 w-4" />{t('books.preview')}
-                    </button>
-                  )}
-                  {b.file && (
-                    <a
-                      href={getFileUrl(b.file)} download
-                      className="inline-flex items-center gap-2 rounded-full border border-white/40 px-5 py-2.5 font-semibold hover:bg-white/10"
-                    >
-                      <Download className="h-4 w-4" />{t('books.download')}
-                    </a>
-                  )}
-                </div>
-              </div>
+      {slides.map((s, i) => (
+        <div
+          key={s.key}
+          className={cn(
+            "absolute inset-0 transition-opacity duration-1000",
+            i === index ? "visible z-10 opacity-100" : "invisible z-0 opacity-0"
+          )}
+        >
+          {s.image ? (
+            <>
+              <img src={getFileUrl(s.image)} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              {/* Voile plus dense que celui du hero : ces visuels sont clairs
+                  et charges, la ou l'accueil pose son texte sur des photos
+                  sombres. Applique uniquement sur une image : sur le degrade
+                  de repli il ecraserait les couleurs de la marque jusqu'au noir. */}
+              <div className="absolute inset-0 bg-black/55" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/30" />
+            </>
+          ) : (
+            // Ni illustration ni apercu : degrade aux couleurs du site, pour
+            // qu'une banderole ne soit jamais vide. Deja assez sombre pour
+            // porter du texte blanc.
+            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-accent/50" />
+          )}
+        </div>
+      ))}
+
+      {/* Contenu */}
+      <div className="relative z-20 flex h-full flex-col items-center justify-center px-6 text-center text-white">
+        {slides.map((s, i) => (
+          <div
+            key={s.key}
+            className={cn(
+              "max-w-3xl transition-all duration-700",
+              i === index ? "relative opacity-100" : "pointer-events-none absolute opacity-0"
+            )}
+            style={{ display: i === index ? 'block' : 'none' }}
+          >
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+              {s.kind === 'tract' ? t('books.tractsTitle') : t('books.featured')}
+            </span>
+            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+              {s.title}
+            </h2>
+            {s.subtitle && <p className="mt-2 text-white/80">{s.subtitle}</p>}
+            <p className="mx-auto mt-4 max-w-2xl text-white/90 line-clamp-3">{s.description}</p>
+
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              {s.href && (
+                <Link
+                  href={s.href}
+                  className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+                >
+                  <Eye className="h-4 w-4" />{t('books.viewTract')}
+                </Link>
+              )}
+              {s.book && (s.book.preview || s.book.file) && (
+                <button
+                  onClick={() => onPreview(s.book!)}
+                  className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+                >
+                  <Eye className="h-4 w-4" />{t('books.preview')}
+                </button>
+              )}
+              {s.file && (
+                <a
+                  href={getFileUrl(s.file)} download
+                  className="inline-flex items-center gap-2 rounded-full border border-white/50 px-7 py-3 font-semibold transition-colors hover:bg-white/10"
+                >
+                  <Download className="h-4 w-4" />{t('books.download')}
+                </a>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      {books.length > 1 && (
+      {slides.length > 1 && (
         <>
           <button
             onClick={() => go(-1)}
-            className="absolute inset-inline-start-0 start-3 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 hover:bg-black/50"
+            className="absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-black/30 p-3 text-white transition-colors hover:bg-black/50 sm:block"
             aria-label="Précédent"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={22} />
           </button>
           <button
             onClick={() => go(1)}
-            className="absolute end-3 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 hover:bg-black/50"
+            className="absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-black/30 p-3 text-white transition-colors hover:bg-black/50 sm:block"
             aria-label="Suivant"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={22} />
           </button>
-          <div className="flex justify-center gap-2 pb-4">
-            {books.map((_, i) => (
+          <div className="absolute bottom-6 left-0 right-0 z-30 flex justify-center gap-2">
+            {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setPaused(true); setIndex(i); }}
-                className={`h-2 rounded-full transition-all ${i === index ? 'w-6 bg-accent' : 'w-2 bg-white/40'}`}
+                className={cn(
+                  "h-2 rounded-full transition-all",
+                  i === index ? "w-7 bg-accent" : "w-2 bg-white/50 hover:bg-white/80"
+                )}
                 aria-label={`${i + 1}`}
               />
             ))}
           </div>
         </>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -176,27 +200,37 @@ export function Publications() {
   // Le carrousel met en avant l'ensemble des publications, tracts compris :
   // c'est le premier bloc de la page, comme le hero sur l'accueil.
   const featured: Slide[] = [
-    ...tracts.map((tr) => ({
+    ...tracts.filter((tr) => tr.featured !== false).map((tr) => ({
       key: `t-${tr.id}`, kind: 'tract' as const,
       title: tr.title,
       subtitle: `${tr.languageCount} ${t('books.languages')}`,
       description: tr.description,
-      cover: tr.cover, file: null, preview: null,
+      // Cascade : illustration televersee, sinon rien (le degrade prend le relais).
+      // Les apercus ne sont pas exposes par la liste publique des tracts.
+      image: tr.cover,
+      file: null, preview: null,
       href: `/t/${tr.slug}`, book: null
     })),
-    ...books.map((b) => ({
+    ...books.filter((b) => b.featured !== false).map((b) => ({
       key: `b-${b.id}`, kind: 'book' as const,
       title: b.title,
       subtitle: b.author ? `${t('books.by')} ${b.author}` : null,
       description: b.description,
-      cover: b.cover, file: b.file, preview: b.preview,
+      image: b.cover,
+      file: b.file, preview: b.preview,
       href: null, book: b
     }))
   ].slice(0, 6);
 
   return (
-    <main className="min-h-screen bg-background pt-24">
-      <div className="container mx-auto px-4 pb-20">
+    <main className="min-h-screen bg-background">
+      {/* Banderole pleine largeur, hors du conteneur : elle doit toucher les
+          bords de l'ecran comme le hero de l'accueil. */}
+      {!loading && featured.length > 0 && (
+        <FeaturedCarousel slides={featured} onPreview={setPreviewed} />
+      )}
+
+      <div className="container mx-auto px-4 pb-20 pt-12">
 
         <header className="mb-10 text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-accent">
@@ -216,12 +250,6 @@ export function Publications() {
         {!loading && (
           <>
             {/* Ouvrages mis en avant */}
-            {featured.length > 0 && (
-              <section className="mb-16">
-                <FeaturedCarousel books={featured} onPreview={setPreviewed} />
-              </section>
-            )}
-
             {/* Tracts */}
             <section className="mb-16">
               <h2 className="font-serif text-2xl font-bold text-primary">

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
-  ArrowLeft, Plus, Trash2, Copy, Check, Languages, ShieldAlert, ExternalLink
+  ArrowLeft, Plus, Trash2, Copy, Check, Languages, ShieldAlert, ExternalLink, Pencil, Image as ImageIcon
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -17,7 +17,7 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { API_URL } from '@/lib/api';
+import { API_URL, getImageUrl } from '@/lib/api';
 
 interface Version {
   id: string; language: string; label: string; dir: string; title: string;
@@ -25,7 +25,8 @@ interface Version {
 }
 interface Tract {
   id: string; slug: string; title: string; description: string;
-  cover: string | null; order: number; status: string; versions: Version[];
+  cover: string | null; order: number; status: string;
+  featured: boolean; versions: Version[];
 }
 
 const SITE = 'https://www.cmcibelgique.org';
@@ -40,6 +41,11 @@ export default function AdminTractsPage() {
 
   const [form, setForm] = useState({ slug: '', title: '', description: '' });
   const [cover, setCover] = useState<File | null>(null);
+
+  const [editing, setEditing] = useState<string | null>(null);
+  const [eForm, setEForm] = useState({ title: '', description: '', order: '0', status: 'published', featured: true });
+  const [eCover, setECover] = useState<File | null>(null);
+  const [eCoverPreview, setECoverPreview] = useState('');
 
   const [vForm, setVForm] = useState({ language: '', label: '', title: '', dir: 'ltr' });
   const [vFile, setVFile] = useState<File | null>(null);
@@ -122,6 +128,51 @@ export default function AdminTractsPage() {
         variant: 'destructive'
       });
     }
+  };
+
+  const openEdit = (t: Tract) => {
+    setEditing(t.id);
+    setEForm({
+      title: t.title, description: t.description,
+      order: String(t.order), status: t.status, featured: t.featured
+    });
+    setECover(null); setECoverPreview('');
+  };
+
+  const saveTract = async (id: string) => {
+    try {
+      const fd = new FormData();
+      fd.append('title', eForm.title);
+      fd.append('description', eForm.description);
+      fd.append('order', eForm.order);
+      fd.append('status', eForm.status);
+      fd.append('featured', String(eForm.featured));
+      if (eCover) fd.append('cover', eCover);
+
+      const res = await fetch(`${API_URL}/api/tracts/${id}`, {
+        method: 'PUT', headers: { Authorization: `Bearer ${token()}` }, body: fd
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Enregistrement impossible');
+
+      toast({ title: 'Tract mis à jour' });
+      setEditing(null); setECover(null); setECoverPreview('');
+      fetchTracts();
+    } catch (err) {
+      toast({
+        title: 'Erreur',
+        description: err instanceof Error ? err.message : '',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const onCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    setECover(f);
+    if (!f) { setECoverPreview(''); return; }
+    const reader = new FileReader();
+    reader.onloadend = () => setECoverPreview(reader.result as string);
+    reader.readAsDataURL(f);
   };
 
   const patchVersion = async (id: string, data: Record<string, unknown>) => {
@@ -231,6 +282,13 @@ export default function AdminTractsPage() {
                     sur {t.versions.length}
                   </CardDescription>
                 </div>
+                <div className="flex shrink-0 gap-2">
+                <Button
+                  variant={editing === t.id ? 'default' : 'outline'} size="sm"
+                  onClick={() => (editing === t.id ? setEditing(null) : openEdit(t))}
+                >
+                  <Pencil className="mr-1 h-4 w-4" />Modifier
+                </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="sm">
@@ -256,10 +314,76 @@ export default function AdminTractsPage() {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+                </div>
               </div>
             </CardHeader>
 
             <CardContent>
+              {editing === t.id && (
+                <div className="mb-6 rounded-lg border bg-gray-50 p-4">
+                  <h3 className="mb-3 font-semibold">Modifier le tract</h3>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div>
+                      <Label>Titre</Label>
+                      <Input value={eForm.title}
+                        onChange={(e) => setEForm({ ...eForm, title: e.target.value })} />
+                    </div>
+                    <div>
+                      <Label>Ordre d&apos;affichage</Label>
+                      <Input type="number" value={eForm.order}
+                        onChange={(e) => setEForm({ ...eForm, order: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <Label>Description</Label>
+                    <Textarea rows={2} value={eForm.description}
+                      onChange={(e) => setEForm({ ...eForm, description: e.target.value })} />
+                  </div>
+
+                  {/* Illustration : sert a la fois de vignette et de fond de banderole */}
+                  <div className="mt-3">
+                    <Label className="flex items-center gap-2">
+                      <ImageIcon className="h-4 w-4" />Illustration du tract
+                    </Label>
+                    <Input type="file" accept="image/*" onChange={onCoverChange} />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Cette image sert de vignette dans le catalogue <strong>et</strong> de
+                      fond a la banderole de mise en avant. Un format paysage large
+                      (16:9 environ) donne le meilleur resultat en pleine largeur.
+                    </p>
+                    {(eCoverPreview || t.cover) && (
+                      <img
+                        src={eCoverPreview || getImageUrl(t.cover)}
+                        alt="Aperçu de l'illustration"
+                        className="mt-2 h-40 w-full max-w-xl rounded-lg border object-cover"
+                      />
+                    )}
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-4">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" checked={eForm.featured}
+                        onChange={(e) => setEForm({ ...eForm, featured: e.target.checked })} />
+                      Mettre en avant dans la banderole
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      Statut
+                      <select className="h-9 rounded-md border px-2 text-sm" value={eForm.status}
+                        onChange={(e) => setEForm({ ...eForm, status: e.target.value })}>
+                        <option value="published">Publié</option>
+                        <option value="draft">Brouillon</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="mt-4 flex gap-2">
+                    <Button onClick={() => saveTract(t.id)}>Enregistrer</Button>
+                    <Button variant="ghost" onClick={() => setEditing(null)}>Annuler</Button>
+                  </div>
+                </div>
+              )}
+
               {/* Versions */}
               <div className="mb-4 space-y-3">
                 {t.versions.map((v) => (
