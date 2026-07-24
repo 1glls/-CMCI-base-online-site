@@ -64,7 +64,7 @@ router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
 
 router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, author, description, externalLink, order, status } = req.body;
+    const { title, author, description, externalLink, order, status, featured } = req.body;
     if (!title) return res.status(400).json({ error: 'title requis' });
 
     const book = await prisma.book.create({
@@ -75,6 +75,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
         preview: req.files?.preview?.[0] ? rel(req.files.preview[0]) : null,
         externalLink: externalLink || null,
         order: Number(order) || 0,
+        featured: featured === undefined ? true : (featured === 'true' || featured === true),
         status: status || 'published'
       }
     });
@@ -86,7 +87,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
 
 router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, author, description, externalLink, order, status } = req.body;
+    const { title, author, description, externalLink, order, status, featured } = req.body;
     const data = {};
     if (title !== undefined) data.title = title;
     if (author !== undefined) data.author = author || null;
@@ -94,6 +95,7 @@ router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, re
     if (externalLink !== undefined) data.externalLink = externalLink || null;
     if (order !== undefined) data.order = Number(order);
     if (status !== undefined) data.status = status;
+    if (featured !== undefined) data.featured = featured === 'true' || featured === true;
     if (req.files?.cover?.[0]) data.cover = rel(req.files.cover[0]);
     if (req.files?.file?.[0]) data.file = rel(req.files.file[0]);
     if (req.files?.preview?.[0]) data.preview = rel(req.files.preview[0]);

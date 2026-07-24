@@ -6,6 +6,7 @@ const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { deleteUploadedFile, deleteUploadedFiles } = require('../utils/upload-cleanup');
+const { generatePreviews } = require('../utils/pdf-preview');
 
 const prisma = new PrismaClient();
 
@@ -62,6 +63,41 @@ const publicVersion = (v) => ({
   title: v.title, file: v.file, previews: parsePreviews(v.previews)
 });
 
+
+/**
+ * Genere les apercus d'une version a partir de son PDF, apres la reponse
+ * HTTP : le rendu d'un PDF de 4 Mo prend une a deux secondes et
+ * l'administrateur n'a pas a attendre. La version est enregistree tout de
+ * suite, les apercus la rejoignent.
+ *
+ * N'est appele que si aucune image n'a ete fournie a la main : des apercus
+ * explicites restent prioritaires.
+ */
+function autoPreviews(versionId, webFilePath) {
+  if (!webFilePath) return;
+
+  setImmediate(async () => {
+    try {
+      const abs = path.join(__dirname, '..', webFilePath.replace(/^\//, ''));
+      const outDir = path.join(__dirname, '..', 'uploads', 'tracts', 'previews');
+
+      const previews = await generatePreviews(abs, outDir, {
+        prefix: 'tract-previews',
+        webBase: '/uploads/tracts/previews'
+      });
+      if (previews.length === 0) return;
+
+      await prisma.tractVersion.update({
+        where: { id: versionId },
+        data: { previews: JSON.stringify(previews) }
+      });
+      console.log(`Apercus generes (${previews.length}) pour la version ${versionId}`);
+    } catch (error) {
+      console.error('Apercus automatiques :', error.message);
+    }
+  });
+}
+
 // --- Public -----------------------------------------------------------------
 
 // GET /api/tracts — liste publique
@@ -74,7 +110,7 @@ router.get('/', async (req, res) => {
     });
     res.json(tracts.map((t) => ({
       id: t.id, slug: t.slug, title: t.title, description: t.description,
-      cover: t.cover, languageCount: t.versions.length
+      cover: t.cover, featured: t.featured, languageCount: t.versions.length
     })));
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -131,7 +167,7 @@ router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
 
 router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { slug, title, description, order, status } = req.body;
+    const { slug, title, description, order, status, featured } = req.body;
     if (!slug || !title) return res.status(400).json({ error: 'slug et title requis' });
 
     const tract = await prisma.tract.create({
@@ -140,6 +176,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
         title, description: description || '',
         cover: req.files?.cover?.[0] ? rel(req.files.cover[0]) : null,
         order: Number(order) || 0,
+        featured: featured === undefined ? true : (featured === 'true' || featured === true),
         status: status || 'published'
       }
     });
@@ -154,12 +191,13 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
 
 router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, description, order, status } = req.body;
+    const { title, description, order, status, featured } = req.body;
     const data = {};
     if (title !== undefined) data.title = title;
     if (description !== undefined) data.description = description;
     if (order !== undefined) data.order = Number(order);
     if (status !== undefined) data.status = status;
+    if (featured !== undefined) data.featured = featured === 'true' || featured === true;
     if (req.files?.cover?.[0]) data.cover = rel(req.files.cover[0]);
 
     res.json(await prisma.tract.update({ where: { id: req.params.id }, data }));
@@ -212,6 +250,9 @@ router.post('/:id/versions', authMiddleware, adminMiddleware, uploadFields, asyn
         status: status || 'draft'
       }
     });
+    // Aucun apercu fourni : on les fabrique depuis le PDF
+    if (!req.files?.previews?.length) autoPreviews(version.id, version.file);
+
     res.status(201).json({ ...version, previews: parsePreviews(version.previews) });
   } catch (error) {
     if (error.code === 'P2002') {
@@ -238,6 +279,12 @@ router.put('/versions/:versionId', authMiddleware, adminMiddleware, uploadFields
     const version = await prisma.tractVersion.update({
       where: { id: req.params.versionId }, data
     });
+
+    // Nouveau PDF sans apercus fournis : on les regenere
+    if (req.files?.file?.[0] && !req.files?.previews?.length) {
+      autoPreviews(version.id, version.file);
+    }
+
     res.json({ ...version, previews: parsePreviews(version.previews) });
   } catch (error) {
     res.status(500).json({ error: error.message });

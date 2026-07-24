@@ -237,6 +237,7 @@ model Book {
   preview      String?  // extrait PDF optionnel
   externalLink String?
   order        Int      @default(0)
+  featured     Boolean  @default(true)   // apparait dans la banderole
   status       String   @default("published")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -251,6 +252,7 @@ model Tract {
   description String
   cover       String?
   order       Int            @default(0)
+  featured    Boolean        @default(true)   // apparait dans la banderole
   status      String         @default("published")
   versions    TractVersion[]
   createdAt   DateTime       @default(now())
