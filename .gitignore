@@ -51,6 +51,9 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+# Claude Code : .mcp.json est partage (serveurs MCP de l'equipe),
+# settings.local.json est personnel (permissions, choix machine).
+.claude/settings.local.json
 *.swp
 *.swo
 

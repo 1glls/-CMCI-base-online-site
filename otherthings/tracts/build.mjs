@@ -139,15 +139,41 @@ async function main() {
   console.log(`\nTermine.${wantPdf ? '' : '  Ajoutez --pdf pour le PDF et les images d\'apercu.'}`);
 }
 
+/** Navigateur deja installe sur la machine, pour eviter d'en telecharger un second. */
+function findChrome() {
+  if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
+  const candidates = [
+    '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  ];
+  return candidates.find((p) => existsSync(p)) || null;
+}
+
 async function renderPdf(htmlPath, dist, slug, code) {
   let puppeteer;
   try {
-    puppeteer = (await import('puppeteer')).default;
+    // puppeteer-core n'embarque pas de navigateur : il utilise celui du systeme.
+    puppeteer = (await import('puppeteer-core')).default;
   } catch {
-    console.log('       [!] puppeteer absent : PDF non genere (npx puppeteer)');
+    try {
+      puppeteer = (await import('puppeteer')).default;
+    } catch {
+      console.log('       [!] puppeteer absent : PDF non genere');
+      console.log('           npm i -D puppeteer-core   (utilise le Chrome installe)');
+      return;
+    }
+  }
+
+  const executablePath = findChrome();
+  if (!executablePath) {
+    console.log('       [!] Aucun navigateur trouve. Definissez CHROME_PATH.');
     return;
   }
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+
+  const browser = await puppeteer.launch({
+    executablePath,
+    args: ['--no-sandbox', '--disable-dev-shm-usage']
+  });
   const page = await browser.newPage();
   await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle0' });
 
