@@ -68,3 +68,9 @@ otherthings/tracts/*/dist/
 # Tracts sources (PDF volumineux, non versionnes)
 otherthings/tracts/*.pdf
 otherthings/tracts/*.html
+
+# Captures d'ecran de verification (Playwright)
+.playwright-mcp/
+*.playwright.jpeg
+header-*.jpeg
+tract-mobile.jpeg
