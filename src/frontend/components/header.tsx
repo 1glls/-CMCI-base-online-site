@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Menu, X, ChevronDown } from "lucide-react"
@@ -24,6 +25,13 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { t } = useLanguage()
+  const pathname = usePathname()
+
+  // L'en-tete transparent a texte blanc n'est lisible qu'au-dessus du hero
+  // sombre de l'accueil. Partout ailleurs le fond est clair : sans fond
+  // opaque, les liens seraient blancs sur blanc, donc invisibles.
+  const onHome = pathname === '/'
+  const solid = isScrolled || !onHome
 
   // Neuf entrees de premier niveau faisaient deborder l'en-tete
   // horizontalement entre 1024 et 1300 px. Regroupees en cinq.
@@ -62,7 +70,7 @@ export function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-white shadow-lg py-3" : "bg-transparent py-5"
+        solid ? "bg-white shadow-lg py-3" : "bg-transparent py-5"
       )}
     >
       <div className="container mx-auto flex items-center justify-between gap-4 px-4">
@@ -70,7 +78,7 @@ export function Header() {
         <Link href="/" className="flex shrink-0 items-center gap-3">
           <div className={cn(
             "flex h-12 w-12 items-center justify-center overflow-hidden rounded-full transition-all",
-            isScrolled ? "bg-white shadow-md" : "bg-white/90"
+            solid ? "bg-white shadow-md" : "bg-white/90"
           )}>
             <Image
               src="/cmci-logo.png" alt="CMCI Logo"
@@ -79,7 +87,7 @@ export function Header() {
           </div>
           <div className={cn(
             "hidden transition-colors sm:block",
-            isScrolled ? "text-foreground" : "text-white"
+            solid ? "text-foreground" : "text-white"
           )}>
             <span className="font-serif text-lg font-bold">CMCI</span>
             <span className="block text-xs opacity-80">{t('nav.country')}</span>
@@ -94,7 +102,7 @@ export function Header() {
                 <button
                   className={cn(
                     "flex items-center gap-1 text-sm font-medium transition-colors hover:text-accent",
-                    isScrolled ? "text-foreground" : "text-white"
+                    solid ? "text-foreground" : "text-white"
                   )}
                 >
                   {entry.label}
@@ -117,14 +125,14 @@ export function Header() {
                 key={entry.href} href={entry.href}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-accent",
-                  isScrolled ? "text-foreground" : "text-white"
+                  solid ? "text-foreground" : "text-white"
                 )}
               >
                 {entry.label}
               </Link>
             )
           )}
-          <div className={cn(isScrolled ? "text-foreground" : "text-white")}>
+          <div className={cn(solid ? "text-foreground" : "text-white")}>
             <LanguageSelector />
           </div>
         </nav>
@@ -141,7 +149,7 @@ export function Header() {
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className={cn(
             "p-2 transition-colors lg:hidden",
-            isScrolled ? "text-foreground" : "text-white"
+            solid ? "text-foreground" : "text-white"
           )}
           aria-label="Toggle menu"
         >
