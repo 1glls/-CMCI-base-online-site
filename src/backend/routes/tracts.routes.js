@@ -7,6 +7,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { deleteUploadedFile, deleteUploadedFiles } = require('../utils/upload-cleanup');
 const { generatePreviews } = require('../utils/pdf-preview');
+const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 
 const prisma = new PrismaClient();
 
@@ -98,6 +99,26 @@ function autoPreviews(versionId, webFilePath) {
   });
 }
 
+
+/**
+ * Les categories arrivent en JSON depuis un envoi multipart. `connect` a la
+ * creation, `set` a la modification : une liste de cases cochees decrit
+ * l'etat voulu, pas un ajout.
+ */
+function parseIds(raw) {
+  if (raw === undefined || raw === null || raw === '') return [];
+  if (Array.isArray(raw)) return raw;
+  try { const p = JSON.parse(raw); return Array.isArray(p) ? p : []; }
+  catch { return String(raw).split(',').map((s) => s.trim()).filter(Boolean); }
+}
+const connectCategories = (raw) => {
+  const ids = parseIds(raw);
+  return ids.length ? { categories: { connect: ids.map((id) => ({ id })) } } : {};
+};
+const setCategories = (raw) => ({
+  categories: { set: parseIds(raw).map((id) => ({ id })) }
+});
+
 // --- Public -----------------------------------------------------------------
 
 // GET /api/tracts — liste publique
@@ -106,11 +127,17 @@ router.get('/', async (req, res) => {
     const tracts = await prisma.tract.findMany({
       where: { status: 'published' },
       orderBy: { order: 'asc' },
-      include: { versions: { where: { status: 'published', reviewed: true } } }
+      include: {
+        versions: { where: { status: 'published', reviewed: true } },
+        categories: { select: { id: true, slug: true, name: true } }
+      }
     });
-    res.json(tracts.map((t) => ({
+
+    const translated = await applyTranslations('Tract', tracts, req.query.lang);
+    res.json(translated.map((t) => ({
       id: t.id, slug: t.slug, title: t.title, description: t.description,
-      cover: t.cover, featured: t.featured, languageCount: t.versions.length
+      cover: t.cover, featured: t.featured, languageCount: t.versions.length,
+      categories: t.categories
     })));
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -154,7 +181,7 @@ router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const tracts = await prisma.tract.findMany({
       orderBy: { order: 'asc' },
-      include: { versions: { orderBy: { label: 'asc' } } }
+      include: { versions: { orderBy: { label: 'asc' } }, categories: true }
     });
     res.json(tracts.map((t) => ({
       ...t,
@@ -167,7 +194,7 @@ router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
 
 router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { slug, title, description, order, status, featured } = req.body;
+    const { slug, title, description, order, status, featured, categoryIds } = req.body;
     if (!slug || !title) return res.status(400).json({ error: 'slug et title requis' });
 
     const tract = await prisma.tract.create({
@@ -177,9 +204,11 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
         cover: req.files?.cover?.[0] ? rel(req.files.cover[0]) : null,
         order: Number(order) || 0,
         featured: featured === undefined ? true : (featured === 'true' || featured === true),
-        status: status || 'published'
+        status: status || 'published',
+        ...connectCategories(categoryIds)
       }
     });
+    autoTranslate('Tract', tract);
     res.status(201).json(tract);
   } catch (error) {
     if (error.code === 'P2002') {
@@ -191,7 +220,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
 
 router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, description, order, status, featured } = req.body;
+    const { title, description, order, status, featured, categoryIds } = req.body;
     const data = {};
     if (title !== undefined) data.title = title;
     if (description !== undefined) data.description = description;
@@ -199,8 +228,12 @@ router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, re
     if (status !== undefined) data.status = status;
     if (featured !== undefined) data.featured = featured === 'true' || featured === true;
     if (req.files?.cover?.[0]) data.cover = rel(req.files.cover[0]);
+    // `set` remplace l'ensemble : c'est ce qu'attend une liste de cases cochees
+    if (categoryIds !== undefined) Object.assign(data, setCategories(categoryIds));
 
-    res.json(await prisma.tract.update({ where: { id: req.params.id }, data }));
+    res.json(await prisma.tract.update({
+      where: { id: req.params.id }, data, include: { categories: true }
+    }));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

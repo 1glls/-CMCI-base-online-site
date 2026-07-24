@@ -177,6 +177,9 @@
     "by": "by",
     "languages": "language(s)",
     "close": "Close",
-    "viewTract": "View tract"
+    "viewTract": "View tract",
+    "allCategories": "All",
+    "filterBy": "Filter by category",
+    "noMatch": "No publication in this category."
   }
 }

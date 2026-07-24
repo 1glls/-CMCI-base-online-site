@@ -23,10 +23,11 @@ interface Version {
   id: string; language: string; label: string; dir: string; title: string;
   file: string | null; previews: string[]; reviewed: boolean; status: string;
 }
+interface Category { id: string; slug: string; name: string; }
 interface Tract {
   id: string; slug: string; title: string; description: string;
   cover: string | null; order: number; status: string;
-  featured: boolean; versions: Version[];
+  featured: boolean; versions: Version[]; categories: Category[];
 }
 
 const SITE = 'https://www.cmcibelgique.org';
@@ -42,6 +43,9 @@ export default function AdminTractsPage() {
   const [form, setForm] = useState({ slug: '', title: '', description: '' });
   const [cover, setCover] = useState<File | null>(null);
 
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [eCats, setECats] = useState<string[]>([]);
+
   const [editing, setEditing] = useState<string | null>(null);
   const [eForm, setEForm] = useState({ title: '', description: '', order: '0', status: 'published', featured: true });
   const [eCover, setECover] = useState<File | null>(null);
@@ -56,6 +60,9 @@ export default function AdminTractsPage() {
   useEffect(() => {
     if (!localStorage.getItem('adminToken')) { router.push('/admin'); return; }
     fetchTracts();
+    fetch(`${API_URL}/api/categories`).then((r) => r.json())
+      .then((d) => Array.isArray(d) && setAllCategories(d))
+      .catch(() => {});
   }, [router]);
 
   const fetchTracts = async () => {
@@ -136,6 +143,7 @@ export default function AdminTractsPage() {
       title: t.title, description: t.description,
       order: String(t.order), status: t.status, featured: t.featured
     });
+    setECats(t.categories?.map((c) => c.id) ?? []);
     setECover(null); setECoverPreview('');
   };
 
@@ -147,6 +155,7 @@ export default function AdminTractsPage() {
       fd.append('order', eForm.order);
       fd.append('status', eForm.status);
       fd.append('featured', String(eForm.featured));
+      fd.append('categoryIds', JSON.stringify(eCats));
       if (eCover) fd.append('cover', eCover);
 
       const res = await fetch(`${API_URL}/api/tracts/${id}`, {
@@ -361,6 +370,37 @@ export default function AdminTractsPage() {
                     )}
                   </div>
 
+                  <div className="mt-3">
+                    <Label>Catégories</Label>
+                    {allCategories.length === 0 ? (
+                      <p className="text-sm text-gray-500">
+                        Aucune catégorie définie.{' '}
+                        <Link href="/admin/categories" className="text-primary underline">
+                          En créer une
+                        </Link>
+                      </p>
+                    ) : (
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {allCategories.map((c) => {
+                          const on = eCats.includes(c.id);
+                          return (
+                            <button
+                              key={c.id} type="button"
+                              onClick={() => setECats(on
+                                ? eCats.filter((id) => id !== c.id)
+                                : [...eCats, c.id])}
+                              className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                                on ? 'border-primary bg-primary text-white' : 'bg-white hover:bg-gray-100'
+                              }`}
+                            >
+                              {c.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="mt-3 flex flex-wrap items-center gap-4">
                     <label className="flex items-center gap-2 text-sm">
                       <input type="checkbox" checked={eForm.featured}
@@ -521,7 +561,9 @@ export default function AdminTractsPage() {
                         onChange={(e) => setVPreviews(e.target.files)}
                       />
                       <p className="mt-1 text-xs text-gray-500">
-                        Produites par <code>build.mjs --pdf</code>, dans dist/preview/.
+                        Facultatif : sans images, les aper&ccedil;us sont g&eacute;n&eacute;r&eacute;s
+                        automatiquement &agrave; partir du PDF, quelques secondes apr&egrave;s
+                        l&apos;enregistrement.
                       </p>
                     </div>
                   </div>

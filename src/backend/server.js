@@ -29,6 +29,7 @@ app.use('/api/backup', require('./routes/backup.routes'));
 app.use('/api/translations', require('./routes/translations.routes'));
 app.use('/api/books', require('./routes/books.routes'));
 app.use('/api/tracts', require('./routes/tracts.routes'));
+app.use('/api/categories', require('./routes/categories.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

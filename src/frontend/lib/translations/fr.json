@@ -177,6 +177,9 @@
     "by": "par",
     "languages": "langue(s)",
     "close": "Fermer",
-    "viewTract": "Voir le tract"
+    "viewTract": "Voir le tract",
+    "allCategories": "Toutes",
+    "filterBy": "Filtrer par catégorie",
+    "noMatch": "Aucune publication dans cette catégorie."
   }
 }

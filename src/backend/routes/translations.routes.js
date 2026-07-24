@@ -26,7 +26,10 @@ const MODELS = {
   Ministry: (id) => prisma.ministry.findUnique({ where: { id } }),
   Assembly: (id) => prisma.assembly.findUnique({ where: { id } }),
   Testimonial: (id) => prisma.testimonial.findUnique({ where: { id } }),
-  HeroSlide: (id) => prisma.heroSlide.findUnique({ where: { id } })
+  HeroSlide: (id) => prisma.heroSlide.findUnique({ where: { id } }),
+  Category: (id) => prisma.category.findUnique({ where: { id } }),
+  Book: (id) => prisma.book.findUnique({ where: { id } }),
+  Tract: (id) => prisma.tract.findUnique({ where: { id } })
 };
 
 // --- Comptes fournisseurs ---------------------------------------------------

@@ -6,6 +6,26 @@ const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
+const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
+
+/**
+ * Les categories arrivent en JSON depuis un envoi multipart. `connect` a la
+ * creation, `set` a la modification : une liste de cases cochees decrit
+ * l'etat voulu, pas un ajout.
+ */
+function parseIds(raw) {
+  if (raw === undefined || raw === null || raw === '') return [];
+  if (Array.isArray(raw)) return raw;
+  try { const p = JSON.parse(raw); return Array.isArray(p) ? p : []; }
+  catch { return String(raw).split(',').map((s) => s.trim()).filter(Boolean); }
+}
+const connectCategories = (raw) => {
+  const ids = parseIds(raw);
+  return ids.length ? { categories: { connect: ids.map((id) => ({ id })) } } : {};
+};
+const setCategories = (raw) => ({
+  categories: { set: parseIds(raw).map((id) => ({ id })) }
+});
 
 const prisma = new PrismaClient();
 
@@ -46,9 +66,11 @@ const rel = (f) => `/uploads/books/${f.fieldname === 'cover' ? 'covers' : 'files
 // GET public
 router.get('/', async (req, res) => {
   try {
-    res.json(await prisma.book.findMany({
-      where: { status: 'published' }, orderBy: { order: 'asc' }
-    }));
+    const books = await prisma.book.findMany({
+      where: { status: 'published' }, orderBy: { order: 'asc' },
+      include: { categories: { select: { id: true, slug: true, name: true } } }
+    });
+    res.json(await applyTranslations('Book', books, req.query.lang));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -56,7 +78,9 @@ router.get('/', async (req, res) => {
 
 router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    res.json(await prisma.book.findMany({ orderBy: { order: 'asc' } }));
+    res.json(await prisma.book.findMany({
+      orderBy: { order: 'asc' }, include: { categories: true }
+    }));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -64,7 +88,7 @@ router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
 
 router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, author, description, externalLink, order, status, featured } = req.body;
+    const { title, author, description, externalLink, order, status, featured, categoryIds } = req.body;
     if (!title) return res.status(400).json({ error: 'title requis' });
 
     const book = await prisma.book.create({
@@ -76,9 +100,11 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
         externalLink: externalLink || null,
         order: Number(order) || 0,
         featured: featured === undefined ? true : (featured === 'true' || featured === true),
-        status: status || 'published'
+        status: status || 'published',
+        ...connectCategories(categoryIds)
       }
     });
+    autoTranslate('Book', book);
     res.status(201).json(book);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -87,7 +113,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
 
 router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, author, description, externalLink, order, status, featured } = req.body;
+    const { title, author, description, externalLink, order, status, featured, categoryIds } = req.body;
     const data = {};
     if (title !== undefined) data.title = title;
     if (author !== undefined) data.author = author || null;
@@ -99,8 +125,11 @@ router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, re
     if (req.files?.cover?.[0]) data.cover = rel(req.files.cover[0]);
     if (req.files?.file?.[0]) data.file = rel(req.files.file[0]);
     if (req.files?.preview?.[0]) data.preview = rel(req.files.preview[0]);
+    if (categoryIds !== undefined) Object.assign(data, setCategories(categoryIds));
 
-    res.json(await prisma.book.update({ where: { id: req.params.id }, data }));
+    res.json(await prisma.book.update({
+      where: { id: req.params.id }, data, include: { categories: true }
+    }));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

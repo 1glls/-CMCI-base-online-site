@@ -238,6 +238,7 @@ model Book {
   externalLink String?
   order        Int      @default(0)
   featured     Boolean  @default(true)   // apparait dans la banderole
+  categories   Category[] @relation("BookCategories")
   status       String   @default("published")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -253,6 +254,7 @@ model Tract {
   cover       String?
   order       Int            @default(0)
   featured    Boolean        @default(true)   // apparait dans la banderole
+  categories  Category[]     @relation("TractCategories")
   status      String         @default("published")
   versions    TractVersion[]
   createdAt   DateTime       @default(now())
@@ -281,4 +283,20 @@ model TractVersion {
 
   @@unique([tractId, language])
   @@map("tract_versions")
+}
+
+/// Categorie partagee par les livres et les tracts.
+/// `slug` est stable et sert au filtrage : le libelle, lui, est traduit via
+/// ContentTranslation, donc il ne peut pas servir de cle de regroupement.
+model Category {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String                 // libelle francais, source des traductions
+  order     Int      @default(0)
+  books     Book[]   @relation("BookCategories")
+  tracts    Tract[]  @relation("TractCategories")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
 }

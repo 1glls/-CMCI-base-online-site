@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText } from "lucide-react"
+import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText, Tags } from "lucide-react"
 import { API_URL } from "@/lib/api"
 
 export default function AdminDashboard() {
@@ -168,6 +168,12 @@ export default function AdminDashboard() {
       description: "Tracts imprimés et versions linguistiques",
       icon: FileText,
       href: "/admin/tracts",
+    },
+    {
+      title: "Catégories",
+      description: "Classer livres et tracts",
+      icon: Tags,
+      href: "/admin/categories",
     },
     {
       title: "Traductions",

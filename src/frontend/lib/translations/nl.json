@@ -177,6 +177,9 @@
     "by": "door",
     "languages": "taal/talen",
     "close": "Sluiten",
-    "viewTract": "Traktaat bekijken"
+    "viewTract": "Traktaat bekijken",
+    "allCategories": "Alle",
+    "filterBy": "Filteren op categorie",
+    "noMatch": "Geen publicatie in deze categorie."
   }
 }

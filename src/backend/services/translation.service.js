@@ -221,7 +221,12 @@ const TRANSLATABLE = {
   Ministry: ['title', 'description'],
   Assembly: ['name', 'description', 'schedule'],
   Testimonial: ['quote', 'role'],
-  HeroSlide: ['title', 'subtitle', 'buttonText']
+  HeroSlide: ['title', 'subtitle', 'buttonText'],
+  Category: ['name'],
+  // Titre et description de catalogue. `author` n'est pas traduit : c'est un
+  // nom de personne.
+  Book: ['title', 'description'],
+  Tract: ['title', 'description']
 };
 
 /**

@@ -7,14 +7,16 @@ import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
+interface Category { id: string; slug: string; name: string; }
 interface Book {
   id: string; title: string; author: string | null; description: string;
   cover: string | null; file: string | null; preview: string | null;
-  externalLink: string | null; featured?: boolean;
+  externalLink: string | null; featured?: boolean; categories?: Category[];
 }
 interface Tract {
   id: string; slug: string; title: string; description: string;
   cover: string | null; languageCount: number; featured?: boolean;
+  categories?: Category[];
 }
 
 /* -------------------------------------------------------------------------
@@ -173,18 +175,24 @@ export function Publications() {
   const { t, language } = useLanguage();
   const [books, setBooks] = useState<Book[]>([]);
   const [tracts, setTracts] = useState<Tract[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewed, setPreviewed] = useState<Book | null>(null);
+  // Le filtre s'appuie sur le slug, jamais sur le libelle : celui-ci est
+  // traduit, et le regroupement casserait au changement de langue.
+  const [activeCat, setActiveCat] = useState('__all__');
 
   useEffect(() => {
     (async () => {
       try {
-        const [b, tr] = await Promise.all([
+        const [b, tr, c] = await Promise.all([
           fetch(`${API_URL}/api/books?lang=${language}`).then((r) => r.json()),
-          fetch(`${API_URL}/api/tracts?lang=${language}`).then((r) => r.json())
+          fetch(`${API_URL}/api/tracts?lang=${language}`).then((r) => r.json()),
+          fetch(`${API_URL}/api/categories?lang=${language}`).then((r) => r.json())
         ]);
         if (Array.isArray(b)) setBooks(b);
         if (Array.isArray(tr)) setTracts(tr);
+        if (Array.isArray(c)) setCategories(c);
       } catch (e) {
         console.error('Publications:', e);
       } finally {
@@ -199,8 +207,14 @@ export function Publications() {
 
   // Le carrousel met en avant l'ensemble des publications, tracts compris :
   // c'est le premier bloc de la page, comme le hero sur l'accueil.
+  const matches = (item: { categories?: Category[] }) =>
+    activeCat === '__all__' || (item.categories ?? []).some((c) => c.slug === activeCat);
+
+  const shownTracts = tracts.filter(matches);
+  const shownBooks = books.filter(matches);
+
   const featured: Slide[] = [
-    ...tracts.filter((tr) => tr.featured !== false).map((tr) => ({
+    ...shownTracts.filter((tr) => tr.featured !== false).map((tr) => ({
       key: `t-${tr.id}`, kind: 'tract' as const,
       title: tr.title,
       subtitle: `${tr.languageCount} ${t('books.languages')}`,
@@ -211,7 +225,7 @@ export function Publications() {
       file: null, preview: null,
       href: `/t/${tr.slug}`, book: null
     })),
-    ...books.filter((b) => b.featured !== false).map((b) => ({
+    ...shownBooks.filter((b) => b.featured !== false).map((b) => ({
       key: `b-${b.id}`, kind: 'book' as const,
       title: b.title,
       subtitle: b.author ? `${t('books.by')} ${b.author}` : null,
@@ -243,6 +257,25 @@ export function Publications() {
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
             {t('books.subtitle')}
           </p>
+
+          {categories.length > 0 && (
+            <div className="mt-8 flex flex-wrap justify-center gap-2">
+              {[{ id: '__all__', slug: '__all__', name: t('books.allCategories') }, ...categories]
+                .map((c) => (
+                  <button
+                    key={c.slug}
+                    onClick={() => setActiveCat(c.slug)}
+                    className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                      activeCat === c.slug
+                        ? 'border-primary bg-primary text-primary-foreground font-medium'
+                        : 'border-border bg-card hover:border-primary/50'
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+            </div>
+          )}
         </header>
 
         {loading && <p className="text-center text-muted-foreground">{t('books.loading')}</p>}
@@ -257,11 +290,13 @@ export function Publications() {
               </h2>
               <p className="mb-6 text-muted-foreground">{t('books.tractsSubtitle')}</p>
 
-              {tracts.length === 0 ? (
-                <p className="text-muted-foreground">{t('books.noTracts')}</p>
+              {shownTracts.length === 0 ? (
+                <p className="text-muted-foreground">
+                  {activeCat === '__all__' ? t('books.noTracts') : t('books.noMatch')}
+                </p>
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {tracts.map((tr) => (
+                  {shownTracts.map((tr) => (
                     <Link
                       key={tr.id} href={`/t/${tr.slug}`}
                       className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
@@ -302,11 +337,13 @@ export function Publications() {
               </h2>
               <p className="mb-6 text-muted-foreground">{t('books.booksSubtitle')}</p>
 
-              {books.length === 0 ? (
-                <p className="text-muted-foreground">{t('books.noBooks')}</p>
+              {shownBooks.length === 0 ? (
+                <p className="text-muted-foreground">
+                  {activeCat === '__all__' ? t('books.noBooks') : t('books.noMatch')}
+                </p>
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {books.map((b) => (
+                  {shownBooks.map((b) => (
                     <article
                       key={b.id}
                       className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
