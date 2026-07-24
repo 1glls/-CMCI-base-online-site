@@ -274,7 +274,8 @@ model TractVersion {
   label     String                       // nom natif : "Kiswahili", "العربية"
   dir       String   @default("ltr")
   title     String
-  file      String?                      // PDF
+  file      String?                      // PDF (mode fige)
+  htmlSource String?                     // /uploads/tracts/html/... (mode traduisible)
   previews  String?                      // JSON: ["/uploads/tracts/previews/...png"]
   reviewed  Boolean  @default(false)
   status    String   @default("draft")

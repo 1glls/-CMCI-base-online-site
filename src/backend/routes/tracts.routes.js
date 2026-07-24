@@ -7,12 +7,15 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { deleteUploadedFile, deleteUploadedFiles } = require('../utils/upload-cleanup');
 const { generatePreviews } = require('../utils/pdf-preview');
-const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
+const { applyTranslations, autoTranslate, changedTranslatableFields, translateHtmlDocument } =
+  require('../services/translation.service');
+const { sanitizeHtml, estimateCost } = require('../utils/html-tract');
 
 const prisma = new PrismaClient();
 
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const DOC_MIMES = ['application/pdf'];
+const HTML_MIMES = ['text/html', 'application/xhtml+xml'];
 
 /**
  * Upload multi-champs : couverture (image), PDF, et jusqu'a 4 images
@@ -22,6 +25,7 @@ const DOC_MIMES = ['application/pdf'];
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const sub = file.fieldname === 'file' ? 'files'
+      : file.fieldname === 'html' ? 'html'
       : file.fieldname === 'previews' ? 'previews' : 'covers';
     const dir = path.join(__dirname, '..', 'uploads', 'tracts', sub);
     fs.mkdirSync(dir, { recursive: true }); // Multer ne cree pas le dossier
@@ -37,7 +41,8 @@ const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024 }, // 15 Mo est insuffisant pour un PDF
   fileFilter: (req, file, cb) => {
-    const allowed = file.fieldname === 'file' ? DOC_MIMES : IMAGE_MIMES;
+    const allowed = file.fieldname === 'file' ? DOC_MIMES
+      : file.fieldname === 'html' ? HTML_MIMES : IMAGE_MIMES;
     if (allowed.includes(file.mimetype)) return cb(null, true);
     // Error et non chaine : le gestionnaire global renvoie un message utile
     cb(new Error(`Type non autorise pour « ${file.fieldname} » : ${file.mimetype}`));
@@ -47,11 +52,14 @@ const upload = multer({
 const uploadFields = upload.fields([
   { name: 'cover', maxCount: 1 },
   { name: 'file', maxCount: 1 },
+  { name: 'html', maxCount: 1 },
   { name: 'previews', maxCount: 4 }
 ]);
 
 const rel = (f) => `/uploads/tracts/${
-  f.fieldname === 'file' ? 'files' : f.fieldname === 'previews' ? 'previews' : 'covers'
+  f.fieldname === 'file' ? 'files'
+    : f.fieldname === 'html' ? 'html'
+    : f.fieldname === 'previews' ? 'previews' : 'covers'
 }/${f.filename}`;
 
 /** Les apercus sont stockes en JSON : SQLite n'a pas de type tableau. */
@@ -61,7 +69,8 @@ const parsePreviews = (v) => {
 
 const publicVersion = (v) => ({
   id: v.id, language: v.language, label: v.label, dir: v.dir,
-  title: v.title, file: v.file, previews: parsePreviews(v.previews)
+  title: v.title, file: v.file, previews: parsePreviews(v.previews),
+  hasHtml: Boolean(v.htmlSource)
 });
 
 
@@ -252,11 +261,104 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     await deleteUploadedFile(tract.cover);
     for (const v of tract.versions) {
       await deleteUploadedFile(v.file);
+      await deleteUploadedFile(v.htmlSource);
       await deleteUploadedFiles(parsePreviews(v.previews));
     }
     res.json({ message: 'Tract supprime' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+
+/**
+ * GET /api/tracts/versions/:id/html — sert le tract assaini.
+ *
+ * Affiche dans une iframe sandboxee cote site : le CSS du tract est concu
+ * pour une page entiere et se heurterait a celui du site s'il etait injecte
+ * directement. Le sandbox bloque aussi toute execution, en plus de
+ * l'assainissement applique ici.
+ */
+router.get('/versions/:id/html', async (req, res) => {
+  try {
+    const version = await prisma.tractVersion.findUnique({
+      where: { id: req.params.id },
+      include: { tract: true }
+    });
+
+    if (!version?.htmlSource) return res.status(404).send('Introuvable');
+    // Meme regle que la liste publique : rien d'invisible ne fuit par ici
+    if (!version.reviewed || version.status !== 'published' ||
+        version.tract.status !== 'published') {
+      return res.status(404).send('Introuvable');
+    }
+
+    const abs = path.join(__dirname, '..', version.htmlSource.replace(/^\//, ''));
+    if (!fs.existsSync(abs)) return res.status(404).send('Fichier absent');
+
+    res.type('html');
+    res.setHeader('Content-Security-Policy', "script-src 'none'; frame-src 'none'");
+    res.send(sanitizeHtml(fs.readFileSync(abs, 'utf8')));
+  } catch (error) {
+    res.status(500).send('Erreur');
+  }
+});
+
+/**
+ * POST /api/tracts/versions/:id/translate — cree une version traduite a
+ * partir d'une source HTML.
+ *
+ * C'est ce qu'un PDF ne permet pas : le texte reste adressable, DeepL le
+ * traduit en preservant balises et styles.
+ */
+router.post('/versions/:id/translate', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { language, label, dir } = req.body;
+    if (!language || !label) {
+      return res.status(400).json({ error: 'language et label requis' });
+    }
+
+    const source = await prisma.tractVersion.findUnique({ where: { id: req.params.id } });
+    if (!source?.htmlSource) {
+      return res.status(400).json({ error: 'Cette version n\'a pas de source HTML traduisible' });
+    }
+
+    const abs = path.join(__dirname, '..', source.htmlSource.replace(/^\//, ''));
+    if (!fs.existsSync(abs)) return res.status(404).json({ error: 'Fichier source absent' });
+
+    const html = fs.readFileSync(abs, 'utf8');
+    const translated = await translateHtmlDocument(html, language);
+
+    const dir_ = path.join(__dirname, '..', 'uploads', 'tracts', 'html');
+    fs.mkdirSync(dir_, { recursive: true });
+    const name = `tract-html-${Date.now()}-${Math.round(Math.random() * 1e9)}.html`;
+    fs.writeFileSync(path.join(dir_, name), translated);
+
+    // Creee en brouillon non relu : une traduction automatique ne se publie
+    // pas seule, c'est la regle appliquee a toutes les langues.
+    const version = await prisma.tractVersion.create({
+      data: {
+        tractId: source.tractId,
+        language: language.trim().toLowerCase(),
+        label: label.trim(),
+        title: source.title,
+        dir: dir === 'rtl' ? 'rtl' : 'ltr',
+        htmlSource: `/uploads/tracts/html/${name}`,
+        reviewed: false,
+        status: 'draft'
+      }
+    });
+
+    res.status(201).json({
+      version: { ...version, previews: [] },
+      characters: estimateCost(html),
+      note: 'Traduction automatique : a relire avant publication.'
+    });
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Cette langue existe deja pour ce tract' });
+    }
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -277,6 +379,7 @@ router.post('/:id/versions', authMiddleware, adminMiddleware, uploadFields, asyn
         title: title || label,
         dir: dir === 'rtl' ? 'rtl' : 'ltr',
         file: req.files?.file?.[0] ? rel(req.files.file[0]) : null,
+        htmlSource: req.files?.html?.[0] ? rel(req.files.html[0]) : null,
         previews: req.files?.previews?.length
           ? JSON.stringify(req.files.previews.map(rel)) : null,
         reviewed: reviewed === 'true' || reviewed === true,
@@ -305,6 +408,7 @@ router.put('/versions/:versionId', authMiddleware, adminMiddleware, uploadFields
     if (reviewed !== undefined) data.reviewed = reviewed === 'true' || reviewed === true;
     if (status !== undefined) data.status = status;
     if (req.files?.file?.[0]) data.file = rel(req.files.file[0]);
+    if (req.files?.html?.[0]) data.htmlSource = rel(req.files.html[0]);
     if (req.files?.previews?.length) {
       data.previews = JSON.stringify(req.files.previews.map(rel));
     }
@@ -333,6 +437,7 @@ router.delete('/versions/:versionId', authMiddleware, adminMiddleware, async (re
 
     await prisma.tractVersion.delete({ where: { id: req.params.versionId } });
     await deleteUploadedFile(version.file);
+    await deleteUploadedFile(version.htmlSource);
     await deleteUploadedFiles(parsePreviews(version.previews));
 
     res.json({ message: 'Version supprimee' });

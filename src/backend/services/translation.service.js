@@ -110,7 +110,7 @@ async function refreshUsage(providerId) {
  * Traduit un lot de textes. Bascule de compte si le quota est atteint.
  * Renvoie { translations: string[], provider, characters }.
  */
-async function translateBatch(texts, targetLang, sourceLang = 'FR') {
+async function translateBatch(texts, targetLang, sourceLang = 'FR', options = {}) {
   const clean = texts.map((t) => (t ?? '').toString());
   const characters = clean.reduce((n, t) => n + t.length, 0);
   if (characters === 0) return { translations: clean, provider: null, characters: 0 };
@@ -134,6 +134,10 @@ async function translateBatch(texts, targetLang, sourceLang = 'FR') {
       target_lang: targetLang.toUpperCase(),
       source_lang: sourceLang.toUpperCase()
     });
+    // tag_handling=html : DeepL preserve balises, classes et attributs, et
+    // ne traduit que le texte. C'est ce qui rend un tract HTML traduisible
+    // la ou un PDF ne l'est pas.
+    if (options.tagHandling) params.set('tag_handling', options.tagHandling);
     clean.forEach((t) => params.append('text', t));
 
     const manual = await requestRaw(
@@ -331,7 +335,20 @@ function changedTranslatableFields(model, before, after) {
   });
 }
 
+/**
+ * Traduit un document HTML complet en preservant sa mise en forme.
+ * Le CSS et les images embarquees ne sont pas envoyes : voir utils/html-tract.
+ */
+async function translateHtmlDocument(html, targetLang) {
+  const { translateDocument } = require('../utils/html-tract');
+  return translateDocument(html, targetLang, async (chunks, lang) => {
+    const { translations } = await translateBatch(chunks, lang, 'FR', { tagHandling: 'html' });
+    return translations;
+  });
+}
+
 module.exports = {
+  translateHtmlDocument,
   autoTranslate,
   changedTranslatableFields,
   TARGET_LANGUAGES,
