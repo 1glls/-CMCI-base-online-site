@@ -97,7 +97,7 @@ export function About() {
               asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
             >
-              <a href="#valeurs">{t('about.learnMore')}</a>
+              <a href="/#valeurs">{t('about.learnMore')}</a>
             </Button>
           </div>
 

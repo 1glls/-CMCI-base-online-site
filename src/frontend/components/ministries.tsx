@@ -58,7 +58,7 @@ export default function Ministries() {
           <div className="text-center mb-16">
             <p className="text-emerald-600 uppercase tracking-wider font-semibold mb-3">{t('ministries.label')}</p>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {t('ministries.label')}
+              {t('ministries.title')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               {t('ministries.loading')}
@@ -74,7 +74,7 @@ export default function Ministries() {
       <div className="container mx-auto px-4">
         {/* En-tête */}
         <div className="text-center mb-16">
-          <p className="text-emerald-600 uppercase tracking-wider font-semibold mb-3">MINISTRY</p>
+          <p className="text-emerald-600 uppercase tracking-wider font-semibold mb-3">{t('ministries.label')}</p>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             {t('ministries.title')}
           </h2>
@@ -144,7 +144,7 @@ export default function Ministries() {
             <p className="text-white/90 mb-6 max-w-xl">
               {t('ministries.joinText')}
             </p>
-            <a href="#contact">
+            <a href="/#contact">
               <Button size="lg" variant="secondary" className="font-semibold">
                 {t('ministries.joinButton')}
                 <ArrowRight className="ml-2 h-5 w-5" />

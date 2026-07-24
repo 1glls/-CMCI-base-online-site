@@ -25,12 +25,12 @@ export function Footer() {
   // Defini a l'interieur du composant : hors du cycle de rendu, les libelles
   // resteraient en francais au changement de langue.
   const quickLinks = [
-    { href: "#accueil", label: t('nav.home') },
-    { href: "#vision", label: t('nav.vision') },
-    { href: "#valeurs", label: t('nav.values') },
-    { href: "#evenements", label: t('nav.events') },
-    { href: "#assemblees", label: t('nav.assemblies') },
-    { href: "#galerie", label: t('nav.gallery') },
+    { href: "/#accueil", label: t('nav.home') },
+    { href: "/#vision", label: t('nav.vision') },
+    { href: "/#valeurs", label: t('nav.values') },
+    { href: "/#evenements", label: t('nav.events') },
+    { href: "/#assemblees", label: t('nav.assemblies') },
+    { href: "/#galerie", label: t('nav.gallery') },
   ]
 
   return (

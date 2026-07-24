@@ -1,0 +1,77 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "CMCI Logo CMCI Belgique" [ref=e4] [cursor=pointer]:
+        - /url: "#accueil"
+        - img "CMCI Logo" [ref=e6]
+        - generic [ref=e7]:
+          - text: CMCI
+          - generic [ref=e8]: Belgique
+      - navigation [ref=e9]:
+        - link "Accueil" [ref=e10] [cursor=pointer]:
+          - /url: "#accueil"
+        - link "Vision" [ref=e11] [cursor=pointer]:
+          - /url: "#vision"
+        - link "Nos Valeurs" [ref=e12] [cursor=pointer]:
+          - /url: "#valeurs"
+        - link "Ministères" [ref=e13] [cursor=pointer]:
+          - /url: "#ministeres"
+        - link "Événements" [ref=e14] [cursor=pointer]:
+          - /url: "#evenements"
+        - link "Assemblées" [ref=e15] [cursor=pointer]:
+          - /url: "#assemblees"
+        - link "Galerie" [ref=e16] [cursor=pointer]:
+          - /url: "#galerie"
+        - link "Publications" [ref=e17] [cursor=pointer]:
+          - /url: /livres
+        - link "Contact" [ref=e18] [cursor=pointer]:
+          - /url: "#contact"
+        - button "Select language" [ref=e21]:
+          - generic [ref=e25]: fr
+      - link "Nous rejoindre" [ref=e27] [cursor=pointer]:
+        - /url: "#contact"
+  - main [ref=e28]:
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - text: Livre & littérature
+        - heading "Nos publications" [level=1] [ref=e31]
+        - paragraph [ref=e33]: Les ouvrages et tracts de notre ministère, à lire et à partager.
+      - paragraph [ref=e34]: Chargement...
+  - contentinfo [ref=e35]:
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]: CMCI
+          - generic [ref=e41]:
+            - text: CMCI
+            - generic [ref=e42]: Belgique
+        - paragraph [ref=e43]: La Communauté Missionnaire Chrétienne Internationale en Belgique - une famille de disciples dévoués à Jésus-Christ, notre modèle en toutes choses.
+      - generic [ref=e44]:
+        - heading "Liens rapides" [level=3] [ref=e45]
+        - list [ref=e46]:
+          - listitem [ref=e47]:
+            - link "Accueil" [ref=e48] [cursor=pointer]:
+              - /url: "#accueil"
+          - listitem [ref=e49]:
+            - link "Vision" [ref=e50] [cursor=pointer]:
+              - /url: "#vision"
+          - listitem [ref=e51]:
+            - link "Nos Valeurs" [ref=e52] [cursor=pointer]:
+              - /url: "#valeurs"
+          - listitem [ref=e53]:
+            - link "Événements" [ref=e54] [cursor=pointer]:
+              - /url: "#evenements"
+          - listitem [ref=e55]:
+            - link "Assemblées" [ref=e56] [cursor=pointer]:
+              - /url: "#assemblees"
+          - listitem [ref=e57]:
+            - link "Galerie" [ref=e58] [cursor=pointer]:
+              - /url: "#galerie"
+    - generic [ref=e61]:
+      - paragraph [ref=e62]: © 2026 CMCI Belgique. Tous droits réservés. Fait avec pour la gloire de Dieu.
+      - generic [ref=e65]:
+        - link "Mentions légales" [ref=e66] [cursor=pointer]:
+          - /url: "#"
+        - link "Politique de confidentialité" [ref=e67] [cursor=pointer]:
+          - /url: "#"
+  - alert [ref=e68]

@@ -21,7 +21,14 @@ interface Tract {
    Defilement automatique, suspendu au survol et des qu'on prend la main :
    un contenu qui bouge pendant qu'on le lit est un contenu qu'on ne lit pas.
 ------------------------------------------------------------------------- */
-function FeaturedCarousel({ books, onPreview }: { books: Book[]; onPreview: (b: Book) => void }) {
+type Slide = {
+  key: string; kind: 'book' | 'tract';
+  title: string; subtitle: string | null; description: string;
+  cover: string | null; file: string | null; preview: string | null;
+  href: string | null; book: Book | null;
+};
+
+function FeaturedCarousel({ books, onPreview }: { books: Slide[]; onPreview: (b: Book) => void }) {
   const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -51,33 +58,39 @@ function FeaturedCarousel({ books, onPreview }: { books: Book[]; onPreview: (b: 
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {books.map((b) => (
-          <div key={b.id} className="w-full shrink-0">
+          <div key={b.key} className="w-full shrink-0">
             <div className="grid items-center gap-6 p-6 sm:p-10 md:grid-cols-[auto_1fr]">
-              <div className="mx-auto w-40 shrink-0 md:w-48">
+              <div className="mx-auto w-44 shrink-0 md:w-56">
                 {b.cover ? (
                   <img
                     src={getFileUrl(b.cover)} alt={b.title}
                     className="w-full rounded-lg shadow-2xl"
                   />
                 ) : (
-                  <div className="flex aspect-[3/4] items-center justify-center rounded-lg bg-white/10 text-sm text-white/60">
+                  <div className="flex aspect-[3/4] items-center justify-center rounded-lg bg-white/10 p-4 text-center text-sm text-white/60">
                     {b.title}
                   </div>
                 )}
               </div>
               <div className="text-center md:text-start">
                 <span className="text-xs font-semibold uppercase tracking-wider text-accent">
-                  {t('books.featured')}
+                  {b.kind === 'tract' ? t('books.tractsTitle') : t('books.featured')}
                 </span>
                 <h3 className="mt-2 font-serif text-2xl font-bold sm:text-3xl">{b.title}</h3>
-                {b.author && (
-                  <p className="mt-1 text-white/70">{t('books.by')} {b.author}</p>
-                )}
+                {b.subtitle && <p className="mt-1 text-white/70">{b.subtitle}</p>}
                 <p className="mt-3 line-clamp-3 text-white/85">{b.description}</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
-                  {(b.preview || b.file) && (
+                  {b.href && (
+                    <Link
+                      href={b.href}
+                      className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-accent-foreground hover:bg-accent/90"
+                    >
+                      <Eye className="h-4 w-4" />{t('books.viewTract')}
+                    </Link>
+                  )}
+                  {b.book && (b.book.preview || b.book.file) && (
                     <button
-                      onClick={() => onPreview(b)}
+                      onClick={() => onPreview(b.book!)}
                       className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-accent-foreground hover:bg-accent/90"
                     >
                       <Eye className="h-4 w-4" />{t('books.preview')}
@@ -160,6 +173,27 @@ export function Publications() {
     ? getFileUrl(previewed.preview || previewed.file)
     : null;
 
+  // Le carrousel met en avant l'ensemble des publications, tracts compris :
+  // c'est le premier bloc de la page, comme le hero sur l'accueil.
+  const featured: Slide[] = [
+    ...tracts.map((tr) => ({
+      key: `t-${tr.id}`, kind: 'tract' as const,
+      title: tr.title,
+      subtitle: `${tr.languageCount} ${t('books.languages')}`,
+      description: tr.description,
+      cover: tr.cover, file: null, preview: null,
+      href: `/t/${tr.slug}`, book: null
+    })),
+    ...books.map((b) => ({
+      key: `b-${b.id}`, kind: 'book' as const,
+      title: b.title,
+      subtitle: b.author ? `${t('books.by')} ${b.author}` : null,
+      description: b.description,
+      cover: b.cover, file: b.file, preview: b.preview,
+      href: null, book: b
+    }))
+  ].slice(0, 6);
+
   return (
     <main className="min-h-screen bg-background pt-24">
       <div className="container mx-auto px-4 pb-20">
@@ -182,9 +216,9 @@ export function Publications() {
         {!loading && (
           <>
             {/* Ouvrages mis en avant */}
-            {books.length > 0 && (
+            {featured.length > 0 && (
               <section className="mb-16">
-                <FeaturedCarousel books={books.slice(0, 5)} onPreview={setPreviewed} />
+                <FeaturedCarousel books={featured} onPreview={setPreviewed} />
               </section>
             )}
 
