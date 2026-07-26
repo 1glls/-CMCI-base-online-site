@@ -169,6 +169,82 @@ router.post('/content/:model/:recordId', authMiddleware, adminMiddleware, async 
   }
 });
 
+/**
+ * Modeles dont le contenu est redige en admin et doit exister en en/nl.
+ * `Book` en est volontairement absent : les livres ztfbooks arrivent deja
+ * dans leur langue de publication, on ne traduit pas leur titre.
+ */
+const BACKFILL = {
+  Event: () => prisma.event.findMany(),
+  Ministry: () => prisma.ministry.findMany(),
+  Assembly: () => prisma.assembly.findMany(),
+  Testimonial: () => prisma.testimonial.findMany(),
+  HeroSlide: () => prisma.heroSlide.findMany(),
+  Category: () => prisma.category.findMany(),
+  Tract: () => prisma.tract.findMany()
+};
+const BACKFILL_LANGS = ['en', 'nl'];
+
+/**
+ * Traduit tout ce qui manque, en une passe.
+ *
+ * Repare les contenus crees par script ou avant le branchement de la
+ * traduction (le tract « Le chemin du salut », importe, n'avait aucune
+ * traduction). Idempotent : ne touche qu'aux champs sans traduction pour la
+ * langue visee — une seconde passe ne consomme rien, et une traduction relue
+ * (qui a donc une ligne) n'est jamais reecrite.
+ *
+ * ?dryRun=1 : estime le cout en caracteres sans appeler DeepL.
+ */
+router.post('/backfill', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const dryRun = req.query.dryRun === '1' || req.query.dryRun === 'true';
+    const summary = {};
+    let characters = 0;
+
+    for (const [model, load] of Object.entries(BACKFILL)) {
+      const fields = TRANSLATABLE[model] || [];
+      const records = await load();
+      summary[model] = { records: records.length, translated: 0, filled: 0 };
+
+      for (const record of records) {
+        const existing = await prisma.contentTranslation.findMany({
+          where: { model, recordId: record.id },
+          select: { language: true, field: true }
+        });
+        const have = new Set(existing.map((e) => `${e.language}.${e.field}`));
+
+        for (const lang of BACKFILL_LANGS) {
+          // Champs traduisibles renseignes en francais mais sans ligne pour `lang`
+          const missing = fields.filter(
+            (f) => record[f] && String(record[f]).trim() && !have.has(`${lang}.${f}`)
+          );
+          if (missing.length === 0) continue;
+
+          characters += missing.reduce((n, f) => n + String(record[f]).length, 0);
+
+          if (!dryRun) {
+            await translateRecord(model, record.id, record, lang, missing);
+            summary[model].translated += 1;
+          }
+          summary[model].filled += missing.length;
+        }
+      }
+    }
+
+    res.json({
+      dryRun,
+      characters,
+      summary,
+      message: dryRun
+        ? `${characters} caracteres a traduire.`
+        : 'Traduction des contenus manquants terminee.'
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 /** Correction manuelle : marque la traduction comme relue. */
 router.put('/content/:model/:recordId', authMiddleware, adminMiddleware, async (req, res) => {
   try {

@@ -107,6 +107,20 @@ async function main() {
   console.log(`  visible    : ${version.reviewed && version.status === 'published' ? 'oui' : 'non — a valider dans l\'admin'}`);
   console.log(`\n  URL du QR  : https://www.cmcibelgique.org/t/${slug}?de=${lang}`);
 
+  // Un contenu neuf ne doit jamais naitre monolingue : on traduit le tract
+  // (titre, description) en en/nl, comme le font les routes admin. Sans quoi
+  // le catalogue afficherait le francais quelle que soit la langue choisie.
+  const freshTract = await prisma.tract.findUnique({ where: { id: tract.id } });
+  const { translateRecord } = require('../services/translation.service');
+  for (const target of ['en', 'nl']) {
+    try {
+      await translateRecord('Tract', tract.id, freshTract, target);
+      console.log(`  traduction ${target} : ok`);
+    } catch (e) {
+      console.log(`  traduction ${target} : ignoree (${e.message})`);
+    }
+  }
+
   await prisma.$disconnect();
 }
 

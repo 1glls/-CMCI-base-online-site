@@ -45,6 +45,8 @@ export default function AdminTranslationsPage() {
   const [saving, setSaving] = useState(false);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', apiKey: '', characterLimit: '500000', priority: '0' });
+  const [backfill, setBackfill] = useState<{ characters: number } | null>(null);
+  const [backfilling, setBackfilling] = useState(false);
 
   const token = () => localStorage.getItem('adminToken');
 
@@ -141,6 +143,32 @@ export default function AdminTranslationsPage() {
     fetchProviders();
   };
 
+  const runBackfill = async (dryRun: boolean) => {
+    setBackfilling(true);
+    try {
+      const res = await fetch(`${API_URL}/api/translations/backfill${dryRun ? '?dryRun=1' : ''}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token()}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Echec');
+      if (dryRun) {
+        setBackfill({ characters: data.characters });
+      } else {
+        setBackfill(null);
+        toast({ title: 'Contenus traduits', description: data.message });
+        fetchProviders();
+      }
+    } catch (err) {
+      toast({
+        title: 'Erreur',
+        description: err instanceof Error ? err.message : '',
+        variant: 'destructive'
+      });
+    } finally {
+      setBackfilling(false);
+    }
+  };
+
   const globalPercent = totals.limit > 0 ? Math.round((totals.used / totals.limit) * 100) : 0;
 
   return (
@@ -183,6 +211,40 @@ export default function AdminTranslationsPage() {
             <p className="mt-2 text-xs text-gray-500">
               {globalPercent}% de {fmt(totals.limit)} caractères
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Traduire les contenus manquants */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Traduire les contenus manquants</CardTitle>
+            <CardDescription>
+              Complete en anglais et néerlandais tout contenu qui n&apos;a pas encore
+              été traduit — événements, ministères, assemblées, témoignages, slides,
+              catégories, tracts. Sans effet sur les traductions déjà relues.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" onClick={() => runBackfill(true)} disabled={backfilling}>
+                {backfilling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Estimer
+              </Button>
+              {backfill && (
+                <>
+                  <span className="text-sm text-gray-600">
+                    {fmt(backfill.characters)} caractères à traduire
+                  </span>
+                  <Button onClick={() => runBackfill(false)} disabled={backfilling || backfill.characters === 0}>
+                    {backfilling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Traduire tout ce qui manque
+                  </Button>
+                </>
+              )}
+            </div>
+            {backfill?.characters === 0 && (
+              <p className="mt-2 text-sm text-green-700">Tout est déjà traduit.</p>
+            )}
           </CardContent>
         </Card>
 
