@@ -236,6 +236,13 @@ model Book {
   file         String?  // /uploads/books/files/...   PDF complet
   preview      String?  // extrait PDF optionnel
   externalLink String?
+  source       String?  @default("local") // "local" | "ztfbooks"
+  sourceId     String?                     // id ztfbooks, pour l'idempotence
+  language     String?                     // ex. "Français" (normalise)
+  languageCode String?                     // ex. "fr", pour le filtre
+  priceLabel   String?                     // ex. "3,99 €" ou "Gratuit"
+  coverKey     String?                     // thumbnailFileName, resolu a la demande
+  hidden       Boolean  @default(false)    // masque localement, survit aux syncs
   order        Int      @default(0)
   featured     Boolean  @default(true)   // apparait dans la banderole
   categories   Category[] @relation("BookCategories")
@@ -243,6 +250,7 @@ model Book {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  @@unique([source, sourceId])
   @@map("books")
 }
 

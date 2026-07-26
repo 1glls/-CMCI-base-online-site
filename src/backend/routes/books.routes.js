@@ -7,6 +7,10 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
+const { syncBooks, resolveCover } = require('../services/ztfbooks.service');
+
+// URL de couverture : notre relais, qui regenere le lien presigne ztfbooks
+const coverUrl = (b) => b.coverKey ? `/api/books/${b.id}/cover` : b.cover;
 
 /**
  * Les categories arrivent en JSON depuis un envoi multipart. `connect` a la
@@ -67,20 +71,56 @@ const rel = (f) => `/uploads/books/${f.fieldname === 'cover' ? 'covers' : 'files
 router.get('/', async (req, res) => {
   try {
     const books = await prisma.book.findMany({
-      where: { status: 'published' }, orderBy: { order: 'asc' },
+      where: { status: 'published', hidden: false },
+      orderBy: [{ order: 'asc' }, { title: 'asc' }],
       include: { categories: { select: { id: true, slug: true, name: true } } }
     });
-    res.json(await applyTranslations('Book', books, req.query.lang));
+    // Pas de traduction : un livre garde le titre de sa langue de publication.
+    res.json(books.map((b) => ({
+      id: b.id, title: b.title, author: b.author, description: b.description,
+      cover: coverUrl(b), file: b.file, preview: b.preview,
+      externalLink: b.externalLink, source: b.source,
+      language: b.language, languageCode: b.languageCode,
+      priceLabel: b.priceLabel, featured: b.featured, categories: b.categories
+    })));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+/** GET /api/books/:id/cover — relais vers la couverture ztfbooks (lien presigne). */
+router.get('/:id/cover', async (req, res) => {
+  try {
+    const book = await prisma.book.findUnique({ where: { id: req.params.id } });
+    if (!book) return res.status(404).send('Introuvable');
+    if (book.cover && !book.coverKey) return res.redirect(302, book.cover);
+
+    const url = await resolveCover(book.coverKey);
+    if (!url) return res.status(404).send('Couverture indisponible');
+    // Le lien presigne expire : cache court, jamais definitif
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.redirect(302, url);
+  } catch (error) {
+    res.status(502).send('Erreur');
+  }
+});
+
+/** POST /api/books/sync — synchronise le catalogue ztfbooks (admin). */
+router.post('/sync', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const result = await syncBooks();
+    res.json({ message: 'Synchronisation terminee', ...result });
+  } catch (error) {
+    res.status(502).json({ error: error.message });
+  }
+});
+
 router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    res.json(await prisma.book.findMany({
-      orderBy: { order: 'asc' }, include: { categories: true }
-    }));
+    const books = await prisma.book.findMany({
+      orderBy: [{ order: 'asc' }, { title: 'asc' }], include: { categories: true }
+    });
+    res.json(books.map((b) => ({ ...b, coverDisplay: coverUrl(b) })));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
