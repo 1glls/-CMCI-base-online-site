@@ -180,6 +180,10 @@
     "viewTract": "Voir le tract",
     "allCategories": "Toutes",
     "filterBy": "Filtrer par catégorie",
-    "noMatch": "Aucune publication dans cette catégorie."
+    "noMatch": "Aucune publication dans cette catégorie.",
+    "allLanguages": "Toutes les langues",
+    "viewOnZtf": "Voir sur ztfbooks",
+    "free": "Gratuit",
+    "filterByLanguage": "Filtrer par langue"
   }
 }

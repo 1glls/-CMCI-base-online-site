@@ -180,6 +180,10 @@
     "viewTract": "Traktaat bekijken",
     "allCategories": "Alle",
     "filterBy": "Filteren op categorie",
-    "noMatch": "Geen publicatie in deze categorie."
+    "noMatch": "Geen publicatie in deze categorie.",
+    "allLanguages": "Alle talen",
+    "viewOnZtf": "Bekijk op ztfbooks",
+    "free": "Gratis",
+    "filterByLanguage": "Filteren op taal"
   }
 }

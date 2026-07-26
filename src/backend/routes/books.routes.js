@@ -153,7 +153,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
 
 router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, author, description, externalLink, order, status, featured, categoryIds } = req.body;
+    const { title, author, description, externalLink, order, status, featured, hidden, categoryIds } = req.body;
     const data = {};
     if (title !== undefined) data.title = title;
     if (author !== undefined) data.author = author || null;
@@ -162,6 +162,7 @@ router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, re
     if (order !== undefined) data.order = Number(order);
     if (status !== undefined) data.status = status;
     if (featured !== undefined) data.featured = featured === 'true' || featured === true;
+    if (hidden !== undefined) data.hidden = hidden === 'true' || hidden === true;
     if (req.files?.cover?.[0]) data.cover = rel(req.files.cover[0]);
     if (req.files?.file?.[0]) data.file = rel(req.files.file[0]);
     if (req.files?.preview?.[0]) data.preview = rel(req.files.preview[0]);

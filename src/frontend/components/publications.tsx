@@ -7,11 +7,24 @@ import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
+/** Les descriptions ztfbooks contiennent du HTML : on n'affiche que le texte. */
+function stripHtml(s: string): string {
+  return (s || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&#?[a-z0-9]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 interface Category { id: string; slug: string; name: string; }
 interface Book {
   id: string; title: string; author: string | null; description: string;
   cover: string | null; file: string | null; preview: string | null;
   externalLink: string | null; featured?: boolean; categories?: Category[];
+  source?: string | null; language?: string | null;
+  languageCode?: string | null; priceLabel?: string | null;
 }
 interface Tract {
   id: string; slug: string; title: string; description: string;
@@ -186,6 +199,8 @@ export function Publications() {
   // Le filtre s'appuie sur le slug, jamais sur le libelle : celui-ci est
   // traduit, et le regroupement casserait au changement de langue.
   const [activeCat, setActiveCat] = useState('__all__');
+  const [activeLang, setActiveLang] = useState('__all__');
+  const [booksShown, setBooksShown] = useState(24);
 
   useEffect(() => {
     (async () => {
@@ -227,14 +242,24 @@ export function Publications() {
     activeCat === '__all__' || (item.categories ?? []).some((c) => c.slug === activeCat);
 
   const shownTracts = tracts.filter(matches);
-  const shownBooks = books.filter(matches);
+  const shownBooks = books.filter(
+    (b) => matches(b) && (activeLang === '__all__' || (b.languageCode || b.language) === activeLang)
+  );
+  // Langues presentes, pour le filtre. Cle stable (code sinon nom).
+  const langMap = new Map<string, string>();
+  for (const b of books) {
+    const key = b.languageCode || b.language;
+    if (key && b.language) langMap.set(key, b.language);
+  }
+  const languages = Array.from(langMap.entries())
+    .sort((a, b) => a[1].localeCompare(b[1]));
 
   const featured: Slide[] = [
     ...shownTracts.filter((tr) => tr.featured !== false).map((tr) => ({
       key: `t-${tr.id}`, kind: 'tract' as const,
       title: tr.title,
       subtitle: `${tr.languageCount} ${t('books.languages')}`,
-      description: tr.description,
+      description: stripHtml(tr.description),
       // Cascade : illustration televersee, sinon rien (le degrade prend le relais).
       // Les apercus ne sont pas exposes par la liste publique des tracts.
       image: tr.cover,
@@ -245,7 +270,7 @@ export function Publications() {
       key: `b-${b.id}`, kind: 'book' as const,
       title: b.title,
       subtitle: b.author ? `${t('books.by')} ${b.author}` : null,
-      description: b.description,
+      description: stripHtml(b.description),
       image: b.cover,
       file: b.file, preview: b.preview,
       href: null, book: b
@@ -351,25 +376,61 @@ export function Publications() {
               <h2 className="font-serif text-2xl font-bold text-primary">
                 {t('books.booksTitle')}
               </h2>
-              <p className="mb-6 text-muted-foreground">{t('books.booksSubtitle')}</p>
+              <p className="mb-4 text-muted-foreground">{t('books.booksSubtitle')}</p>
+
+              {/* Filtre par langue — sur code stable, jamais sur le libelle */}
+              {languages.length > 1 && (
+                <div className="mb-6 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => { setActiveLang('__all__'); setBooksShown(24); }}
+                    className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                      activeLang === '__all__'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-card hover:border-primary/50'
+                    }`}
+                  >
+                    {t('books.allLanguages')}
+                  </button>
+                  {languages.map(([code, name]) => (
+                    <button
+                      key={code}
+                      onClick={() => { setActiveLang(code!); setBooksShown(24); }}
+                      className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                        activeLang === code
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-card hover:border-primary/50'
+                      }`}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {shownBooks.length === 0 ? (
                 <p className="text-muted-foreground">
-                  {activeCat === '__all__' ? t('books.noBooks') : t('books.noMatch')}
+                  {activeCat === '__all__' && activeLang === '__all__' ? t('books.noBooks') : t('books.noMatch')}
                 </p>
               ) : (
+                <>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {shownBooks.map((b) => (
+                  {shownBooks.slice(0, booksShown).map((b) => (
                     <article
                       key={b.id}
                       className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
                     >
                       {b.cover && (
-                        <div className="aspect-[3/4] overflow-hidden bg-secondary">
+                        <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
                           <img
                             src={getFileUrl(b.cover)} alt={b.title}
+                            loading="lazy"
                             className="h-full w-full object-cover"
                           />
+                          {b.language && (
+                            <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
+                              {b.language}
+                            </span>
+                          )}
                         </div>
                       )}
                       <div className="flex flex-1 flex-col p-5">
@@ -379,32 +440,19 @@ export function Publications() {
                             {t('books.by')} {b.author}
                           </p>
                         )}
-                        <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">
-                          {b.description}
+                        <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">
+                          {stripHtml(b.description)}
                         </p>
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {(b.preview || b.file) && (
-                            <button
-                              onClick={() => setPreviewed(b)}
-                              className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm font-medium hover:bg-secondary/70"
-                            >
-                              <Eye className="h-4 w-4" />{t('books.preview')}
-                            </button>
-                          )}
-                          {b.file && (
-                            <a
-                              href={getFileUrl(b.file)} download
-                              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90"
-                            >
-                              <Download className="h-4 w-4" />{t('books.download')}
-                            </a>
+                        <div className="mt-4 flex items-center justify-between gap-2">
+                          {b.priceLabel && (
+                            <span className="text-sm font-semibold text-primary">{b.priceLabel}</span>
                           )}
                           {b.externalLink && (
                             <a
-                              href={b.externalLink} target="_blank" rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm hover:bg-secondary"
+                              href={b.externalLink} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90"
                             >
-                              <ExternalLink className="h-4 w-4" />{t('books.read')}
+                              <ExternalLink className="h-4 w-4" />{t('books.viewOnZtf')}
                             </a>
                           )}
                         </div>
@@ -412,6 +460,17 @@ export function Publications() {
                     </article>
                   ))}
                 </div>
+                {shownBooks.length > booksShown && (
+                  <div className="mt-8 text-center">
+                    <button
+                      onClick={() => setBooksShown((n) => n + 24)}
+                      className="rounded-full border-2 border-primary px-6 py-2.5 font-medium text-primary transition-colors hover:bg-primary hover:text-white"
+                    >
+                      {t('books.seeMore')} ({shownBooks.length - booksShown})
+                    </button>
+                  </div>
+                )}
+                </>
               )}
             </section>
           </>
