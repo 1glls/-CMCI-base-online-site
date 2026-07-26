@@ -184,6 +184,8 @@
     "allLanguages": "Toutes les langues",
     "viewOnZtf": "Voir sur ztfbooks",
     "free": "Gratuit",
-    "filterByLanguage": "Filtrer par langue"
+    "filterByLanguage": "Filtrer par langue",
+    "filterByCategory": "Filtrer par catégorie",
+    "seeMore": "Voir plus"
   }
 }

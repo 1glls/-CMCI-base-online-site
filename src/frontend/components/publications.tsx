@@ -80,18 +80,24 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
         >
           {s.image ? (
             <>
-              {/* object-[center_30%] : privilegie le haut de l'image, ou se
-                  trouvent le plus souvent les sujets, plutot que de rogner au
-                  centre geometrique. */}
+              {/* Fond flou : remplit toute la bande quelle que soit la forme
+                  de l'image, sans etirement visible. */}
+              <img
+                src={getFileUrl(s.image)} alt="" aria-hidden
+                className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
+              />
+              {/* Image nette, entiere, jamais deformee ni rognee (contain). */}
               <img
                 src={getFileUrl(s.image)} alt=""
-                className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+                className="absolute inset-0 h-full w-full object-contain"
               />
-              {/* Voile modere : un aplat leger pour la lisibilite, renforce
-                  seulement au centre par un degrade horizontal, la ou vit le
-                  texte. L'ancien double voile noircissait toute l'image. */}
-              <div className="absolute inset-0 bg-black/35" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-black/50" />
+              {/* Voile leger d'ensemble + halo sombre au centre, la ou vit le
+                  texte : lisibilite sans noircir l'image. */}
+              <div className="absolute inset-0 bg-black/30" />
+              <div
+                className="absolute inset-0"
+                style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%)' }}
+              />
             </>
           ) : (
             // Ni illustration ni apercu : degrade aux couleurs du site, pour
@@ -299,22 +305,23 @@ export function Publications() {
             {t('books.subtitle')}
           </p>
 
+          {/* 53 categories : un menu deroulant plutot qu'un mur de pastilles.
+              Le filtre langue reste en pastilles plus bas (moins nombreuses). */}
           {categories.length > 0 && (
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
-              {[{ id: '__all__', slug: '__all__', name: t('books.allCategories') }, ...categories]
-                .map((c) => (
-                  <button
-                    key={c.slug}
-                    onClick={() => setActiveCat(c.slug)}
-                    className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
-                      activeCat === c.slug
-                        ? 'border-primary bg-primary text-primary-foreground font-medium'
-                        : 'border-border bg-card hover:border-primary/50'
-                    }`}
-                  >
-                    {c.name}
-                  </button>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t('books.filterByCategory')}
+              </label>
+              <select
+                value={activeCat}
+                onChange={(e) => { setActiveCat(e.target.value); setBooksShown(24); }}
+                className="rounded-full border border-border bg-card px-4 py-2 text-sm focus:border-primary focus:outline-none"
+              >
+                <option value="__all__">{t('books.allCategories')}</option>
+                {categories.map((c) => (
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
                 ))}
+              </select>
             </div>
           )}
         </header>
@@ -336,7 +343,7 @@ export function Publications() {
                   {activeCat === '__all__' ? t('books.noTracts') : t('books.noMatch')}
                 </p>
               ) : (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {shownTracts.map((tr) => (
                     <Link
                       key={tr.id} href={`/t/${tr.slug}`}
@@ -413,7 +420,7 @@ export function Publications() {
                 </p>
               ) : (
                 <>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {shownBooks.slice(0, booksShown).map((b) => (
                     <article
                       key={b.id}
@@ -433,26 +440,23 @@ export function Publications() {
                           )}
                         </div>
                       )}
-                      <div className="flex flex-1 flex-col p-5">
-                        <h3 className="font-serif text-lg font-bold text-primary">{b.title}</h3>
+                      <div className="flex flex-1 flex-col p-3">
+                        <h3 className="font-serif text-sm font-bold leading-tight text-primary line-clamp-2">{b.title}</h3>
                         {b.author && (
-                          <p className="text-sm text-muted-foreground">
-                            {t('books.by')} {b.author}
+                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                            {b.author}
                           </p>
                         )}
-                        <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">
-                          {stripHtml(b.description)}
-                        </p>
-                        <div className="mt-4 flex items-center justify-between gap-2">
+                        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
                           {b.priceLabel && (
-                            <span className="text-sm font-semibold text-primary">{b.priceLabel}</span>
+                            <span className="text-xs font-semibold text-primary">{b.priceLabel}</span>
                           )}
                           {b.externalLink && (
                             <a
                               href={b.externalLink} target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90"
+                              className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:bg-accent/90"
                             >
-                              <ExternalLink className="h-4 w-4" />{t('books.viewOnZtf')}
+                              <ExternalLink className="h-3.5 w-3.5" />ztfbooks
                             </a>
                           )}
                         </div>

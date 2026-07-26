@@ -184,6 +184,8 @@
     "allLanguages": "All languages",
     "viewOnZtf": "View on ztfbooks",
     "free": "Free",
-    "filterByLanguage": "Filter by language"
+    "filterByLanguage": "Filter by language",
+    "filterByCategory": "Filter by category",
+    "seeMore": "See more"
   }
 }
