@@ -67,13 +67,18 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
         >
           {s.image ? (
             <>
-              <img src={getFileUrl(s.image)} alt="" className="absolute inset-0 h-full w-full object-cover" />
-              {/* Voile plus dense que celui du hero : ces visuels sont clairs
-                  et charges, la ou l'accueil pose son texte sur des photos
-                  sombres. Applique uniquement sur une image : sur le degrade
-                  de repli il ecraserait les couleurs de la marque jusqu'au noir. */}
-              <div className="absolute inset-0 bg-black/55" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/30" />
+              {/* object-[center_30%] : privilegie le haut de l'image, ou se
+                  trouvent le plus souvent les sujets, plutot que de rogner au
+                  centre geometrique. */}
+              <img
+                src={getFileUrl(s.image)} alt=""
+                className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+              />
+              {/* Voile modere : un aplat leger pour la lisibilite, renforce
+                  seulement au centre par un degrade horizontal, la ou vit le
+                  texte. L'ancien double voile noircissait toute l'image. */}
+              <div className="absolute inset-0 bg-black/35" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-black/50" />
             </>
           ) : (
             // Ni illustration ni apercu : degrade aux couleurs du site, pour
