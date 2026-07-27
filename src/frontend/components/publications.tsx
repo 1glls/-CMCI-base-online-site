@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Download, Eye, X, ChevronLeft, ChevronRight, Languages, Search } from 'lucide-react';
-import { GROUP_ORDER, groupForSlug, PRIMARY_LANGS } from '@/lib/book-categories';
+import { PRIMARY_LANGS } from '@/lib/book-categories';
+import { CategoryFilter } from '@/components/category-filter';
+
+/** Repli des accents pour une recherche insensible : « évangélisa » ⊂ « evangelisa ». */
+const foldAccents = (s: string) =>
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -26,6 +31,7 @@ interface Book {
   externalLink: string | null; featured?: boolean; categories?: Category[];
   source?: string | null; language?: string | null;
   languageCode?: string | null; priceLabel?: string | null;
+  groupLanguages?: { code: string | null; name: string }[];
 }
 interface Tract {
   id: string; slug: string; title: string; description: string;
@@ -251,10 +257,10 @@ export function Publications() {
     activeCat === '__all__' || (item.categories ?? []).some((c) => c.slug === activeCat);
 
   const shownTracts = tracts.filter(matches);
-  const q = query.trim().toLowerCase();
+  const q = foldAccents(query.trim());
   const shownBooks = books
     .filter((b) => matches(b) && (activeLang === '__all__' || (b.languageCode || b.language) === activeLang))
-    .filter((b) => !q || b.title.toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q))
+    .filter((b) => !q || foldAccents(b.title).includes(q) || foldAccents(b.author || '').includes(q))
     // Mise en avant par langue du site : les ouvrages dans la langue courante
     // remontent en tete, sans masquer les autres (tri stable).
     .sort((a, b) => {
@@ -262,16 +268,6 @@ export function Publications() {
       const bv = (b.languageCode || '') === language ? 0 : 1;
       return av - bv;
     });
-
-  // Categories groupees par theme general, pour un <optgroup> scannable.
-  // On ne liste que les categories effectivement presentes.
-  const catByGroup = new Map<string, Category[]>();
-  for (const c of categories) {
-    const g = groupForSlug(c.slug);
-    const arr = catByGroup.get(g) || [];
-    arr.push(c);
-    catByGroup.set(g, arr);
-  }
 
   // Langues presentes, pour le filtre. Cle stable (code sinon nom).
   const langMap = new Map<string, string>();
@@ -356,23 +352,12 @@ export function Publications() {
                 <label className="text-sm font-medium text-muted-foreground">
                   {t('books.filterByCategory')}
                 </label>
-                <select
+                <CategoryFilter
+                  categories={categories}
                   value={activeCat}
-                  onChange={(e) => { setActiveCat(e.target.value); setBooksShown(24); }}
-                  className="rounded-full border border-border bg-card px-4 py-2 text-sm focus:border-primary focus:outline-none"
-                >
-                  <option value="__all__">{t('books.allCategories')}</option>
-                  {GROUP_ORDER.filter((g) => catByGroup.has(g)).map((g) => (
-                    <optgroup key={g} label={t(`books.groups.${g}`)}>
-                      {catByGroup.get(g)!
-                        .slice()
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map((c) => (
-                          <option key={c.slug} value={c.slug}>{c.name}</option>
-                        ))}
-                    </optgroup>
-                  ))}
-                </select>
+                  onChange={(slug) => { setActiveCat(slug); setBooksShown(24); }}
+                  t={t}
+                />
               </>
             )}
           </div>
@@ -383,7 +368,9 @@ export function Publications() {
         {!loading && (
           <>
             {/* Ouvrages mis en avant */}
-            {/* Tracts */}
+            {/* Tracts — masques pendant une recherche de livre : ils ne font
+                pas partie des resultats et brouilleraient la lecture. */}
+            {!q && (
             <section className="mb-16">
               <h2 className="font-serif text-2xl font-bold text-primary">
                 {t('books.tractsTitle')}
@@ -429,6 +416,7 @@ export function Publications() {
                 </div>
               )}
             </section>
+            )}
 
             {/* Livres */}
             <section>
@@ -500,11 +488,22 @@ export function Publications() {
                             loading="lazy"
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
-                          {b.language && (
-                            <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
-                              {b.language}
-                            </span>
-                          )}
+                          {/* Toutes les langues de l'ouvrage (editions reliees),
+                              en haut a droite. Une seule si le livre n'est pas groupe. */}
+                          {(() => {
+                            const langs = b.groupLanguages?.length
+                              ? b.groupLanguages.map((l) => l.name)
+                              : (b.language ? [b.language] : []);
+                            return langs.length > 0 && (
+                              <span className="absolute right-2 top-2 flex max-w-[85%] flex-wrap justify-end gap-1">
+                                {langs.map((name) => (
+                                  <span key={name} className="rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
+                                    {name}
+                                  </span>
+                                ))}
+                              </span>
+                            );
+                          })()}
                         </div>
                       )}
                       <div className="flex flex-1 flex-col p-3">

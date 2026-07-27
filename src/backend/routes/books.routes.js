@@ -75,12 +75,36 @@ router.get('/', async (req, res) => {
       orderBy: [{ order: 'asc' }, { title: 'asc' }],
       include: { categories: { select: { id: true, slug: true, name: true } } }
     });
+
+    // Langues par ouvrage regroupe (workKey) : chaque edition d'un ouvrage
+    // manuellement relie affiche toutes les langues du groupe sur sa tuile.
+    const langsByWork = new Map();
+    for (const b of books) {
+      if (!b.workKey || !b.language) continue;
+      const arr = langsByWork.get(b.workKey) || [];
+      arr.push({ code: b.languageCode, name: b.language });
+      langsByWork.set(b.workKey, arr);
+    }
+    const groupLanguagesFor = (b) => {
+      const raw = b.workKey && langsByWork.has(b.workKey)
+        ? langsByWork.get(b.workKey)
+        : (b.language ? [{ code: b.languageCode, name: b.language }] : []);
+      const seen = new Set();
+      const out = [];
+      for (const l of raw) {
+        const k = l.code || l.name;
+        if (!seen.has(k)) { seen.add(k); out.push(l); }
+      }
+      return out.sort((a, b) => a.name.localeCompare(b.name));
+    };
+
     // Pas de traduction : un livre garde le titre de sa langue de publication.
     res.json(books.map((b) => ({
       id: b.id, title: b.title, author: b.author, description: b.description,
       cover: coverUrl(b), file: b.file, preview: b.preview,
       externalLink: b.externalLink, source: b.source,
       language: b.language, languageCode: b.languageCode,
+      groupLanguages: groupLanguagesFor(b),
       priceLabel: b.priceLabel, featured: b.featured, categories: b.categories
     })));
   } catch (error) {
