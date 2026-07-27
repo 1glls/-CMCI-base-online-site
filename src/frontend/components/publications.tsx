@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Download, Eye, X, ChevronLeft, ChevronRight, Languages } from 'lucide-react';
+import { Download, Eye, X, ChevronLeft, ChevronRight, Languages, Search } from 'lucide-react';
+import { GROUP_ORDER, groupForSlug, PRIMARY_LANGS } from '@/lib/book-categories';
 import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -207,6 +208,8 @@ export function Publications() {
   const [activeCat, setActiveCat] = useState('__all__');
   const [activeLang, setActiveLang] = useState('__all__');
   const [booksShown, setBooksShown] = useState(24);
+  const [query, setQuery] = useState('');
+  const [showAllLangs, setShowAllLangs] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -248,9 +251,28 @@ export function Publications() {
     activeCat === '__all__' || (item.categories ?? []).some((c) => c.slug === activeCat);
 
   const shownTracts = tracts.filter(matches);
-  const shownBooks = books.filter(
-    (b) => matches(b) && (activeLang === '__all__' || (b.languageCode || b.language) === activeLang)
-  );
+  const q = query.trim().toLowerCase();
+  const shownBooks = books
+    .filter((b) => matches(b) && (activeLang === '__all__' || (b.languageCode || b.language) === activeLang))
+    .filter((b) => !q || b.title.toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q))
+    // Mise en avant par langue du site : les ouvrages dans la langue courante
+    // remontent en tete, sans masquer les autres (tri stable).
+    .sort((a, b) => {
+      const av = (a.languageCode || '') === language ? 0 : 1;
+      const bv = (b.languageCode || '') === language ? 0 : 1;
+      return av - bv;
+    });
+
+  // Categories groupees par theme general, pour un <optgroup> scannable.
+  // On ne liste que les categories effectivement presentes.
+  const catByGroup = new Map<string, Category[]>();
+  for (const c of categories) {
+    const g = groupForSlug(c.slug);
+    const arr = catByGroup.get(g) || [];
+    arr.push(c);
+    catByGroup.set(g, arr);
+  }
+
   // Langues presentes, pour le filtre. Cle stable (code sinon nom).
   const langMap = new Map<string, string>();
   for (const b of books) {
@@ -259,6 +281,10 @@ export function Publications() {
   }
   const languages = Array.from(langMap.entries())
     .sort((a, b) => a[1].localeCompare(b[1]));
+  // Filtre langue compact : langues principales d'abord, le reste replie.
+  const primaryLangs = languages.filter(([code]) => PRIMARY_LANGS.includes(code || ''));
+  const otherLangs = languages.filter(([code]) => !PRIMARY_LANGS.includes(code || ''));
+  const visibleLangs = showAllLangs ? [...primaryLangs, ...otherLangs] : primaryLangs;
 
   // Mise en avant des livres selon la langue du site : on privilegie les
   // ouvrages dans la langue courante, avec repli sur l'ensemble si aucun.
@@ -311,25 +337,45 @@ export function Publications() {
             {t('books.subtitle')}
           </p>
 
-          {/* 53 categories : un menu deroulant plutot qu'un mur de pastilles.
-              Le filtre langue reste en pastilles plus bas (moins nombreuses). */}
-          {categories.length > 0 && (
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <label className="text-sm font-medium text-muted-foreground">
-                {t('books.filterByCategory')}
-              </label>
-              <select
-                value={activeCat}
-                onChange={(e) => { setActiveCat(e.target.value); setBooksShown(24); }}
-                className="rounded-full border border-border bg-card px-4 py-2 text-sm focus:border-primary focus:outline-none"
-              >
-                <option value="__all__">{t('books.allCategories')}</option>
-                {categories.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.name}</option>
-                ))}
-              </select>
+          {/* Recherche + filtre categorie. Les 54 series ztfbooks sont rangees
+              sous des themes generaux (<optgroup>) pour rester scannables. */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setBooksShown(24); }}
+                placeholder={t('books.searchPlaceholder')}
+                className="w-64 rounded-full border border-border bg-card py-2 pl-9 pr-4 text-sm focus:border-primary focus:outline-none"
+              />
             </div>
-          )}
+
+            {categories.length > 0 && (
+              <>
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t('books.filterByCategory')}
+                </label>
+                <select
+                  value={activeCat}
+                  onChange={(e) => { setActiveCat(e.target.value); setBooksShown(24); }}
+                  className="rounded-full border border-border bg-card px-4 py-2 text-sm focus:border-primary focus:outline-none"
+                >
+                  <option value="__all__">{t('books.allCategories')}</option>
+                  {GROUP_ORDER.filter((g) => catByGroup.has(g)).map((g) => (
+                    <optgroup key={g} label={t(`books.groups.${g}`)}>
+                      {catByGroup.get(g)!
+                        .slice()
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((c) => (
+                          <option key={c.slug} value={c.slug}>{c.name}</option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </>
+            )}
+          </div>
         </header>
 
         {loading && <p className="text-center text-muted-foreground">{t('books.loading')}</p>}
@@ -404,7 +450,7 @@ export function Publications() {
                   >
                     {t('books.allLanguages')}
                   </button>
-                  {languages.map(([code, name]) => (
+                  {visibleLangs.map(([code, name]) => (
                     <button
                       key={code}
                       onClick={() => { setActiveLang(code!); setBooksShown(24); }}
@@ -417,12 +463,26 @@ export function Publications() {
                       {name}
                     </button>
                   ))}
+                  {otherLangs.length > 0 && (
+                    <button
+                      onClick={() => setShowAllLangs((v) => !v)}
+                      className="rounded-full border border-dashed border-border bg-card px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/50"
+                    >
+                      {showAllLangs
+                        ? t('books.fewerLanguages')
+                        : t('books.moreLanguages').replace('{n}', String(otherLangs.length))}
+                    </button>
+                  )}
                 </div>
               )}
 
               {shownBooks.length === 0 ? (
                 <p className="text-muted-foreground">
-                  {activeCat === '__all__' && activeLang === '__all__' ? t('books.noBooks') : t('books.noMatch')}
+                  {q
+                    ? t('books.noSearchMatch')
+                    : activeCat === '__all__' && activeLang === '__all__'
+                      ? t('books.noBooks')
+                      : t('books.noMatch')}
                 </p>
               ) : (
                 <>

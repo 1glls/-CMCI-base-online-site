@@ -202,6 +202,21 @@
       "downloadOnZtf": "Télécharger / Acheter sur ztfbooks",
       "notFound": "Ce livre est introuvable.",
       "viewBook": "Voir le livre"
-    }
+    },
+    "groups": {
+      "priere": "Prière & combat spirituel",
+      "vie-chretienne": "Vie chrétienne & sanctification",
+      "salut": "Salut, évangélisation & réveil",
+      "leadership": "Leadership & ministère",
+      "famille": "Couple, famille & finances",
+      "jeunesse": "Jeunesse & enfants",
+      "ztf": "Vie & œuvres de Z.T. Fomum",
+      "langues": "Éditions en d’autres langues",
+      "autres": "Autres"
+    },
+    "searchPlaceholder": "Rechercher un livre…",
+    "moreLanguages": "+ {n} autres langues",
+    "fewerLanguages": "Moins de langues",
+    "noSearchMatch": "Aucun livre ne correspond à votre recherche."
   }
 }

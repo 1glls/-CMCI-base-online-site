@@ -202,6 +202,21 @@
       "downloadOnZtf": "Downloaden / Kopen op ztfbooks",
       "notFound": "Dit boek kon niet worden gevonden.",
       "viewBook": "Boek bekijken"
-    }
+    },
+    "groups": {
+      "priere": "Gebed & geestelijke strijd",
+      "vie-chretienne": "Christelijk leven & heiliging",
+      "salut": "Redding, evangelisatie & opwekking",
+      "leadership": "Leiderschap & bediening",
+      "famille": "Huwelijk, gezin & financiën",
+      "jeunesse": "Jeugd & kinderen",
+      "ztf": "Leven & werk van Z.T. Fomum",
+      "langues": "Edities in andere talen",
+      "autres": "Overige"
+    },
+    "searchPlaceholder": "Zoek een boek…",
+    "moreLanguages": "+ {n} meer talen",
+    "fewerLanguages": "Minder talen",
+    "noSearchMatch": "Geen boek komt overeen met uw zoekopdracht."
   }
 }

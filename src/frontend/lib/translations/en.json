@@ -202,6 +202,21 @@
       "downloadOnZtf": "Download / Buy on ztfbooks",
       "notFound": "This book could not be found.",
       "viewBook": "View book"
-    }
+    },
+    "groups": {
+      "priere": "Prayer & spiritual warfare",
+      "vie-chretienne": "Christian life & sanctification",
+      "salut": "Salvation, evangelism & revival",
+      "leadership": "Leadership & ministry",
+      "famille": "Marriage, family & finances",
+      "jeunesse": "Youth & children",
+      "ztf": "Z.T. Fomum’s life & works",
+      "langues": "Editions in other languages",
+      "autres": "Other"
+    },
+    "searchPlaceholder": "Search for a book…",
+    "moreLanguages": "+ {n} more languages",
+    "fewerLanguages": "Fewer languages",
+    "noSearchMatch": "No book matches your search."
   }
 }
