@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Download, Eye, X, ChevronLeft, ChevronRight, Languages, ExternalLink } from 'lucide-react';
+import { Download, Eye, X, ChevronLeft, ChevronRight, Languages } from 'lucide-react';
 import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -134,7 +134,7 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
                   href={s.href}
                   className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
                 >
-                  <Eye className="h-4 w-4" />{t('books.viewTract')}
+                  <Eye className="h-4 w-4" />{s.kind === 'tract' ? t('books.viewTract') : t('books.detail.viewBook')}
                 </Link>
               )}
               {s.book && (s.book.preview || s.book.file) && (
@@ -260,6 +260,12 @@ export function Publications() {
   const languages = Array.from(langMap.entries())
     .sort((a, b) => a[1].localeCompare(b[1]));
 
+  // Mise en avant des livres selon la langue du site : on privilegie les
+  // ouvrages dans la langue courante, avec repli sur l'ensemble si aucun.
+  const featuredBooksAll = shownBooks.filter((b) => b.featured !== false);
+  const featuredBooksInLang = featuredBooksAll.filter((b) => (b.languageCode || '') === language);
+  const featuredBooks = featuredBooksInLang.length > 0 ? featuredBooksInLang : featuredBooksAll;
+
   const featured: Slide[] = [
     ...shownTracts.filter((tr) => tr.featured !== false).map((tr) => ({
       key: `t-${tr.id}`, kind: 'tract' as const,
@@ -272,14 +278,14 @@ export function Publications() {
       file: null, preview: null,
       href: `/t/${tr.slug}`, book: null
     })),
-    ...shownBooks.filter((b) => b.featured !== false).map((b) => ({
+    ...featuredBooks.map((b) => ({
       key: `b-${b.id}`, kind: 'book' as const,
       title: b.title,
       subtitle: b.author ? `${t('books.by')} ${b.author}` : null,
       description: stripHtml(b.description),
       image: b.cover,
       file: b.file, preview: b.preview,
-      href: null, book: b
+      href: `/livres/${b.id}`, book: b
     }))
   ].slice(0, 6);
 
@@ -422,16 +428,17 @@ export function Publications() {
                 <>
                 <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {shownBooks.slice(0, booksShown).map((b) => (
-                    <article
+                    <Link
                       key={b.id}
-                      className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
+                      href={`/livres/${b.id}`}
+                      className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
                     >
                       {b.cover && (
                         <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
                           <img
                             src={getFileUrl(b.cover)} alt={b.title}
                             loading="lazy"
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                           {b.language && (
                             <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
@@ -441,7 +448,7 @@ export function Publications() {
                         </div>
                       )}
                       <div className="flex flex-1 flex-col p-3">
-                        <h3 className="font-serif text-sm font-bold leading-tight text-primary line-clamp-2">{b.title}</h3>
+                        <h3 className="font-serif text-sm font-bold leading-tight text-primary line-clamp-2 group-hover:underline">{b.title}</h3>
                         {b.author && (
                           <p className="mt-0.5 truncate text-xs text-muted-foreground">
                             {b.author}
@@ -451,17 +458,12 @@ export function Publications() {
                           {b.priceLabel && (
                             <span className="text-xs font-semibold text-primary">{b.priceLabel}</span>
                           )}
-                          {b.externalLink && (
-                            <a
-                              href={b.externalLink} target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:bg-accent/90"
-                            >
-                              <ExternalLink className="h-3.5 w-3.5" />ztfbooks
-                            </a>
-                          )}
+                          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-accent">
+                            {t('books.detail.viewBook')}<ChevronRight className="h-3.5 w-3.5" />
+                          </span>
                         </div>
                       </div>
-                    </article>
+                    </Link>
                   ))}
                 </div>
                 {shownBooks.length > booksShown && (

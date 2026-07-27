@@ -127,6 +127,7 @@ async function syncBooks() {
       if (id) catIds.push(id);
     }
 
+    const readMinutes = parseInt(b.timeToRead, 10);
     const data = {
       title: b.ebookTitle || 'Sans titre',
       author: b.author?.name || null,
@@ -137,6 +138,14 @@ async function syncBooks() {
       priceLabel: priceLabel(b),
       coverKey: b.thumbnailFileName || null,
       featured: Boolean(b.featured),
+      // Metadonnees pour la fiche + comparaison ztfbooks. workKey/views/likes
+      // sont edites/mesures cote CMCI : jamais dans cet objet, donc preserves.
+      pages: Number.isFinite(b.numberOfPages) ? b.numberOfPages : null,
+      readMinutes: Number.isFinite(readMinutes) ? readMinutes : null,
+      publisherName: b.publisher?.name || null,
+      discountPercentage: b.discountPercentage ?? null,
+      sourceDownloads: Number.isFinite(b.numberOfDownloads) ? b.numberOfDownloads : null,
+      sourceLikes: Number.isFinite(b.numberOfLikes) ? b.numberOfLikes : null,
       status: 'published'
     };
     const rel = catIds.map((id) => ({ id }));

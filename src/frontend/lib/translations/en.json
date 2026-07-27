@@ -186,6 +186,22 @@
     "free": "Free",
     "filterByLanguage": "Filter by language",
     "filterByCategory": "Filter by category",
-    "seeMore": "See more"
+    "seeMore": "See more",
+    "detail": {
+      "back": "Back to books",
+      "availableIn": "Also available in",
+      "pages": "pages",
+      "readTime": "min read",
+      "publisher": "Publisher",
+      "category": "Category",
+      "like": "Like",
+      "liked": "Liked",
+      "physicalCopyTitle": "A printed copy in Belgium?",
+      "physicalCopyText": "To get a physical copy of this book, contact us in Belgium.",
+      "contactUs": "Contact us",
+      "downloadOnZtf": "Download / Buy on ztfbooks",
+      "notFound": "This book could not be found.",
+      "viewBook": "View book"
+    }
   }
 }

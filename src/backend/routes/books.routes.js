@@ -115,12 +115,158 @@ router.post('/sync', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/books/stats — audience mesuree sur cmcibelgique.org (admin).
+ * Top ouvrages par vues/likes locaux, top categories/series par vues cumulees,
+ * et compteurs ztfbooks en regard pour comparaison.
+ */
+router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const books = await prisma.book.findMany({
+      where: { status: 'published' },
+      include: { categories: { select: { id: true, name: true } } }
+    });
+
+    const topBooks = [...books]
+      .sort((a, b) => (b.views - a.views) || (b.likes - a.likes))
+      .slice(0, 20)
+      .map((b) => ({
+        id: b.id, title: b.title, language: b.language,
+        views: b.views, likes: b.likes,
+        sourceDownloads: b.sourceDownloads, sourceLikes: b.sourceLikes
+      }));
+
+    // Vues cumulees par categorie (= « serie » chez ztfbooks)
+    const byCat = new Map();
+    for (const b of books) {
+      for (const c of b.categories) {
+        const e = byCat.get(c.id) || { id: c.id, name: c.name, views: 0, likes: 0, books: 0 };
+        e.views += b.views; e.likes += b.likes; e.books += 1;
+        byCat.set(c.id, e);
+      }
+    }
+    const topCategories = [...byCat.values()]
+      .sort((a, b) => b.views - a.views).slice(0, 20);
+
+    const totals = books.reduce((t, b) => ({
+      views: t.views + b.views, likes: t.likes + b.likes
+    }), { views: 0, likes: 0 });
+
+    res.json({ topBooks, topCategories, totals, totalBooks: books.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/books/group — relie plusieurs editions comme un meme ouvrage (admin).
+ * Genere un workKey partage. Reutilise un workKey deja present dans la selection.
+ */
+router.post('/group', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const ids = parseIds(req.body.ids);
+    if (ids.length < 2) return res.status(400).json({ error: 'Au moins deux livres requis' });
+    const existing = await prisma.book.findFirst({
+      where: { id: { in: ids }, workKey: { not: null } }, select: { workKey: true }
+    });
+    const workKey = existing?.workKey || require('crypto').randomUUID();
+    await prisma.book.updateMany({ where: { id: { in: ids } }, data: { workKey } });
+    res.json({ workKey, count: ids.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/** POST /api/books/ungroup — dissocie un livre de son groupe (admin). */
+router.post('/ungroup', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'id requis' });
+    await prisma.book.update({ where: { id }, data: { workKey: null } });
+    res.json({ message: 'Dissocie' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const books = await prisma.book.findMany({
       orderBy: [{ order: 'asc' }, { title: 'asc' }], include: { categories: true }
     });
-    res.json(books.map((b) => ({ ...b, coverDisplay: coverUrl(b) })));
+    res.json(books.map((b) => ({ ...b, coverDisplay: coverUrl(b) }))); // workKey deja dans ...b
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/books/:id — fiche publique d'un livre + editions soeurs (memes workKey).
+ * Enregistre APRES les routes litterales (/all, /sync, /stats) pour ne pas les capter.
+ * Pas de traduction : le livre garde le titre de sa langue de publication.
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const b = await prisma.book.findFirst({
+      where: { id: req.params.id, status: 'published', hidden: false },
+      include: { categories: { select: { id: true, slug: true, name: true } } }
+    });
+    if (!b) return res.status(404).json({ error: 'Livre introuvable' });
+
+    let siblings = [];
+    if (b.workKey) {
+      const others = await prisma.book.findMany({
+        where: { workKey: b.workKey, status: 'published', hidden: false, id: { not: b.id } },
+        select: { id: true, language: true, languageCode: true, externalLink: true }
+      });
+      siblings = others;
+    }
+
+    res.json({
+      id: b.id, title: b.title, author: b.author, description: b.description,
+      cover: coverUrl(b), file: b.file, preview: b.preview,
+      externalLink: b.externalLink, source: b.source,
+      language: b.language, languageCode: b.languageCode,
+      priceLabel: b.priceLabel, discountPercentage: b.discountPercentage,
+      pages: b.pages, readMinutes: b.readMinutes, publisherName: b.publisherName,
+      likes: b.likes, categories: b.categories, siblings
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/** POST /api/books/:id/view — incremente l'audience CMCI (une fois par session cote client). */
+router.post('/:id/view', async (req, res) => {
+  try {
+    await prisma.book.update({ where: { id: req.params.id }, data: { views: { increment: 1 } } });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/** POST /api/books/:id/like — « J'aime » public. Renvoie le total. */
+router.post('/:id/like', async (req, res) => {
+  try {
+    const b = await prisma.book.update({
+      where: { id: req.params.id }, data: { likes: { increment: 1 } }, select: { likes: true }
+    });
+    res.json({ likes: b.likes });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/** POST /api/books/:id/unlike — retire un « J'aime » (plancher a 0). */
+router.post('/:id/unlike', async (req, res) => {
+  try {
+    const cur = await prisma.book.findUnique({ where: { id: req.params.id }, select: { likes: true } });
+    if (!cur) return res.status(404).json({ error: 'Livre introuvable' });
+    const b = await prisma.book.update({
+      where: { id: req.params.id }, data: { likes: Math.max(0, cur.likes - 1) }, select: { likes: true }
+    });
+    res.json({ likes: b.likes });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

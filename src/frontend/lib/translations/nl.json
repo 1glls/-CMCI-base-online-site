@@ -186,6 +186,22 @@
     "free": "Gratis",
     "filterByLanguage": "Filteren op taal",
     "filterByCategory": "Filteren op categorie",
-    "seeMore": "Meer weergeven"
+    "seeMore": "Meer weergeven",
+    "detail": {
+      "back": "Terug naar boeken",
+      "availableIn": "Ook beschikbaar in",
+      "pages": "pagina's",
+      "readTime": "min lezen",
+      "publisher": "Uitgever",
+      "category": "Categorie",
+      "like": "Vind ik leuk",
+      "liked": "Leuk gevonden",
+      "physicalCopyTitle": "Een gedrukt exemplaar in België?",
+      "physicalCopyText": "Neem contact met ons op in België voor een fysiek exemplaar van dit boek.",
+      "contactUs": "Contacteer ons",
+      "downloadOnZtf": "Downloaden / Kopen op ztfbooks",
+      "notFound": "Dit boek kon niet worden gevonden.",
+      "viewBook": "Boek bekijken"
+    }
   }
 }

@@ -243,6 +243,15 @@ model Book {
   priceLabel   String?                     // ex. "3,99 €" ou "Gratuit"
   coverKey     String?                     // thumbnailFileName, resolu a la demande
   hidden       Boolean  @default(false)    // masque localement, survit aux syncs
+  workKey            String?               // regroupement manuel des editions d'un meme ouvrage
+  pages              Int?                  // numberOfPages ztfbooks
+  readMinutes        Int?                  // timeToRead ("10" -> 10)
+  publisherName      String?               // publisher.name
+  discountPercentage Float?                // remise, pour le prix barre
+  sourceDownloads    Int?                  // numberOfDownloads ztfbooks (comparaison)
+  sourceLikes        Int?                  // numberOfLikes ztfbooks (comparaison)
+  views              Int      @default(0)  // audience reelle sur cmcibelgique.org
+  likes              Int      @default(0)  // « J'aime » sur notre site
   order        Int      @default(0)
   featured     Boolean  @default(true)   // apparait dans la banderole
   categories   Category[] @relation("BookCategories")
@@ -251,6 +260,7 @@ model Book {
   updatedAt    DateTime @updatedAt
 
   @@unique([source, sourceId])
+  @@index([workKey])
   @@map("books")
 }
 

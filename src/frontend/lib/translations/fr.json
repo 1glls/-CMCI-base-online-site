@@ -186,6 +186,22 @@
     "free": "Gratuit",
     "filterByLanguage": "Filtrer par langue",
     "filterByCategory": "Filtrer par catégorie",
-    "seeMore": "Voir plus"
+    "seeMore": "Voir plus",
+    "detail": {
+      "back": "Retour aux livres",
+      "availableIn": "Aussi disponible en",
+      "pages": "pages",
+      "readTime": "min de lecture",
+      "publisher": "Éditeur",
+      "category": "Catégorie",
+      "like": "J'aime",
+      "liked": "Aimé",
+      "physicalCopyTitle": "Un exemplaire papier en Belgique ?",
+      "physicalCopyText": "Pour obtenir une version physique de cet ouvrage, contactez-nous en Belgique.",
+      "contactUs": "Nous contacter",
+      "downloadOnZtf": "Télécharger / Acheter sur ztfbooks",
+      "notFound": "Ce livre est introuvable.",
+      "viewBook": "Voir le livre"
+    }
   }
 }
