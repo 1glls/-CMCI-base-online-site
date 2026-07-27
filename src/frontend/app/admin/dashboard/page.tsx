@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText, Tags, BookOpen } from "lucide-react"
+import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText, Tags, BookOpen, ChevronDown } from "lucide-react"
 import { API_URL } from "@/lib/api"
 
 export default function AdminDashboard() {
@@ -21,7 +21,28 @@ export default function AdminDashboard() {
     ministries: 0,
     forms: 0,
   })
+  // Thèmes dépliés du dashboard : tout ouvert au premier passage, puis
+  // le pliage de l'utilisateur est mémorisé dans localStorage.
+  const [openGroups, setOpenGroups] = useState<Set<string>>(
+    new Set(["content", "publications", "communication", "system"])
+  )
   const router = useRouter()
+
+  useEffect(() => {
+    const saved = localStorage.getItem("adminDashGroups")
+    if (saved) {
+      try { setOpenGroups(new Set(JSON.parse(saved))) } catch { /* ignore */ }
+    }
+  }, [])
+
+  const toggleGroup = (key: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      localStorage.setItem("adminDashGroups", JSON.stringify([...next]))
+      return next
+    })
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken")
@@ -195,6 +216,18 @@ export default function AdminDashboard() {
     },
   ]
 
+  // Regroupement des tuiles par theme general, presente en accordeon.
+  const GROUPS = [
+    { key: "content", title: "Contenu du site", titles: ["Section Hero", "Événements", "Témoignages", "Galerie", "Ministères", "Assemblées"] },
+    { key: "publications", title: "Publications", titles: ["Livres", "Tracts", "Catégories"] },
+    { key: "communication", title: "Communication", titles: ["Newsletter", "Formulaires", "Réseaux Sociaux"] },
+    { key: "system", title: "Système", titles: ["Paramètres", "Traductions", "Sauvegardes"] },
+  ]
+  const groups = GROUPS.map((g) => ({
+    ...g,
+    items: g.titles.map((t) => menuItems.find((m) => m.title === t)).filter(Boolean) as typeof menuItems,
+  }))
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -211,29 +244,61 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {menuItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <item.icon className="h-8 w-8 text-blue-600" />
-                    {item.count !== undefined && (
-                      <div
-                        className={`text-2xl font-bold ${
-                          item.badge ? "text-red-600" : "text-gray-900"
-                        }`}
-                      >
-                        {item.count}
-                      </div>
+        <div className="space-y-4">
+          {groups.map((group) => {
+            const isOpen = openGroups.has(group.key)
+            const hasAlert = group.items.some((item) => (item as { badge?: boolean }).badge)
+            return (
+              <div key={group.key} className="rounded-lg border bg-white shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.key)}
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center justify-between px-4 py-4 sm:px-6"
+                >
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-semibold text-gray-900">{group.title}</h2>
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                      {group.items.length}
+                    </span>
+                    {hasAlert && (
+                      <span className="h-2.5 w-2.5 rounded-full bg-red-600" title="Éléments en attente" />
                     )}
                   </div>
-                  <CardTitle className="mt-2">{item.title}</CardTitle>
-                  <CardDescription>{item.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
+                  <ChevronDown
+                    className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {isOpen && (
+                  <div className="grid grid-cols-1 gap-6 px-4 pb-6 sm:px-6 md:grid-cols-2 lg:grid-cols-3">
+                    {group.items.map((item) => (
+                      <Link key={item.href} href={item.href}>
+                        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                          <CardHeader>
+                            <div className="flex items-center justify-between">
+                              <item.icon className="h-8 w-8 text-blue-600" />
+                              {item.count !== undefined && (
+                                <div
+                                  className={`text-2xl font-bold ${
+                                    item.badge ? "text-red-600" : "text-gray-900"
+                                  }`}
+                                >
+                                  {item.count}
+                                </div>
+                              )}
+                            </div>
+                            <CardTitle className="mt-2">{item.title}</CardTitle>
+                            <CardDescription>{item.description}</CardDescription>
+                          </CardHeader>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </main>
     </div>
