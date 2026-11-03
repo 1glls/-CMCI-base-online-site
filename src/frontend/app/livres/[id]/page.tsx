@@ -29,8 +29,11 @@ export async function generateMetadata({
   return {
     title: `${book.title} — CMCI Belgique`,
     description: book.description ? book.description.replace(/<[^>]*>/g, ' ').slice(0, 160) : undefined,
+    alternates: { canonical: `/livres/${id}` },
     openGraph: {
       title: book.title,
+      url: `/livres/${id}`,
+      siteName: 'CMCI Belgique',
       type: 'book',
       images: book.cover ? [getFileUrl(book.cover)] : undefined
     }

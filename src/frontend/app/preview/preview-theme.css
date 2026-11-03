@@ -1,0 +1,173 @@
+/*
+ * Banc d'essai visuel — tokens isolés (--pv-*) pour comparer 4 styles,
+ * clair/sombre, ET une couleur d'accent vive (axe --data-accent).
+ * Ces variables ne servent QUE /preview (aucune collision avec globals.css).
+ * Axes : [data-style] × [data-theme] × [data-accent].
+ */
+
+.pv-root {
+  --pv-serif: Georgia, 'Times New Roman', serif;
+  --pv-sans: var(--font-sans, 'Open Sans', sans-serif);
+  --pv-display: var(--font-serif, 'Montserrat', sans-serif);
+  --pv-accent-ink: #1a202c;
+  background: var(--pv-bg);
+  color: var(--pv-fg);
+  font-family: var(--pv-sans);
+  transition: background-color .3s ease, color .3s ease;
+}
+
+/* ============================ ÉDITORIAL ÉLEVÉ ============================ */
+[data-style="editorial"] {
+  --pv-bg: #ffffff;
+  --pv-surface: #f8fafc;
+  --pv-fg: #1a202c;
+  --pv-muted: #5a6472;
+  --pv-border: #e5e9f0;
+  --pv-primary: #1a365d;
+  --pv-heading: var(--pv-serif);
+  --pv-heading-weight: 600;
+  --pv-radius: 0.85rem;
+  --pv-shadow: 0 14px 38px -18px rgb(26 54 93 / .30);
+  --pv-band-bg: linear-gradient(160deg, #241b0f 0%, #17120a 100%);
+  --pv-band-fg: #fdf6ec;
+  --pv-hero-bg: radial-gradient(120% 120% at 72% 8%, color-mix(in srgb, var(--pv-accent) 14%, #ffffff) 0%, #ffffff 58%);
+  --pv-hero-fg: #1a202c;
+}
+[data-style="editorial"][data-theme="dark"] {
+  --pv-bg: #14110c;
+  --pv-surface: #1e1912;
+  --pv-fg: #f4ede1;
+  --pv-muted: #b7a992;
+  --pv-border: #322a1e;
+  --pv-primary: #f4ede1;
+  --pv-shadow: 0 18px 44px -20px rgb(0 0 0 / .6);
+  --pv-band-bg: linear-gradient(160deg, #0f0b06 0%, #241a0e 100%);
+  --pv-band-fg: #f4ede1;
+  --pv-hero-bg: radial-gradient(120% 120% at 72% 8%, color-mix(in srgb, var(--pv-accent) 22%, #1e1912) 0%, #14110c 62%);
+  --pv-hero-fg: #f4ede1;
+}
+
+/* ============================= SOMBRE IMPACT ============================= */
+[data-style="sombre"] {
+  --pv-bg: #ffffff;
+  --pv-surface: #f4f2ee;
+  --pv-fg: #17130d;
+  --pv-muted: #6b6155;
+  --pv-border: #e7e2da;
+  --pv-primary: #17130d;
+  --pv-heading: var(--pv-display);
+  --pv-heading-weight: 800;
+  --pv-radius: 0.4rem;
+  --pv-shadow: 0 20px 50px -20px rgb(23 19 13 / .45);
+  --pv-band-bg: linear-gradient(150deg, #1b1409 0%, #0d0a05 100%);
+  --pv-band-fg: #fdf6ea;
+  --pv-hero-bg: linear-gradient(140deg, #17130d 0%, color-mix(in srgb, var(--pv-accent) 30%, #17130d) 60%, #0d0a05 100%);
+  --pv-hero-fg: #fdf6ea;
+}
+[data-style="sombre"][data-theme="dark"] {
+  --pv-bg: #0c0906;
+  --pv-surface: #171009;
+  --pv-fg: #faf3e8;
+  --pv-muted: #ab9d88;
+  --pv-border: #2a2013;
+  --pv-primary: #faf3e8;
+  --pv-shadow: 0 22px 60px -22px rgb(0 0 0 / .8);
+  --pv-band-bg: linear-gradient(150deg, #080502 0%, #1a1206 100%);
+  --pv-band-fg: #faf3e8;
+  --pv-hero-bg: linear-gradient(140deg, #0c0906 0%, color-mix(in srgb, var(--pv-accent) 34%, #0c0906) 58%, #080502 100%);
+  --pv-hero-fg: #faf3e8;
+}
+
+/* =========================== VIBRANT MISSIONNAIRE ======================= */
+[data-style="vibrant"] {
+  --pv-bg: #fffaf5;
+  --pv-surface: #fff3e8;
+  --pv-fg: #2a1a10;
+  --pv-muted: #7d6552;
+  --pv-border: #f6e2d0;
+  --pv-primary: var(--pv-accent);
+  --pv-heading: var(--pv-display);
+  --pv-heading-weight: 800;
+  --pv-radius: 1.35rem;
+  --pv-shadow: 0 20px 46px -18px color-mix(in srgb, var(--pv-accent) 45%, transparent);
+  --pv-band-bg: linear-gradient(120deg, color-mix(in srgb, var(--pv-accent) 88%, #2a1a10) 0%, var(--pv-accent) 45%, var(--pv-accent-2) 105%);
+  --pv-band-fg: #ffffff;
+  --pv-hero-bg: linear-gradient(125deg, var(--pv-accent) 0%, var(--pv-accent-2) 62%, color-mix(in srgb, var(--pv-accent) 55%, #2a1a10) 125%);
+  --pv-hero-fg: #ffffff;
+}
+[data-style="vibrant"][data-theme="dark"] {
+  --pv-bg: #17100a;
+  --pv-surface: #1f150d;
+  --pv-fg: #fbeede;
+  --pv-muted: #bd9f86;
+  --pv-border: #352516;
+  --pv-shadow: 0 22px 54px -20px rgb(0 0 0 / .6);
+  --pv-band-bg: linear-gradient(120deg, color-mix(in srgb, var(--pv-accent) 40%, #0d0805) 0%, color-mix(in srgb, var(--pv-accent) 70%, #0d0805) 55%, color-mix(in srgb, var(--pv-accent-2) 60%, #0d0805) 100%);
+  --pv-band-fg: #fbeede;
+  --pv-hero-bg: linear-gradient(125deg, color-mix(in srgb, var(--pv-accent) 65%, #0d0805) 0%, color-mix(in srgb, var(--pv-accent-2) 55%, #0d0805) 62%, #0d0805 125%);
+  --pv-hero-fg: #fbeede;
+}
+
+/* =========================== MINIMAL INSTITUTIONNEL ==================== */
+[data-style="minimal"] {
+  --pv-bg: #ffffff;
+  --pv-surface: #ffffff;
+  --pv-fg: #1c1917;
+  --pv-muted: #78716c;
+  --pv-border: #e7e5e4;
+  --pv-primary: #1c1917;
+  --pv-heading: var(--pv-display);
+  --pv-heading-weight: 500;
+  --pv-radius: 0.25rem;
+  --pv-shadow: none;
+  --pv-band-bg: #faf8f6;
+  --pv-band-fg: #1c1917;
+  --pv-hero-bg: #ffffff;
+  --pv-hero-fg: #1c1917;
+}
+[data-style="minimal"][data-theme="dark"] {
+  --pv-bg: #0a0a0a;
+  --pv-surface: #101010;
+  --pv-fg: #f5f5f4;
+  --pv-muted: #a8a29e;
+  --pv-border: #292524;
+  --pv-primary: #f5f5f4;
+  --pv-shadow: none;
+  --pv-band-bg: #121110;
+  --pv-band-fg: #f5f5f4;
+  --pv-hero-bg: #0a0a0a;
+  --pv-hero-fg: #f5f5f4;
+}
+
+/* ===================== COULEUR D'ACCENT VIVE (axe séparé) ===============
+   Déclaré APRÈS les styles → l'emporte sur leur --pv-accent par défaut.
+   Inspiré des références chaudes (sunmetalon, cmgi-nl) : pas de bleu. */
+[data-accent="feu"]      { --pv-accent: #f24d1e; --pv-accent-2: #ffab00; --pv-accent-ink: #ffffff; }
+[data-accent="ambre"]    { --pv-accent: #f0920f; --pv-accent-2: #ff6a1a; --pv-accent-ink: #241a08; }
+[data-accent="corail"]   { --pv-accent: #fb5a5a; --pv-accent-2: #ff9d5c; --pv-accent-ink: #ffffff; }
+[data-accent="emeraude"] { --pv-accent: #0fae7a; --pv-accent-2: #f4c53c; --pv-accent-ink: #04271d; }
+[data-accent="violet"]   { --pv-accent: #8b5cf6; --pv-accent-2: #f4a11e; --pv-accent-ink: #ffffff; }
+[data-accent="or"]       { --pv-accent: #d4af37; --pv-accent-2: #e6bd4d; --pv-accent-ink: #1a202c; }
+
+/* ============================ MOUVEMENT / TRANSITIONS ===================
+   Reveal fondu-translation avec easing lent en fin de course (esprit Lenis),
+   survol des cartes qui soulève, halo du hero en flottement lent. */
+.pv-heading { font-family: var(--pv-heading); font-weight: var(--pv-heading-weight); }
+
+.pv-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .75s cubic-bezier(.16, 1, .3, 1), transform .75s cubic-bezier(.16, 1, .3, 1);
+}
+.pv-reveal.pv-in { opacity: 1; transform: none; }
+
+.pv-lift { transition: transform .38s cubic-bezier(.16, 1, .3, 1), box-shadow .38s ease; will-change: transform; }
+.pv-lift:hover { transform: translateY(-8px); }
+
+@keyframes pv-float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-16px, 18px); } }
+.pv-float { animation: pv-float 10s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-reveal { opacity: 1; transform: none; transition: none; }
+  .pv-float { animation: none; }
+}

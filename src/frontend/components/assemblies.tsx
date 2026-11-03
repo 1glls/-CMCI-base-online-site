@@ -10,7 +10,7 @@ import dynamic from "next/dynamic"
 // Import dynamique de la carte pour éviter les erreurs SSR
 const AssemblyMap = dynamic(() => import("./assembly-map"), { ssr: false })
 
-interface Assembly {
+export interface Assembly {
   id: string
   city: string
   address: string
@@ -22,11 +22,13 @@ interface Assembly {
   status: string
 }
 
-export function Assemblies() {
+export function Assemblies({ initialAssemblies }: { initialAssemblies?: Assembly[] }) {
   const { t, language } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
-  const [assemblies, setAssemblies] = useState<Assembly[]>([])
-  const [loading, setLoading] = useState(true)
+  const [assemblies, setAssemblies] = useState<Assembly[]>(initialAssemblies ?? [])
+  const [loading, setLoading] = useState(!initialAssemblies?.length)
+  // Les assemblees francaises arrivent deja du serveur : inutile de les recharger.
+  const skipFrenchFetch = useRef(!!initialAssemblies?.length)
   const [selectedAssembly, setSelectedAssembly] = useState<Assembly | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -49,6 +51,12 @@ export function Assemblies() {
 
   // Charger les assemblées depuis l'API
   useEffect(() => {
+    if (language === 'fr' && skipFrenchFetch.current) {
+      skipFrenchFetch.current = false
+      return
+    }
+    skipFrenchFetch.current = false
+
     const fetchAssemblies = async () => {
       try {
         const response = await fetch(`${API_URL}/api/assemblies?lang=${language}`)

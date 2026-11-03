@@ -21,20 +21,19 @@ export const metadata: Metadata = {
   title: 'CMCI Belgique - Communauté Missionnaire Chrétienne Internationale',
   description: 'Rejoignez la CMCI Belgique - Une communauté de disciples dévoués à Jésus-Christ, notre modèle en toutes choses. Découvrez notre vision, nos valeurs et nos assemblées.',
   keywords: ['CMCI', 'Belgique', 'église', 'chrétien', 'communauté', 'missionnaire', 'Bruxelles', 'culte', 'prière'],
-  generator: 'v0.app',
   verification: {
     google: 'Z0jrhdY3JojQh64BINvb-fjvBQEBFffumX_A1zak2Is',
   },
-  alternates: {
-    canonical: 'https://www.cmcibelgique.org',
-  },
+  // Pas de canonical ici : herite par toutes les pages, il declarerait
+  // /livres, chaque livre et chaque tract comme copies de l'accueil.
+  // Chaque page publique declare le sien.
   openGraph: {
     title: 'CMCI Belgique - Communauté Missionnaire Chrétienne Internationale',
     description: 'Une communauté de disciples dévoués à Jésus-Christ',
-    url: 'https://www.cmcibelgique.org',
     siteName: 'CMCI Belgique',
     type: 'website',
     locale: 'fr_BE',
+    images: ['/cmci-logo.png'],
   },
   icons: {
     icon: [

@@ -28,37 +28,43 @@ interface SocialLinks {
   whatsapp: string
 }
 
-export function Newsletter() {
+// Helper function to ensure URLs have protocol
+const normalizeUrl = (url: string): string => {
+  if (!url || url === "#") return "#";
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `https://${url}`;
+};
+
+const contactFromSettings = (s: Record<string, string>): ContactSettings => ({
+  phone: s.contact_phone || "",
+  email: s.contact_email || "",
+  address: s.contact_address || "",
+  hours: s.contact_hours || ""
+})
+
+const socialFromSettings = (s: Record<string, string>): SocialLinks => ({
+  facebook: normalizeUrl(s.social_facebook || "#"),
+  instagram: normalizeUrl(s.social_instagram || "#"),
+  youtube: normalizeUrl(s.social_youtube || "#"),
+  tiktok: normalizeUrl(s.social_tiktok || "#"),
+  telegram: normalizeUrl(s.social_telegram || "#"),
+  whatsapp: normalizeUrl(s.social_whatsapp || "#")
+})
+
+export function Newsletter({ initialSettings = {} }: { initialSettings?: Record<string, string> }) {
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { t } = useLanguage()
-  const [contactInfo, setContactInfo] = useState<ContactSettings>({
-    phone: "+32 2 123 45 67",
-    email: "contact@cmci.be",
-    address: "123 Avenue Louise, 1050 Bruxelles",
-    hours: "Lundi - Samedi: 9h00 - 18h00"
-  })
-  const [socialLinks, setSocialLinks] = useState<SocialLinks>({
-    facebook: "#",
-    instagram: "#",
-    youtube: "#",
-    tiktok: "#",
-    telegram: "#",
-    whatsapp: "#"
-  })
+  // Coordonnees reelles des le rendu serveur (reglages admin), plus de
+  // valeurs d'exemple visibles par Google avant le chargement client.
+  const [contactInfo, setContactInfo] = useState<ContactSettings>(() => contactFromSettings(initialSettings))
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(() => socialFromSettings(initialSettings))
   const sectionRef = useRef<HTMLElement>(null)
-
-  // Helper function to ensure URLs have protocol
-  const normalizeUrl = (url: string): string => {
-    if (!url || url === "#") return "#";
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
-    }
-    return `https://${url}`;
-  };
 
   // Charger les informations de contact
   useEffect(() => {
@@ -72,21 +78,8 @@ export function Newsletter() {
             return acc
           }, {})
           
-          setContactInfo({
-            phone: settingsMap.contact_phone || contactInfo.phone,
-            email: settingsMap.contact_email || contactInfo.email,
-            address: settingsMap.contact_address || contactInfo.address,
-            hours: settingsMap.contact_hours || contactInfo.hours
-          })
-          
-          setSocialLinks({
-            facebook: normalizeUrl(settingsMap.social_facebook || "#"),
-            instagram: normalizeUrl(settingsMap.social_instagram || "#"),
-            youtube: normalizeUrl(settingsMap.social_youtube || "#"),
-            tiktok: normalizeUrl(settingsMap.social_tiktok || "#"),
-            telegram: normalizeUrl(settingsMap.social_telegram || "#"),
-            whatsapp: normalizeUrl(settingsMap.social_whatsapp || "#")
-          })
+          setContactInfo(contactFromSettings(settingsMap))
+          setSocialLinks(socialFromSettings(settingsMap))
         }
       } catch (error) {
         console.error("Erreur chargement contact info:", error)

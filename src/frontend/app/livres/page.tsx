@@ -3,10 +3,22 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Publications } from '@/components/publications';
 
+const DESCRIPTION =
+  'Les ouvrages et tracts de la Communauté Missionnaire Chrétienne Internationale en Belgique, à lire, télécharger et partager.';
+
 export const metadata: Metadata = {
   title: 'Livre & littérature — CMCI Belgique',
-  description:
-    'Les ouvrages et tracts de la Communauté Missionnaire Chrétienne Internationale en Belgique, à lire, télécharger et partager.',
+  description: DESCRIPTION,
+  alternates: { canonical: '/livres' },
+  openGraph: {
+    title: 'Livre & littérature — CMCI Belgique',
+    description: DESCRIPTION,
+    url: '/livres',
+    siteName: 'CMCI Belgique',
+    type: 'website',
+    locale: 'fr_BE',
+    images: ['/cmci-logo.png'],
+  },
 };
 
 export default function LivresPage() {

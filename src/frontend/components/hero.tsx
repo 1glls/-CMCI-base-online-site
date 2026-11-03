@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { API_URL } from "@/lib/api"
 
-interface HeroSlide {
+export interface HeroSlide {
   id: string
   title: string
   subtitle: string
@@ -30,21 +30,31 @@ interface HeroSlide {
   }
 }
 
-export function Hero() {
+/** Nom officiel, porte par le h1 : les titres de slides changent avec l'actualite. */
+const SITE_HEADING = "CMCI Belgique — Communauté Missionnaire Chrétienne Internationale"
+
+export function Hero({ initialSlides }: { initialSlides?: HeroSlide[] }) {
   const { t, language } = useLanguage()
-  const [slides, setSlides] = useState<HeroSlide[]>([])
+  const [slides, setSlides] = useState<HeroSlide[]>(initialSlides ?? [])
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialSlides?.length)
+  // Les slides francaises arrivent deja du serveur : inutile de les recharger.
+  const skipFrenchFetch = useRef(!!initialSlides?.length)
 
   useEffect(() => {
+    if (language === 'fr' && skipFrenchFetch.current) {
+      skipFrenchFetch.current = false
+      return
+    }
+    skipFrenchFetch.current = false
+
     const fetchSlidesAndEvents = async () => {
       try {
         // Charger les slides hero personnalisés
         const slidesResponse = await fetch(`${API_URL}/api/hero?lang=${language}`)
         const customSlides = await slidesResponse.json()
+        if (!Array.isArray(customSlides)) return
 
-        console.log("✅ Hero slides chargées:", customSlides)
-        
         // Les slides personnalisées peuvent maintenant contenir des événements liés
         // Pas besoin de combiner automatiquement - tout est géré via l'admin
         const allSlides = customSlides
@@ -80,11 +90,23 @@ export function Hero() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
   }
 
+  // Pas encore de slides (ou aucune publiee) : hero fixe plutot qu'un
+  // « Chargement... », qui serait tout ce que lirait un moteur de recherche.
   if (loading || slides.length === 0) {
     return (
       <section id="accueil" className="relative h-screen min-h-[600px] overflow-hidden bg-primary">
-        <div className="absolute inset-0 flex items-center justify-center text-white">
-          <p>{t('ministries.loading')}</p>
+        <img src="/images/hero-worship.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-20 h-full flex flex-col items-center justify-center text-center text-white px-4">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-balance">
+              {SITE_HEADING}
+            </h1>
+            <p className="italic text-base md:text-lg opacity-80 max-w-2xl mx-auto">
+              &laquo; {t('hero.verse')} &raquo;
+              <span className="block mt-2 text-sm">- {t('hero.verseRef')}</span>
+            </p>
+          </div>
         </div>
       </section>
     )
@@ -138,6 +160,10 @@ export function Hero() {
       {/* Content */}
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center text-white px-4">
         <div className="max-w-4xl mx-auto">
+          <h1 className="text-accent font-semibold text-xs md:text-sm uppercase tracking-[0.2em] mb-6">
+            {SITE_HEADING}
+          </h1>
+
           {/* Titre et sous-titre dynamiques */}
           <div className="relative mb-16">
             {slides.map((slide, index) => (
@@ -151,9 +177,9 @@ export function Hero() {
                 )}
                 style={{ display: index === currentSlide ? 'block' : 'none' }}
               >
-                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance animate-fade-in-up">
+                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance animate-fade-in-up">
                   {slide.title}
-                </h1>
+                </h2>
                 <p className="text-lg md:text-xl lg:text-2xl mb-8 opacity-90 animate-fade-in-up animation-delay-200">
                   {slide.subtitle}
                 </p>

@@ -1,3 +1,5 @@
+je veux 
+
 # CMCI Belgique - Site Web Officiel
 
 Site web de la Communauté Missionnaire Chrétienne Internationale (CMCI) en Belgique avec interface d'administration et intégration réseaux sociaux.
@@ -31,6 +33,7 @@ cmci-belgique-website/
 ## ✨ Fonctionnalités
 
 ### Frontend Public
+
 - Page d'accueil avec hero, vision, valeurs
 - Section événements dynamique
 - Galerie d'images par catégories
@@ -39,6 +42,7 @@ cmci-belgique-website/
 - Flux de réseaux sociaux approuvés
 
 ### Interface Admin
+
 - 🔐 Authentification sécurisée (JWT)
 - 📅 Gestion des événements (CRUD complet)
 - 💬 Gestion des témoignages
@@ -51,6 +55,7 @@ cmci-belgique-website/
 - ⚙️ Paramètres du site
 
 ### Backend API
+
 - API REST complète
 - Base de données PostgreSQL/MySQL
 - Upload d'images avec Multer
@@ -61,6 +66,7 @@ cmci-belgique-website/
 ## 🚀 Installation
 
 ### Prérequis
+
 - Node.js 18+
 - PostgreSQL ou MySQL
 - npm ou pnpm
@@ -82,12 +88,14 @@ npm run install:all
 ### Configuration Backend
 
 1. Créer le fichier `.env` dans `src/backend/`:
+
 ```bash
 cd src/backend
 cp .env.example .env
 ```
 
 2. Configurer les variables d'environnement:
+
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/cmci_db"
 JWT_SECRET="votre_secret_jwt_tres_securise"
@@ -101,6 +109,7 @@ TIKTOK_ACCESS_TOKEN=
 ```
 
 3. Initialiser la base de données:
+
 ```bash
 cd src/backend
 npm run prisma:generate
@@ -108,6 +117,7 @@ npm run prisma:migrate
 ```
 
 4. Créer les dossiers d'upload:
+
 ```bash
 mkdir -p uploads/{events,testimonials,gallery}
 ```
@@ -115,6 +125,7 @@ mkdir -p uploads/{events,testimonials,gallery}
 ### Démarrage
 
 #### Mode développement (avec auto-reload)
+
 ```bash
 # Démarrer backend et frontend simultanément
 npm run dev
@@ -125,6 +136,7 @@ npm run dev:frontend # Frontend sur http://localhost:3000
 ```
 
 #### Mode production
+
 ```bash
 npm run build
 npm start
@@ -149,10 +161,12 @@ Ensuite connectez-vous sur: http://localhost:3000/admin
 ## 📡 API Endpoints
 
 ### Authentification
+
 - `POST /api/auth/register` - Créer un admin
 - `POST /api/auth/login` - Connexion admin
 
 ### Événements
+
 - `GET /api/events` - Liste publique des événements
 - `GET /api/events/all` - Tous les événements (admin)
 - `POST /api/events` - Créer un événement (admin)
@@ -160,18 +174,21 @@ Ensuite connectez-vous sur: http://localhost:3000/admin
 - `DELETE /api/events/:id` - Supprimer (admin)
 
 ### Témoignages
+
 - `GET /api/testimonials` - Liste publique
 - `POST /api/testimonials` - Créer (admin)
 - `PUT /api/testimonials/:id` - Modifier (admin)
 - `DELETE /api/testimonials/:id` - Supprimer (admin)
 
 ### Galerie
+
 - `GET /api/gallery` - Liste publique
 - `POST /api/gallery` - Ajouter image (admin)
 - `PUT /api/gallery/:id` - Modifier (admin)
 - `DELETE /api/gallery/:id` - Supprimer (admin)
 
 ### Réseaux Sociaux
+
 - `GET /api/social-media` - Posts approuvés (public)
 - `GET /api/social-media/all` - Tous les posts (admin)
 - `POST /api/social-media/sync-all` - Synchroniser tous (admin)
@@ -181,6 +198,7 @@ Ensuite connectez-vous sur: http://localhost:3000/admin
 ## 🔧 Technologies utilisées
 
 ### Frontend
+
 - **Next.js 16** - Framework React
 - **TypeScript** - Typage statique
 - **Tailwind CSS** - Styling
@@ -188,6 +206,7 @@ Ensuite connectez-vous sur: http://localhost:3000/admin
 - **Lucide React** - Icônes
 
 ### Backend
+
 - **Express.js** - Framework Node.js
 - **Prisma** - ORM base de données
 - **JWT** - Authentification
@@ -196,6 +215,7 @@ Ensuite connectez-vous sur: http://localhost:3000/admin
 - **bcryptjs** - Hash passwords
 
 ### APIs Externes
+
 - YouTube Data API v3
 - Facebook Graph API
 - Instagram Graph API
@@ -218,11 +238,13 @@ Ensuite connectez-vous sur: http://localhost:3000/admin
 ## 🌐 Déploiement
 
 ### Local
+
 ```bash
 ./deploiement/local/deploy-local.sh
 ```
 
 ### Hostinger
+
 Suivre le guide dans `deploiement/hostinger/README.md`
 
 ## 📝 License

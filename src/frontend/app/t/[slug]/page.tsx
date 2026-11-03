@@ -35,9 +35,12 @@ export async function generateMetadata({
   return {
     title: `${tract.title} — CMCI Belgique`,
     description: tract.description || undefined,
+    alternates: { canonical: `/t/${slug}` },
     openGraph: {
       title: tract.title,
       description: tract.description || undefined,
+      url: `/t/${slug}`,
+      siteName: 'CMCI Belgique',
       type: 'article',
       images: tract.cover ? [getFileUrl(tract.cover)] : undefined
     }
