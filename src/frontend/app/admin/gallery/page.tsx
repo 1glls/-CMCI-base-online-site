@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import { API_URL, getImageUrl } from '@/lib/api';
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from '@/components/admin/visibility';
 
 interface GalleryImage {
   id: string;
@@ -290,6 +291,7 @@ export default function GalleryPage() {
           </Card>
         )}
 
+        <VisibilitySummary items={images} className="mb-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {images.length === 0 ? (
             <Card className="p-8 text-center col-span-full">
@@ -298,7 +300,7 @@ export default function GalleryPage() {
             </Card>
           ) : (
             images.map((image) => (
-              <Card key={image.id} className="overflow-hidden">
+              <Card key={image.id} className={`overflow-hidden ${hiddenCls(image.status)}`}>
                 <div className="aspect-video relative">
                   <img 
                     src={getImageUrl(image.src)} 
@@ -312,14 +314,16 @@ export default function GalleryPage() {
                     {image.category}
                   </span>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className={`text-xs px-2 py-1 rounded ${image.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                      {image.status === 'published' ? 'Publié' : 'Brouillon'}
-                    </span>
+                    <StatusBadge status={image.status} />
                     <p className="text-xs text-gray-500">
                       {new Date(image.createdAt).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
                   <div className="flex gap-2">
+                    <VisibilityToggle
+                      resource="gallery" id={image.id} status={image.status} label={image.alt} compact
+                      onChange={(status) => setImages((list) => list.map((x) => (x.id === image.id ? { ...x, status } : x)))}
+                    />
                     <Button
                       variant="outline"
                       size="sm"

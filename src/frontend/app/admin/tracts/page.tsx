@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL, getImageUrl } from '@/lib/api';
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from '@/components/admin/visibility';
 
 interface Version {
   id: string; language: string; label: string; dir: string; title: string;
@@ -272,8 +273,9 @@ export default function AdminTractsPage() {
           <p className="text-gray-500">Aucun tract pour le moment.</p>
         )}
 
+        {tracts.length > 0 && <VisibilitySummary items={tracts} className="mb-4" />}
         {tracts.map((t) => (
-          <Card key={t.id} className="mb-6">
+          <Card key={t.id} className={`mb-6 ${hiddenCls(t.status)}`}>
             <CardHeader>
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -286,12 +288,17 @@ export default function AdminTractsPage() {
                       <ExternalLink className="h-4 w-4" />
                     </a>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="flex flex-wrap items-center gap-x-2">
+                    <StatusBadge status={t.status} />
                     /t/{t.slug} · {t.versions.filter(isLive).length} langue(s) en ligne
                     sur {t.versions.length}
                   </CardDescription>
                 </div>
                 <div className="flex shrink-0 gap-2">
+                <VisibilityToggle
+                  resource="tracts" id={t.id} status={t.status} label={t.title}
+                  onChange={(status) => setTracts((list) => list.map((x) => (x.id === t.id ? { ...x, status } : x)))}
+                />
                 <Button
                   variant={editing === t.id ? 'default' : 'outline'} size="sm"
                   onClick={() => (editing === t.id ? setEditing(null) : openEdit(t))}
@@ -390,7 +397,7 @@ export default function AdminTractsPage() {
                                 ? eCats.filter((id) => id !== c.id)
                                 : [...eCats, c.id])}
                               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                                on ? 'border-primary bg-primary text-white' : 'bg-white hover:bg-gray-100'
+                                on ? 'border-primary bg-primary text-primary-foreground' : 'bg-white hover:bg-gray-100'
                               }`}
                             >
                               {c.name}

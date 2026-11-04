@@ -1,256 +1,190 @@
-je veux 
-
 # CMCI Belgique - Site Web Officiel
 
-Site web de la Communauté Missionnaire Chrétienne Internationale (CMCI) en Belgique avec interface d'administration et intégration réseaux sociaux.
+Site de la Communauté Missionnaire Chrétienne Internationale (CMCI) en Belgique : <https://www.cmcibelgique.org>
+
+Site public en trois langues (FR / EN / NL), charte graphique « Nuit & or » (mode sombre et mode clair), et
+interface d'administration qui alimente tout le contenu. Rattaché au site mère de la CMCI internationale :
+<https://cmfinternational.org>
 
 ## 🏗️ Architecture
 
 ```
 cmci-belgique-website/
 ├── src/
-│   ├── frontend/          # Application Next.js (React + TypeScript)
-│   │   ├── app/          # Pages et routes
-│   │   ├── components/   # Composants React
-│   │   └── lib/          # Utilitaires
+│   ├── frontend/                 # Next.js 16 (React 19 + TypeScript + Tailwind CSS 4)
+│   │   ├── app/                  # Pages (App Router) : site public + /admin
+│   │   ├── components/
+│   │   │   ├── site/             # Briques communes : en-tête, pied de page, animations, bandeau…
+│   │   │   ├── home/             # Sections de l'accueil et de « Mieux nous connaître »
+│   │   │   ├── gallery/          # Page Galerie (vues « Photo par photo » et « Catalogue »)
+│   │   │   └── ui/               # Composants de base (Radix UI), surtout pour l'admin
+│   │   ├── lib/                  # Accès API, SEO, dates, liens CMFI, traductions
+│   │   ├── public/               # Logos, favicons, images fixes
+│   │   └── build-prod.sh         # Build + redémarrage en production (VPS)
 │   │
-│   └── backend/          # API REST (Express + Prisma)
-│       ├── routes/       # Routes API
-│       ├── services/     # Services (réseaux sociaux, etc.)
-│       ├── middleware/   # Middleware d'authentification
-│       └── prisma/       # Schéma base de données
+│   └── backend/                  # API REST Express + Prisma (SQLite)
+│       ├── routes/               # Une route par type de contenu
+│       ├── services/             # Newsletter (cron), traduction automatique…
+│       ├── middleware/           # Protection JWT des routes admin
+│       ├── prisma/               # schema.prisma + migrations
+│       └── uploads/              # Images envoyées depuis l'admin
 │
-├── deploiement/
-│   ├── local/           # Scripts de déploiement local
-│   └── hostinger/       # Scripts de déploiement Hostinger
-│
-└── otherthings/
-    ├── docs/            # Documentation
-    ├── scripts/         # Scripts utilitaires
-    └── tests/           # Tests
+├── deploiement/                  # Guides local et VPS Hostinger
+└── otherthings/                  # Anciennes docs, scripts (make_logo.py, make_icons.py…)
 ```
 
-## ✨ Fonctionnalités
+## 🌐 Pages publiques
 
-### Frontend Public
+| Adresse | Contenu |
+| --- | --- |
+| `/` | Accueil : hero (message ou diaporama) + livres mis en avant, À la une, aperçu « Mieux nous connaître », Notre identité, Ministères, Agenda (frise horizontale), Assemblées (carte), aperçu Galerie, Contact |
+| `/mieux-nous-connaitre` | Qui sommes-nous, Notre fondateur (Prof. Z. T. Fomum), Vision, Témoignages, Contact |
+| `/temps-forts` | Grands rendez-vous avec compte à rebours et infos pratiques, bande d'images défilantes |
+| `/galerie` | Deux vues au choix : « Photo par photo » et « Catalogue » (`?vue=catalogue`) |
+| `/livres`, `/livres/[id]` | Livres et tracts, fiche de chaque livre |
+| `/t/[slug]` | Lecture d'un tract |
+| `/formulaires/[slug]` | Formulaires d'inscription (apparence d'origine, hors charte) |
+| `/preview` | Page d'essai de styles, exclue de Google |
 
-- Page d'accueil avec hero, vision, valeurs
-- Section événements dynamique
-- Galerie d'images par catégories
-- Témoignages en carrousel
-- Newsletter
-- Flux de réseaux sociaux approuvés
+Menu (pas de nouvelle entrée de premier niveau : les nouvelles pages vont dans les sous-menus) :
+**Accueil** · **Découvrir** (Notre identité, Ministères) · **Vie de l'église** (Agenda, Temps forts, Assemblées,
+Galerie) · **Publications** · **Mieux nous connaître**.
 
-### Interface Admin
+## 🔐 Administration (`/admin`)
 
-- 🔐 Authentification sécurisée (JWT)
-- 📅 Gestion des événements (CRUD complet)
-- 💬 Gestion des témoignages
-- 🖼️ Gestion de la galerie d'images
-- 📱 **Intégration réseaux sociaux** avec validation admin:
-  - YouTube
-  - Facebook
-  - Instagram
-  - TikTok
-- ⚙️ Paramètres du site
+Chaque rubrique de l'admin alimente une partie précise du site :
 
-### Backend API
+| Rubrique admin | Où ça apparaît sur le site |
+| --- | --- |
+| Hero | Diaporama du haut de l'accueil (mode « Diaporama + livres ») |
+| Livres (bouton ✦, 8 max, ordre réglable) | Éventail de livres du hero |
+| Livres / Tracts / Catégories | `/livres`, `/livres/[id]`, `/t/[slug]` |
+| Événements (case « À la une ») | « À la une » (3 max mis en avant) et Agenda de l'accueil |
+| Comptes à rebours | Bandeau animé en haut de toutes les pages + grand bloc sur `/temps-forts` |
+| Ministères | Section Ministères de l'accueil |
+| Assemblées | Carte et liste des assemblées |
+| Galerie | Aperçu sur l'accueil, `/galerie`, images défilantes de `/temps-forts` |
+| Témoignages (avec photo facultative) | `/mieux-nous-connaitre#temoignages` (photo fondue, ou initiale si pas de photo) |
+| Paramètres | Téléphone, e-mail, réseaux sociaux, mode du haut de l'accueil (« Message + livres » / « Diaporama + livres ») |
+| Newsletter, Formulaires, Traductions, Réseaux sociaux, Sauvegarde | Fonctions associées |
 
-- API REST complète
-- Base de données PostgreSQL/MySQL
-- Upload d'images avec Multer
-- Authentification JWT
-- Récupération automatique des posts réseaux sociaux
-- Système de validation des contenus
+Le site relit l'admin automatiquement : environ **1 minute** pour l'accueil et Temps forts, **5 minutes** pour les
+autres pages. Pas besoin de redéployer pour changer du contenu.
 
-## 🚀 Installation
-
-### Prérequis
-
-- Node.js 18+
-- PostgreSQL ou MySQL
-- npm ou pnpm
-
-### Installation rapide
-
-```bash
-# Cloner le projet
-git clone <repository-url>
-cd cmci-belgique-website
-
-# Installer toutes les dépendances
-npm run install:all
-
-# Ou utiliser le script de déploiement
-./deploiement/local/deploy-local.sh
-```
-
-### Configuration Backend
-
-1. Créer le fichier `.env` dans `src/backend/`:
-
-```bash
-cd src/backend
-cp .env.example .env
-```
-
-2. Configurer les variables d'environnement:
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/cmci_db"
-JWT_SECRET="votre_secret_jwt_tres_securise"
-PORT=5000
-
-# API Keys réseaux sociaux (optionnel)
-YOUTUBE_API_KEY=
-FACEBOOK_ACCESS_TOKEN=
-INSTAGRAM_ACCESS_TOKEN=
-TIKTOK_ACCESS_TOKEN=
-```
-
-3. Initialiser la base de données:
-
-```bash
-cd src/backend
-npm run prisma:generate
-npm run prisma:migrate
-```
-
-4. Créer les dossiers d'upload:
-
-```bash
-mkdir -p uploads/{events,testimonials,gallery}
-```
-
-### Démarrage
-
-#### Mode développement (avec auto-reload)
-
-```bash
-# Démarrer backend et frontend simultanément
-npm run dev
-
-# Ou séparément:
-npm run dev:backend  # Backend sur http://localhost:5000
-npm run dev:frontend # Frontend sur http://localhost:3000
-```
-
-#### Mode production
-
-```bash
-npm run build
-npm start
-```
-
-## 👤 Premier utilisateur admin
-
-Créer un compte admin via l'API:
+### Premier compte admin
 
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@cmci.be",
-    "password": "votre_mot_de_passe",
-    "name": "Admin CMCI"
-  }'
+  -d '{"email": "admin@cmci.be", "password": "votre_mot_de_passe", "name": "Admin CMCI"}'
 ```
 
-Ensuite connectez-vous sur: http://localhost:3000/admin
+Voir aussi `CREER-ADMIN.txt`.
 
-## 📡 API Endpoints
+## 🎨 Charte « Nuit & or »
 
-### Authentification
+- **Couleurs** (variables CSS dans `src/frontend/app/globals.css`) : `--nuit` (noir), `--ivoire` (blanc),
+  `--or` / `--or-clair` (or vif), `--rouge` (rouge vif), à savoir le noir, l'or et le rouge belges sur blanc. Le mode clair
+  redéfinit ces variables sous `:root[data-theme="light"]` ; bouton soleil/lune dans l'en-tête (`next-themes`).
+- **Nom de Jésus** : toutes ses formes s'affichent en rouge, y compris dans les textes saisis dans l'admin
+  (composant `Rich`, `components/site/rich-text.tsx`).
+- **Pas de cartes ni de cadres** : les images sont fondues dans le fond (classes `.fondu`, `.fondu-bas`,
+  `.fondu-vers-gauche`, `.fondu-vers-droite`, `.fondu-fond`, basées sur `mask-image`).
+- **Animations** : bibliothèque `motion` (`components/site/motion-kit.tsx`, `section-transition.tsx`). Elles
+  respectent le réglage « réduire les animations » du système.
+- **Polices** : Cormorant Garamond (titres), Cinzel (petites capitales, via `@fontsource/cinzel`).
+- **Logos** : `public/cmci-logo-dark.png` et `cmci-logo-light.png` (un par thème) ; favicons `favicon.ico`,
+  `icon.png`, `apple-icon.png`, générés par `otherthings/make_logo.py` et `otherthings/make_icons.py`.
+- **Liens vers le site mère** : toutes les adresses cmfinternational.org sont dans `src/frontend/lib/cmfi.ts`.
+- **Textes** : `src/frontend/lib/translations/{fr,en,nl}.json` (les textes de la refonte sont sous `home2.*`).
 
-- `POST /api/auth/register` - Créer un admin
-- `POST /api/auth/login` - Connexion admin
+## 🔎 Référencement (SEO)
 
-### Événements
+- Chaque page a son titre, sa description, son adresse officielle (canonical) et son aperçu de partage
+  (`generateMetadata` dans chaque `page.tsx`), avec un seul `h1`.
+- Les pages sont rendues côté serveur : Google lit tout le texte sans exécuter JavaScript.
+- `app/sitemap.ts` génère `/sitemap.xml` (pages + livres + tracts) ; `app/robots.ts` exclut `/admin` et `/preview`.
+- Données structurées « Church » (JSON-LD) : `lib/church-jsonld.tsx`.
+- Après chaque grosse modification : renvoyer le sitemap dans Google Search Console et demander l'indexation des
+  pages modifiées.
+- Seul le français est indexé (le changement de langue se fait dans le navigateur, sans adresse dédiée).
 
-- `GET /api/events` - Liste publique des événements
-- `GET /api/events/all` - Tous les événements (admin)
-- `POST /api/events` - Créer un événement (admin)
-- `PUT /api/events/:id` - Modifier (admin)
-- `DELETE /api/events/:id` - Supprimer (admin)
+## 🚀 Développement local
 
-### Témoignages
+Prérequis : Node.js 20+, npm.
 
-- `GET /api/testimonials` - Liste publique
-- `POST /api/testimonials` - Créer (admin)
-- `PUT /api/testimonials/:id` - Modifier (admin)
-- `DELETE /api/testimonials/:id` - Supprimer (admin)
+```bash
+# Backend (port 5000)
+cd src/backend
+npm install
+cp .env.example .env          # DATABASE_URL="file:./dev.db", JWT_SECRET=…
+npx prisma migrate deploy     # toujours lancer Prisma depuis src/backend
+npx prisma generate
+npm run dev
 
-### Galerie
+# Frontend (dans un 2e terminal)
+cd src/frontend
+npm install
+npx next dev -p 3005          # http://localhost:3005 (le port 3000 peut être occupé)
+```
 
-- `GET /api/gallery` - Liste publique
-- `POST /api/gallery` - Ajouter image (admin)
-- `PUT /api/gallery/:id` - Modifier (admin)
-- `DELETE /api/gallery/:id` - Supprimer (admin)
+Le frontend lit l'adresse de l'API dans `NEXT_PUBLIC_API_URL` (`src/frontend/.env.local`, par défaut
+`http://localhost:5000`).
 
-### Réseaux Sociaux
+Si le style ne se met pas à jour en local : arrêter `next dev`, supprimer `src/frontend/.next`, relancer.
 
-- `GET /api/social-media` - Posts approuvés (public)
-- `GET /api/social-media/all` - Tous les posts (admin)
-- `POST /api/social-media/sync-all` - Synchroniser tous (admin)
-- `POST /api/social-media/fetch/:platform` - Récupérer posts (admin)
-- `PUT /api/social-media/:id/validate` - Valider/rejeter (admin)
+## 🌍 Mise en production (VPS)
 
-## 🔧 Technologies utilisées
+Backend et frontend tournent sous **pm2** (`cmci-backend`, `cmci-frontend`) derrière **nginx** ;
+l'API est servie sur <https://api.cmcibelgique.org>.
 
-### Frontend
+```bash
+cd /home/root/applications/cmci-belgique-website
+git pull
 
-- **Next.js 16** - Framework React
-- **TypeScript** - Typage statique
-- **Tailwind CSS** - Styling
-- **Radix UI** - Composants UI
-- **Lucide React** - Icônes
+cd src/backend
+npx prisma migrate deploy     # si le schéma a changé
+npx prisma generate           # obligatoire après migrate deploy (le client n'est pas régénéré sinon)
+pm2 restart cmci-backend      # si le backend a changé
 
-### Backend
+cd ../frontend
+npm install                   # si des dépendances ont changé
+./build-prod.sh               # build propre + redémarrage de cmci-frontend
+```
 
-- **Express.js** - Framework Node.js
-- **Prisma** - ORM base de données
-- **JWT** - Authentification
-- **Multer** - Upload fichiers
-- **Axios** - Requêtes HTTP (APIs sociales)
-- **bcryptjs** - Hash passwords
+Toujours mettre à jour le **backend avant le frontend** : le build lit les données de l'API.
 
-### APIs Externes
+Installation complète d'un nouveau serveur : `deploiement/hostinger/README.md`.
 
-- YouTube Data API v3
-- Facebook Graph API
-- Instagram Graph API
-- TikTok API for Business
+## 📡 API (préfixe `/api`)
 
-## 📚 Documentation
+Lecture publique, écriture réservée à l'admin (jeton JWT) :
 
-- [Déploiement Local](./deploiement/local/README.md)
-- [Déploiement Hostinger](./deploiement/hostinger/README.md)
+| Route | Contenu |
+| --- | --- |
+| `auth` | Connexion / création d'admin |
+| `hero` | Diapositives du hero |
+| `books` (+ `books/hero`), `tracts`, `categories` | Publications ; `books/hero` = livres mis en avant |
+| `events` | Événements |
+| `countdowns` | Comptes à rebours (bandeau + Temps forts) |
+| `ministries`, `assemblies` | Ministères, assemblées |
+| `gallery`, `testimonials` | Galerie, témoignages |
+| `settings` | Paramètres du site (`hero_mode` : `livres` ou `diaporama`) |
+| `newsletter`, `forms`, `translations`, `social-media`, `backup` | Fonctions associées |
+
+## 🔧 Technologies
+
+- **Frontend** : Next.js 16 (App Router, rendu serveur + régénération périodique), React 19, TypeScript,
+  Tailwind CSS 4, `motion` (animations), `next-themes` (mode clair/sombre), Radix UI, Lucide (icônes), Leaflet (carte).
+- **Backend** : Express, Prisma 6 + SQLite, JWT + bcryptjs, Multer (images), node-cron (newsletter).
+- **Hébergement** : VPS Hostinger, pm2, nginx, Let's Encrypt.
 
 ## 🔒 Sécurité
 
-- Authentification JWT sécurisée
-- Passwords hashés avec bcrypt
-- Middleware de protection des routes admin
-- Validation des uploads d'images
-- CORS configuré
-- Variables d'environnement pour les secrets
+- Authentification JWT, mots de passe hachés (bcrypt), routes admin protégées par middleware.
+- Secrets uniquement dans les fichiers `.env` (jamais dans Git).
+- Sauvegarde régulière de la base SQLite (`src/backend/prisma/*.db`) et du dossier `uploads/`.
 
-## 🌐 Déploiement
-
-### Local
-
-```bash
-./deploiement/local/deploy-local.sh
-```
-
-### Hostinger
-
-Suivre le guide dans `deploiement/hostinger/README.md`
-
-## 📝 License
+## 📝 Licence
 
 Propriété de CMCI Belgique
-
-## 👥 Contact
-
-CMCI Belgique - contact@cmci.be

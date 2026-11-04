@@ -7,6 +7,7 @@ const path = require('path');
 const { processHeroImage, deleteHeroImages } = require('../utils/image-processor');
 const { applyTranslations } = require('../services/translation.service');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 // Configuration Multer en mémoire pour traitement avec sharp
@@ -31,10 +32,22 @@ const upload = multer({
 // GET all published hero slides (public)
 router.get('/', async (req, res) => {
   try {
-    const rawSlides = await prisma.heroSlide.findMany({
+    const publishedSlides = await prisma.heroSlide.findMany({
       where: { status: 'published' },
       orderBy: { order: 'asc' }
     });
+
+    // Un slide lié à un événement masqué (brouillon) est masqué avec lui,
+    // sinon l'événement resterait visible via le haut de l'accueil.
+    const linkedIds = publishedSlides.map((s) => s.eventId).filter(Boolean);
+    const hiddenEvents = linkedIds.length
+      ? await prisma.event.findMany({
+          where: { id: { in: linkedIds }, status: { not: 'published' } },
+          select: { id: true }
+        })
+      : [];
+    const hiddenIds = new Set(hiddenEvents.map((e) => e.id));
+    const rawSlides = publishedSlides.filter((s) => !s.eventId || !hiddenIds.has(s.eventId));
 
     // ?lang=en|nl : traduire les slides avant l'enrichissement
     const lang = req.query.lang;
@@ -246,5 +259,8 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'heroSlide');
 
 module.exports = router;

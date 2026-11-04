@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, User } from 'lucide-react';
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from "@/components/admin/visibility"
 import { API_URL, getImageUrl } from '@/lib/api';
 
 interface Testimonial {
@@ -296,6 +297,7 @@ export default function TestimonialsPage() {
           </Card>
         )}
 
+        <VisibilitySummary items={testimonials} className="mb-4" />
         <div className="grid gap-6">
           {testimonials.length === 0 ? (
             <Card className="p-8 text-center">
@@ -304,7 +306,7 @@ export default function TestimonialsPage() {
             </Card>
           ) : (
             testimonials.map((testimonial) => (
-              <Card key={testimonial.id} className="p-6">
+              <Card key={testimonial.id} className={`p-6 ${hiddenCls(testimonial.status)}`}>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-start gap-4">
@@ -324,9 +326,7 @@ export default function TestimonialsPage() {
                         <p className="text-sm text-gray-600 mb-3">{testimonial.role}</p>
                         <p className="text-gray-700 italic">"{testimonial.quote}"</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className={`text-xs px-2 py-1 rounded ${testimonial.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                            {testimonial.status === 'published' ? 'Publié' : 'Brouillon'}
-                          </span>
+                          <StatusBadge status={testimonial.status} />
                           <p className="text-xs text-gray-500">
                             Créé le {new Date(testimonial.createdAt).toLocaleDateString('fr-FR')}
                           </p>
@@ -335,6 +335,10 @@ export default function TestimonialsPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <VisibilityToggle
+                      resource="testimonials" id={testimonial.id} status={testimonial.status} label={testimonial.name}
+                      onChange={(status) => setTestimonials((list) => list.map((x) => (x.id === testimonial.id ? { ...x, status } : x)))}
+                    />
                     <Button
                       variant="outline"
                       size="sm"

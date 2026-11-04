@@ -338,7 +338,11 @@
       "hint": "Hover an event for a preview, click for full details.",
       "earlier": "Earlier",
       "later": "Later",
-      "past": "Past"
+      "past": "Past",
+      "pastTitle": "Past gatherings",
+      "openCurtain": "Open the curtain",
+      "closeCurtain": "Close",
+      "noneUpcoming": "No upcoming gathering for now."
     },
     "galleryTeaser": {
       "label": "Gallery",

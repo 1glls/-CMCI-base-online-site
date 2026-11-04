@@ -39,6 +39,10 @@ app.get('/api/health', (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
+  // Fichier envoyé depuis l'admin plus lourd que la limite de multer
+  if (err && err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'Fichier trop lourd : réduisez sa taille et réessayez.' });
+  }
   console.error(err.stack);
   res.status(500).json({ 
     error: 'Something went wrong!',

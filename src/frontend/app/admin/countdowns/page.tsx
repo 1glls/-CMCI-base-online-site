@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL, getImageUrl } from '@/lib/api';
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from '@/components/admin/visibility';
 import { type Countdown, phaseOf, progressOf, remaining, targetOf, visibleUnits } from '@/lib/countdown';
 
 const UNIT_LABELS = { years: 'ans', months: 'mois', days: 'j', hours: 'h', mins: 'min', secs: 's' } as const;
@@ -271,6 +272,7 @@ export default function AdminCountdownsPage() {
 
           <div className="space-y-4">
             <h2 className="text-xl font-bold">Comptes à rebours ({items.length})</h2>
+            {items.length > 0 && <VisibilitySummary items={items} />}
             {items.length === 0 && <p className="text-sm text-gray-500">Aucun pour l'instant.</p>}
             {items.map((c) => {
               const phase = phaseOf(c, now);
@@ -281,7 +283,7 @@ export default function AdminCountdownsPage() {
                       <div>
                         <CardTitle className="flex items-center gap-2 text-lg"><Timer className="h-4 w-4 text-amber-600" />{c.title}</CardTitle>
                         <CardDescription>
-                          {PHASE_LABELS[phase]}{c.status === 'draft' && ' · brouillon'} · du{' '}
+                          {PHASE_LABELS[phase]}{c.status === 'draft' && ' · masqué'} · du{' '}
                           {new Date(c.startsAt).toLocaleString('fr-BE', { dateStyle: 'medium', timeStyle: 'short' })} au{' '}
                           {new Date(c.endsAt).toLocaleString('fr-BE', { dateStyle: 'medium', timeStyle: 'short' })}
                         </CardDescription>
@@ -290,6 +292,10 @@ export default function AdminCountdownsPage() {
                         </p>
                       </div>
                       <div className="flex gap-1">
+                        <VisibilityToggle
+                          resource="countdowns" id={c.id} status={c.status} label={c.title} compact
+                          onChange={(status) => setItems((list) => list.map((x) => (x.id === c.id ? { ...x, status } : x)))}
+                        />
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(c)}><Edit className="h-4 w-4" /></Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>

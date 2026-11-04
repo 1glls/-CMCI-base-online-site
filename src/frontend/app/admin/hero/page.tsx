@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Trash2, Edit, Plus, ArrowLeft, MoveUp, MoveDown } from "lucide-react"
 import Link from "next/link"
 import { API_URL } from "@/lib/api"
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from "@/components/admin/visibility"
 
 export default function AdminHeroSlides() {
   const [slides, setSlides] = useState<any[]>([])
@@ -280,9 +281,10 @@ export default function AdminHeroSlides() {
           </Card>
         )}
 
+        <VisibilitySummary items={slides} className="mb-4" />
         <div className="grid grid-cols-1 gap-6">
           {slides.map((slide) => (
-            <Card key={slide.id}>
+            <Card key={slide.id} className={hiddenCls(slide.status)}>
               <div className="flex">
                 {slide.image && (
                   <div className="w-64 h-40 flex-shrink-0 overflow-hidden">
@@ -297,8 +299,9 @@ export default function AdminHeroSlides() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center justify-between">
                       <span>{slide.title}</span>
-                      <span className="text-sm font-normal text-gray-500">
-                        Ordre: {slide.order}
+                      <span className="flex items-center gap-2 text-sm font-normal text-gray-500">
+                        <StatusBadge status={slide.status} />
+                        Ordre : {slide.order}
                       </span>
                     </CardTitle>
                   </CardHeader>
@@ -315,6 +318,10 @@ export default function AdminHeroSlides() {
                       </div>
                     )}
                     <div className="flex gap-2">
+                      <VisibilityToggle
+                        resource="hero" id={slide.id} status={slide.status} label={slide.title}
+                        onChange={(status) => setSlides((list) => list.map((x) => (x.id === slide.id ? { ...x, status } : x)))}
+                      />
                       <Button size="sm" variant="outline" onClick={() => handleEdit(slide)}>
                         <Edit className="h-4 w-4" />
                       </Button>

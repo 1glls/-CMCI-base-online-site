@@ -88,7 +88,7 @@ router.post('/unsubscribe', async (req, res) => {
 });
 
 // POST - Send newsletter manually (admin only)
-router.post('/send', authMiddleware, async (req, res) => {
+router.post('/send', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { eventIds, customMessage } = req.body; // IDs des événements à inclure et message personnalisé
 
@@ -133,7 +133,7 @@ router.post('/send', authMiddleware, async (req, res) => {
 });
 
 // GET - Newsletter statistics (admin only)
-router.get('/stats', authMiddleware, async (req, res) => {
+router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const total = await prisma.newsletter.count();
     const active = await prisma.newsletter.count({
@@ -154,7 +154,7 @@ router.get('/stats', authMiddleware, async (req, res) => {
 });
 
 // GET - Newsletter automation settings (admin only)
-router.get('/automation', authMiddleware, async (req, res) => {
+router.get('/automation', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const settings = await prisma.settings.findMany({
       where: {
@@ -178,7 +178,7 @@ router.get('/automation', authMiddleware, async (req, res) => {
 });
 
 // PUT - Update newsletter automation settings (admin only)
-router.put('/automation', authMiddleware, async (req, res) => {
+router.put('/automation', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { enabled, frequency, day, time } = req.body;
     

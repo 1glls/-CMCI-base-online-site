@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
-const { authMiddleware } = require('../middleware/auth.middleware');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 // GET all published assemblies (public)
@@ -22,7 +23,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET all assemblies (admin only)
-router.get('/all', authMiddleware, async (req, res) => {
+router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const assemblies = await prisma.assembly.findMany({
       orderBy: { createdAt: 'desc' }
@@ -54,7 +55,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create assembly (admin only)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { city, address, latitude, longitude, schedule, phone, email, status } = req.body;
 
@@ -89,7 +90,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // PUT update assembly (admin only)
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const { city, address, latitude, longitude, schedule, phone, email, status } = req.body;
@@ -124,7 +125,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // DELETE assembly (admin only)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     await prisma.assembly.delete({
@@ -136,5 +137,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete assembly' });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'assembly');
 
 module.exports = router;

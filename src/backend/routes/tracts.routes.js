@@ -11,6 +11,7 @@ const { applyTranslations, autoTranslate, changedTranslatableFields, translateHt
   require('../services/translation.service');
 const { sanitizeHtml, estimateCost } = require('../utils/html-tract');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -445,5 +446,8 @@ router.delete('/versions/:versionId', authMiddleware, adminMiddleware, async (re
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'tract');
 
 module.exports = router;

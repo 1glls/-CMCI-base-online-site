@@ -4,7 +4,7 @@
 
 ### 1. Prérequis
 - Node.js 18+ et npm
-- PostgreSQL 14+
+- Aucune base à installer : SQLite (fichier `src/backend/prisma/dev.db`)
 - Git
 
 ### 2. Backend
@@ -17,17 +17,17 @@ npm install
 
 #### Configuration
 1. Copier `.env.example` vers `.env`
-2. Configurer DATABASE_URL avec vos credentials PostgreSQL
+2. Garder `DATABASE_URL="file:./dev.db"` (SQLite)
 3. Configurer JWT_SECRET avec une clé secrète
 4. Ajouter vos clés API pour les réseaux sociaux (optionnel)
 
 #### Base de données
 ```bash
-# Générer le client Prisma
-npm run prisma:generate
+# Appliquer les migrations (crée/met à jour dev.db)
+npx prisma migrate deploy
 
-# Créer les migrations
-npm run prisma:migrate
+# Générer le client Prisma (toujours après une migration)
+npx prisma generate
 
 # Ouvrir Prisma Studio (interface DB)
 npm run prisma:studio

@@ -537,24 +537,25 @@ sudo tail -f /var/log/nginx/error.log
 
 ### Mettre à jour le code
 ```bash
-cd /home/cmci/applications/cmci-belgique-website
+cd /home/root/applications/cmci-belgique-website
 
 # Pull les dernières modifications
 git pull origin main
 
-# Backend
+# Backend (TOUJOURS avant le frontend : le build lit les données de l'API)
 cd src/backend
-pnpm install --prod
-npx prisma migrate deploy
-npx prisma generate
+npm install
+npx prisma migrate deploy     # applique les nouvelles migrations
+npx prisma generate           # obligatoire : migrate deploy ne régénère pas le client Prisma
 pm2 restart cmci-backend
 
 # Frontend
 cd ../frontend
-pnpm install
-pnpm run build
-pm2 restart cmci-frontend
+npm install                   # nouvelles dépendances (ex. motion, @fontsource/cinzel)
+./build-prod.sh               # fixe NEXT_PUBLIC_API_URL, build propre, redémarre cmci-frontend
 ```
+
+Puis, si de nouvelles pages ont été ajoutées : Google Search Console → Sitemaps → renvoyer `sitemap.xml`.
 
 ### Surveiller les ressources
 ```bash

@@ -1,248 +1,72 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                    🏗️  PROJET RESTRUCTURÉ AVEC SUCCÈS                        ║
-║                           CMCI Belgique Website                              ║
+║                     🏗️  STRUCTURE DU PROJET (nov. 2026)                      ║
+║                 CMCI Belgique - charte « Nuit & or »                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-📁 STRUCTURE FINALE
-════════════════════════════════════════════════════════════════════════════════
+Documentation complète : README.md (pages, admin, charte, SEO, mise en production)
 
 cmci-belgique-website/
 │
-├── 📄 README.md                    ─── Documentation principale complète
-├── 📄 DEMARRAGE-RAPIDE.md          ─── Guide de démarrage rapide
-├── 📄 SYNTHESE.md                  ─── Résumé de la restructuration
-├── 📄 package.json                 ─── Scripts du monorepo
-├── 📄 .gitignore                   ─── Fichiers ignorés par Git
+├── README.md                       ─── Documentation principale
+├── COMMANDES.txt                   ─── Commandes de lancement en local
+├── CREER-ADMIN.txt                 ─── Créer un compte admin
+├── deploy.sh / demarrer.sh         ─── Scripts utilitaires
 │
-├── 📂 src/                         ─── CODE SOURCE
-│   ├── 📂 frontend/                ─── 🎨 APPLICATION NEXT.JS
-│   │   ├── 📂 app/                 ─── Pages et routes
-│   │   │   ├── 📂 admin/           ─── ⭐ INTERFACE ADMIN
-│   │   │   │   ├── page.tsx        ─── Login admin
-│   │   │   │   ├── dashboard/      ─── Tableau de bord
-│   │   │   │   ├── events/         ─── Gestion événements
-│   │   │   │   ├── testimonials/   ─── Gestion témoignages
-│   │   │   │   ├── gallery/        ─── Gestion galerie
-│   │   │   │   ├── social-media/   ─── ⭐ Validation réseaux sociaux
-│   │   │   │   └── settings/       ─── Paramètres
-│   │   │   ├── layout.tsx
-│   │   │   ├── page.tsx
-│   │   │   └── globals.css
-│   │   ├── 📂 components/          ─── Composants React (existants)
-│   │   ├── 📂 hooks/               ─── Custom hooks
-│   │   ├── 📂 lib/                 ─── Utilitaires
-│   │   ├── 📂 public/              ─── Assets statiques
-│   │   ├── 📄 package.json
-│   │   ├── 📄 tsconfig.json
-│   │   └── 📄 next.config.mjs
+├── src/
+│   ├── frontend/                   ─── 🎨 NEXT.JS 16 (React 19, Tailwind 4, motion)
+│   │   ├── app/
+│   │   │   ├── page.tsx            ─── Accueil
+│   │   │   ├── mieux-nous-connaitre/ ─ Qui sommes-nous, Fondateur, Vision, Témoignages, Contact
+│   │   │   ├── temps-forts/        ─── Comptes à rebours + infos pratiques
+│   │   │   ├── galerie/            ─── Vues « Photo par photo » / « Catalogue »
+│   │   │   ├── livres/  t/         ─── Livres, tracts
+│   │   │   ├── formulaires/        ─── Formulaires d'inscription
+│   │   │   ├── preview/            ─── Page d'essai (exclue de Google)
+│   │   │   ├── admin/              ─── ⭐ ADMINISTRATION (hero, books, events,
+│   │   │   │                           countdowns, ministries, assemblies, gallery,
+│   │   │   │                           testimonials, settings, newsletter, forms,
+│   │   │   │                           tracts, categories, translations,
+│   │   │   │                           social-media, backup, dashboard)
+│   │   │   ├── layout.tsx          ─── Polices, thème clair/sombre, favicons
+│   │   │   ├── globals.css         ─── Couleurs, mode clair, fondus d'images
+│   │   │   ├── sitemap.ts          ─── /sitemap.xml
+│   │   │   └── robots.ts           ─── /robots.txt
+│   │   ├── components/
+│   │   │   ├── site/               ─── En-tête, pied, bandeau compte à rebours,
+│   │   │   │                           animations, sélecteur de langue, thème…
+│   │   │   ├── home/               ─── Sections de l'accueil et de Mieux nous connaître
+│   │   │   ├── gallery/            ─── Page Galerie
+│   │   │   ├── ui/                 ─── Composants de base (admin)
+│   │   │   └── *.tsx (racine)      ─── Composants d'avant la refonte : seuls
+│   │   │                               publications, book-detail, tract-viewer,
+│   │   │                               category-filter, assembly-map sont
+│   │   │                               encore utilisés
+│   │   ├── lib/
+│   │   │   ├── api.ts / server-data.ts ─ Appels à l'API
+│   │   │   ├── site.ts             ─── Constantes (HOME_PATH, URL du site)
+│   │   │   ├── cmfi.ts             ─── Liens vers cmfinternational.org
+│   │   │   ├── church-jsonld.tsx   ─── Données structurées pour Google
+│   │   │   ├── countdown.ts / event-date.ts ─ Dates
+│   │   │   └── translations/       ─── fr.json, en.json, nl.json
+│   │   ├── public/                 ─── Logos (dark/light), favicons, images
+│   │   └── build-prod.sh           ─── Build + redémarrage en production
 │   │
-│   └── 📂 backend/                 ─── 🔧 API EXPRESS + PRISMA
-│       ├── 📂 routes/              ─── ⭐ ROUTES API REST
-│       │   ├── auth.routes.js      ─── Authentification
-│       │   ├── events.routes.js    ─── CRUD événements
-│       │   ├── testimonials.routes.js  ─── CRUD témoignages
-│       │   ├── gallery.routes.js   ─── CRUD galerie
-│       │   ├── social-media.routes.js  ─── ⭐ Réseaux sociaux + validation
-│       │   └── settings.routes.js  ─── Paramètres
-│       ├── 📂 services/            ─── ⭐ SERVICES
-│       │   └── social-media.service.js  ─── YouTube, FB, Insta, TikTok
-│       ├── 📂 middleware/          ─── Middleware
-│       │   └── auth.middleware.js  ─── Protection JWT
-│       ├── 📂 prisma/              ─── ⭐ BASE DE DONNÉES
-│       │   └── schema.prisma       ─── Schéma DB (6 modèles)
-│       ├── 📂 api/
-│       ├── 📂 config/
-│       ├── 📂 models/
-│       ├── 📂 utils/
-│       ├── 📄 server.js            ─── Serveur Express
-│       ├── 📄 package.json
-│       └── 📄 .env.example         ─── Template configuration
+│   └── backend/                    ─── 🔧 EXPRESS + PRISMA (SQLite)
+│       ├── server.js               ─── Serveur + crons newsletter
+│       ├── routes/                 ─── auth, hero, books, tracts, categories,
+│       │                               events, countdowns, ministries, assemblies,
+│       │                               gallery, testimonials, settings, newsletter,
+│       │                               forms, translations, social-media, backup
+│       ├── services/               ─── Newsletter, traduction, réseaux sociaux
+│       ├── middleware/             ─── Protection JWT
+│       ├── prisma/                 ─── schema.prisma, migrations/, dev.db
+│       └── uploads/                ─── Images envoyées depuis l'admin
 │
-├── 📂 deploiement/                 ─── 🚀 SCRIPTS DÉPLOIEMENT
-│   ├── 📂 local/
-│   │   ├── README.md               ─── Guide déploiement local
-│   │   └── deploy-local.sh         ─── Script automatique
-│   └── 📂 hostinger/
-│       └── README.md               ─── Guide déploiement production
+├── deploiement/
+│   ├── local/README.md             ─── Installation locale
+│   └── hostinger/README.md         ─── Installation et mise à jour du VPS
 │
-└── 📂 otherthings/                 ─── 📚 RESSOURCES
-    ├── 📂 docs/
-    │   └── DOCUMENTATION.md        ─── Documentation technique
-    ├── 📂 scripts/
-    │   ├── create-admin.sh         ─── Créer premier admin
-    │   └── test-api.sh             ─── Tests automatiques
-    └── 📂 tests/
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                           ⚡ COMMANDES RAPIDES                                ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-🚀 INSTALLATION
-────────────────────────────────────────────────────────────────────────────────
-$ ./deploiement/local/deploy-local.sh    # Installation automatique
-
-Ou manuellement :
-$ cd src/backend && npm install
-$ cd src/frontend && npm install
-
-
-🎯 DÉMARRAGE
-────────────────────────────────────────────────────────────────────────────────
-Terminal 1 - Backend :
-$ cd src/backend
-$ npm run dev                             # → http://localhost:5000
-
-Terminal 2 - Frontend :
-$ cd src/frontend  
-$ npm run dev                             # → http://localhost:3000
-
-
-🔐 CRÉER ADMIN
-────────────────────────────────────────────────────────────────────────────────
-$ ./otherthings/scripts/create-admin.sh
-
-Ou avec curl :
-$ curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@cmci.be","password":"Pass123","name":"Admin"}'
-
-
-🧪 TESTER L'API
-────────────────────────────────────────────────────────────────────────────────
-$ ./otherthings/scripts/test-api.sh
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                      🎯 FONCTIONNALITÉS PRINCIPALES                           ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-✅ BACKEND API
-────────────────────────────────────────────────────────────────────────────────
-  ✓ Serveur Express.js avec CORS
-  ✓ Base de données Prisma (PostgreSQL/MySQL)
-  ✓ Authentification JWT sécurisée
-  ✓ Upload d'images (Multer)
-  ✓ 6 routes API complètes
-  ✓ Middleware de protection admin
-  ✓ Service réseaux sociaux (4 plateformes)
-
-✅ INTERFACE ADMIN
-────────────────────────────────────────────────────────────────────────────────
-  ✓ Login sécurisé JWT
-  ✓ Dashboard avec statistiques
-  ✓ Gestion événements (Create, Read, Update, Delete)
-  ✓ Gestion témoignages (CRUD)
-  ✓ Gestion galerie images (CRUD)
-  ✓ ⭐ Validation posts réseaux sociaux
-  ✓ Interface moderne et responsive
-
-✅ INTÉGRATION RÉSEAUX SOCIAUX ⭐
-────────────────────────────────────────────────────────────────────────────────
-  ✓ YouTube       - Récupération vidéos
-  ✓ Facebook      - Récupération posts
-  ✓ Instagram     - Récupération posts
-  ✓ TikTok        - Récupération vidéos
-  ✓ Synchronisation automatique
-  ✓ Système de validation admin (Approuver/Rejeter)
-  ✓ Seuls posts approuvés affichés publiquement
-  ✓ Historique des validations
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                         🌐 ACCÈS APPLICATIONS                                 ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-🎨 FRONTEND PUBLIC
-  └─ http://localhost:3000                ─── Site web public
-
-🔐 INTERFACE ADMIN
-  ├─ http://localhost:3000/admin          ─── Login admin
-  ├─ http://localhost:3000/admin/dashboard ─── Dashboard
-  ├─ http://localhost:3000/admin/events    ─── Événements
-  ├─ http://localhost:3000/admin/testimonials ─── Témoignages
-  ├─ http://localhost:3000/admin/gallery   ─── Galerie
-  └─ http://localhost:3000/admin/social-media ─── ⭐ Réseaux sociaux
-
-🔧 API BACKEND
-  ├─ http://localhost:5000/api/health     ─── Health check
-  ├─ http://localhost:5000/api/auth       ─── Authentification
-  ├─ http://localhost:5000/api/events     ─── Événements
-  ├─ http://localhost:5000/api/testimonials ─── Témoignages
-  ├─ http://localhost:5000/api/gallery    ─── Galerie
-  └─ http://localhost:5000/api/social-media ─── ⭐ Réseaux sociaux
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                      📱 WORKFLOW RÉSEAUX SOCIAUX                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-1️⃣  SYNCHRONISATION (Admin)
-   └─ Clic "Synchroniser" → Récupère posts de YouTube, FB, Insta, TikTok
-   
-2️⃣  VALIDATION (Admin)  
-   ├─ Posts apparaissent avec statut "pending"
-   ├─ Admin voit : contenu, miniature, auteur, date
-   └─ Admin clique : "Approuver" ✅ ou "Rejeter" ❌
-   
-3️⃣  AFFICHAGE PUBLIC
-   └─ Seuls les posts "approved" sont visibles sur le site
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                            📚 DOCUMENTATION                                   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-📖 Guides disponibles :
-  ├─ README.md                            ─── Documentation complète
-  ├─ DEMARRAGE-RAPIDE.md                  ─── Guide démarrage
-  ├─ SYNTHESE.md                          ─── Résumé restructuration
-  ├─ deploiement/local/README.md          ─── Déploiement local
-  ├─ deploiement/hostinger/README.md      ─── Déploiement Hostinger
-  └─ otherthings/docs/DOCUMENTATION.md    ─── Doc technique
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                          ⚙️ CONFIGURATION REQUISE                             ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-1. Copier le fichier de configuration :
-   $ cd src/backend
-   $ cp .env.example .env
-
-2. Éditer .env avec vos informations :
-   - DATABASE_URL          (PostgreSQL ou MySQL)
-   - JWT_SECRET            (Secret sécurisé)
-   - YOUTUBE_API_KEY       (Optionnel)
-   - FACEBOOK_ACCESS_TOKEN (Optionnel)
-   - INSTAGRAM_ACCESS_TOKEN (Optionnel)
-   - TIKTOK_ACCESS_TOKEN   (Optionnel)
-
-3. Initialiser la base de données :
-   $ npm run prisma:generate
-   $ npm run prisma:migrate
-
-4. Créer les dossiers d'upload :
-   $ mkdir -p uploads/{events,testimonials,gallery}
-
-
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                         🎉 PROJET PRÊT À L'EMPLOI !                          ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-✅ Tout votre code frontend existant conservé
-✅ Backend API complet ajouté
-✅ Interface admin fonctionnelle
-✅ Intégration réseaux sociaux avec validation
-✅ Documentation complète
-✅ Scripts de déploiement
-✅ Sécurité implémentée
-
-🚀 Prêt à être lancé et déployé !
-
-────────────────────────────────────────────────────────────────────────────────
-Pour toute question, consultez la documentation dans les fichiers :
-  • README.md
-  • DEMARRAGE-RAPIDE.md
-  • otherthings/docs/DOCUMENTATION.md
-────────────────────────────────────────────────────────────────────────────────
+└── otherthings/
+    ├── docs/                       ─── Anciennes notes (historique, pas à jour)
+    ├── make_logo.py / make_icons.py ── Génération des logos et favicons
+    └── scripts/                    ─── Scripts utilitaires

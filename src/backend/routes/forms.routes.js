@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { initializeSheet, appendSubmission, isGoogleSheetsConfigured } = require('../services/google-sheets.service');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 // =============================
@@ -269,5 +270,8 @@ router.delete('/submissions/:id', authMiddleware, adminMiddleware, async (req, r
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'form', ['published', 'draft', 'closed']);
 
 module.exports = router;

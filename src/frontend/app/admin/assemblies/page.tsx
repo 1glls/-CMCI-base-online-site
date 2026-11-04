@@ -19,6 +19,7 @@ import {
   Navigation
 } from 'lucide-react';
 import { API_URL } from '@/lib/api';
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from '@/components/admin/visibility';
 
 interface Assembly {
   id: string;
@@ -394,19 +395,13 @@ export default function AssembliesPage() {
             </Card>
           ) : (
             assemblies.map((assembly) => (
-              <Card key={assembly.id} className="p-6">
+              <Card key={assembly.id} className={`p-6 ${hiddenCls(assembly.status)}`}>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <MapPin className="text-blue-600" size={24} />
                       <h3 className="text-xl font-bold">CMCI {assembly.city}</h3>
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        assembly.status === 'published' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {assembly.status === 'published' ? 'Publié' : 'Brouillon'}
-                      </span>
+                      <StatusBadge status={assembly.status} />
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
@@ -440,6 +435,10 @@ export default function AssembliesPage() {
                   </div>
 
                   <div className="flex gap-2 ml-4">
+                    <VisibilityToggle
+                      resource="assemblies" id={assembly.id} status={assembly.status} label={`CMCI ${assembly.city}`}
+                      onChange={(status) => setAssemblies((list) => list.map((x) => (x.id === assembly.id ? { ...x, status } : x)))}
+                    />
                     <Button
                       size="sm"
                       variant="outline"

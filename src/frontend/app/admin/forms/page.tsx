@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Trash2, Edit, Plus, ArrowLeft, Eye, Copy, GripVertical, ChevronDown, ChevronUp, FileText, ExternalLink, Download } from "lucide-react"
 import Link from "next/link"
 import { API_URL } from "@/lib/api"
+import { VisibilityToggle, StatusBadge, hiddenCls } from "@/components/admin/visibility"
 
 interface FormField {
   id: string
@@ -619,7 +620,7 @@ export default function AdminForms() {
           {forms.map((form) => {
             const fieldCount = JSON.parse(form.fields).length
             return (
-              <Card key={form.id} className="relative">
+              <Card key={form.id} className={`relative ${hiddenCls(form.status)}`}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
@@ -628,13 +629,7 @@ export default function AdminForms() {
                         {fieldCount} champ(s) • {form._count?.submissions || form.submitCount} réponse(s)
                       </CardDescription>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      form.status === 'published' ? 'bg-green-100 text-green-700' :
-                      form.status === 'closed' ? 'bg-red-100 text-red-700' :
-                      'bg-gray-100 text-gray-600'
-                    }`}>
-                      {form.status === 'published' ? 'Publié' : form.status === 'closed' ? 'Fermé' : 'Brouillon'}
-                    </span>
+                    <StatusBadge status={form.status} form className="shrink-0" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -650,6 +645,10 @@ export default function AdminForms() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
+                    <VisibilityToggle
+                      resource="forms" id={form.id} status={form.status} label={form.title} mode="fermer"
+                      onChange={(status) => setForms((list) => list.map((x) => (x.id === form.id ? { ...x, status } : x)))}
+                    />
                     <Button size="sm" variant="outline" onClick={() => handleEdit(form)}>
                       <Edit className="h-3 w-3 mr-1" /> Modifier
                     </Button>

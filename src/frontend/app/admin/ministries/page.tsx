@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL, getImageUrl } from '@/lib/api';
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from '@/components/admin/visibility';
 
 interface Ministry {
   id: string;
@@ -357,17 +358,22 @@ export default function AdminMinistriesPage() {
           {/* Liste */}
           <div className="space-y-4">
             <h2 className="text-xl font-bold">Ministères ({ministries.length})</h2>
+            <VisibilitySummary items={ministries} />
             {ministries.map((ministry) => (
-              <Card key={ministry.id}>
+              <Card key={ministry.id} className={hiddenCls(ministry.status)}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle className="text-lg">{ministry.title}</CardTitle>
-                      <CardDescription>
-                        Ordre: {ministry.order} • {ministry.status}
+                      <CardDescription className="flex items-center gap-2">
+                        Ordre : {ministry.order} <StatusBadge status={ministry.status} />
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">
+                      <VisibilityToggle
+                        resource="ministries" id={ministry.id} status={ministry.status} label={ministry.title} compact
+                        onChange={(status) => setMinistries((list) => list.map((x) => (x.id === ministry.id ? { ...x, status } : x)))}
+                      />
                       <Button
                         variant="ghost"
                         size="icon"

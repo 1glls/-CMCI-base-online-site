@@ -91,7 +91,7 @@ export default function AdminSocialMedia() {
       youtube: "bg-red-100 text-red-800",
       facebook: "bg-blue-100 text-blue-800",
       instagram: "bg-pink-100 text-pink-800",
-      tiktok: "bg-black text-white",
+      tiktok: "bg-[#000] text-[#fff]",
     }
     return colors[platform] || "bg-gray-100 text-gray-800"
   }

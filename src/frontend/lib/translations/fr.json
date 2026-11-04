@@ -338,7 +338,11 @@
       "hint": "Survolez un événement pour l'aperçu, cliquez pour tout savoir.",
       "earlier": "Plus tôt",
       "later": "Plus tard",
-      "past": "Passé"
+      "past": "Passé",
+      "pastTitle": "Rendez-vous passés",
+      "openCurtain": "Ouvrir le rideau",
+      "closeCurtain": "Refermer",
+      "noneUpcoming": "Aucun rendez-vous à venir pour le moment."
     },
     "galleryTeaser": {
       "label": "Galerie",

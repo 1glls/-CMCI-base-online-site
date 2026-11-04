@@ -45,4 +45,7 @@ Le projet a été restructuré. Les dossiers sont maintenant dans src/
 
 ═══════════════════════════════════════════════════════════════
 
-📚 DOCUMENTATION: voir README.md et DEMARRAGE-RAPIDE.md
+Si le port 3000 est déjà pris :  cd src/frontend && npx next dev -p 3005
+                                 ➡️  Site: http://localhost:3005
+
+📚 DOCUMENTATION: voir README.md (pages, admin, charte, SEO, mise en production)

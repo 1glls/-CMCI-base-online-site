@@ -338,7 +338,11 @@
       "hint": "Beweeg over een evenement voor een voorproefje, klik voor alle details.",
       "earlier": "Eerder",
       "later": "Later",
-      "past": "Voorbij"
+      "past": "Voorbij",
+      "pastTitle": "Voorbije samenkomsten",
+      "openCurtain": "Gordijn openen",
+      "closeCurtain": "Sluiten",
+      "noneUpcoming": "Voorlopig geen komende samenkomsten."
     },
     "galleryTeaser": {
       "label": "Galerij",

@@ -7,6 +7,7 @@ const path = require('path');
 const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 // Configuration Multer pour upload d'images
@@ -162,5 +163,8 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'event');
 
 module.exports = router;

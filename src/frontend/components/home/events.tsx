@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { ArrowLeft, ArrowRight, ArrowUpRight, Clock, MapPin, Repeat } from "lucide-react"
+import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronsLeftRight, Clock, MapPin, Repeat } from "lucide-react"
 import { getImageUrl } from "@/lib/api"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useLocalizedData } from "@/hooks/use-localized-data"
@@ -43,9 +43,94 @@ function EventLink({ e, className }: { e: EventItem; className: string }) {
 }
 
 /**
+ * Rideau des rendez-vous passes, pose a gauche du repere « Aujourd'hui ».
+ * Ferme : un pan de velours rouge a frange or cache les evenements passes.
+ * Ouvert : le pan se resserre sur le cote, retenu par une embrasse or, et les
+ * evenements passes se deroulent entre lui et « Aujourd'hui ».
+ */
+function Curtain({ open, count, onToggle }: { open: boolean; count: number; onToggle: () => void }) {
+  const { t } = useLanguage()
+  const reduce = useReducedMotion()
+  const dur = reduce ? 0 : 0.9
+  const label = open ? t("home2.timeline.closeCurtain") : `${t("home2.timeline.openCurtain")} : ${count} ${t("home2.timeline.pastTitle").toLowerCase()}`
+  return (
+    <motion.button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      aria-controls="frise-passes"
+      aria-label={label}
+      title={label}
+      animate={{ width: open ? 64 : 136 }}
+      transition={{ duration: dur, ease: EASE }}
+      className="group relative z-10 flex h-[15.5rem] shrink-0 flex-col items-stretch self-start outline-none focus-visible:ring-2 focus-visible:ring-or"
+    >
+      {/* Tringle et ses embouts */}
+      <span aria-hidden className="relative z-10 mx-[-6px] h-1.5 rounded-full bg-gradient-to-r from-or-clair via-or to-or-clair shadow-[0_2px_8px_rgba(0,0,0,.5)]">
+        <span className="absolute -left-1 -top-[3px] h-3 w-3 rounded-full bg-or-clair" />
+        <span className="absolute -right-1 -top-[3px] h-3 w-3 rounded-full bg-or-clair" />
+      </span>
+
+      {/* Le pan de velours : plis verticaux + ombre, frange or en bas.
+          Ouvert, il se resserre vers l'embrasse (clip-path anime). */}
+      <motion.span
+        aria-hidden
+        initial={false}
+        animate={{
+          clipPath: open
+            ? "polygon(0% 0%, 100% 0%, 42% 58%, 78% 100%, 0% 100%)"
+            : "polygon(0% 0%, 100% 0%, 100% 58%, 100% 100%, 0% 100%)",
+        }}
+        transition={{ duration: dur, ease: EASE }}
+        className="relative -mt-0.5 block flex-1 origin-top border-b-[3px] border-dotted border-or transition-transform duration-700 group-hover:[transform:skewX(-1.5deg)]"
+        style={{
+          background:
+            "repeating-linear-gradient(90deg, rgba(0,0,0,.38) 0 2px, transparent 2px 8px, rgba(255,255,255,.08) 8px 10px, transparent 10px 15px)," +
+            "linear-gradient(to bottom, color-mix(in oklab, var(--rouge) 72%, black), color-mix(in oklab, var(--rouge) 38%, black))",
+        }}
+      >
+        {/* Lumiere de rampe sur le velours */}
+        <span className="absolute inset-0 bg-[radial-gradient(80%_45%_at_50%_0%,rgba(255,216,102,.18),transparent)]" />
+      </motion.span>
+
+      {/* Embrasse or (visible rideau ouvert) */}
+      <motion.span
+        aria-hidden
+        initial={false}
+        animate={{ opacity: open ? 1 : 0, scaleX: open ? 1 : 0.4 }}
+        transition={{ duration: dur * 0.6, delay: open ? dur * 0.5 : 0 }}
+        className="absolute left-0 top-[56%] h-2 w-9 origin-left rounded-full bg-gradient-to-r from-or to-or-clair shadow-[0_0_10px_rgba(240,179,35,.6)]"
+      />
+
+      {/* Etiquette posee sur le rideau ferme */}
+      <motion.span
+        initial={false}
+        animate={{ opacity: open ? 0 : 1 }}
+        transition={{ duration: reduce ? 0 : 0.3 }}
+        className="pointer-events-none absolute inset-x-0 top-10 flex flex-col items-center px-2 text-center"
+      >
+        {/* Couleurs fixes : le velours reste rouge sombre en mode clair comme en sombre */}
+        <span className="font-display text-5xl leading-none text-[#f6f1e7] [text-shadow:0_2px_10px_rgba(0,0,0,.6)]">{count}</span>
+        <span className="eyebrow mt-2 !text-[9px] !tracking-[0.22em] text-[#ffd866]">{t("home2.timeline.pastTitle")}</span>
+        <span className="mt-4 inline-flex items-center gap-1 border border-[#ffd866]/60 px-2 py-1 font-caps text-[9px] uppercase tracking-[0.18em] text-[#f6f1e7] transition-colors group-hover:border-[#ffd866] group-hover:bg-[#ffd866] group-hover:text-[#0b0a08]">
+          <ChevronsLeftRight className="h-3 w-3" />{t("home2.timeline.openCurtain")}
+        </span>
+      </motion.span>
+
+      {/* Sous le rideau ouvert : « Refermer » */}
+      <span className={`eyebrow mt-3 !text-[9px] !tracking-[0.2em] text-or transition-opacity ${open ? "opacity-100" : "opacity-0"}`}>
+        {t("home2.timeline.closeCurtain")}
+      </span>
+    </motion.button>
+  )
+}
+
+/**
  * Agenda en frise horizontale : axe qui se dessine, evenements dans l'ordre
  * chronologique, repere rouge « Aujourd'hui ». Au passage (survol, clavier)
  * un apercu s'ouvre sous l'axe ; au clic, un panneau donne tous les details.
+ * Les rendez-vous passes sont replies derriere un rideau (ferme par defaut) :
+ * la frise commence a « Aujourd'hui » et montre davantage d'evenements a venir.
  */
 export function Events({ initial }: { initial: EventItem[] }) {
   const { t, language } = useLanguage()
@@ -62,16 +147,25 @@ export function Events({ initial }: { initial: EventItem[] }) {
 
   const [previewId, setPreviewId] = useState<string | null>(null)
   const [open, setOpen] = useState<EventItem | null>(null)
-  const preview = axis.find((x) => x.e.id === previewId) ?? next[0] ?? axis[axis.length - 1]
+  const [showPast, setShowPast] = useState(false)
+  // L'apercu ne montre qu'un evenement visible (pas un passe cache derriere le rideau)
+  const visible = showPast ? axis : next
+  const preview = visible.find((x) => x.e.id === previewId) ?? next[0] ?? (showPast ? pastAsc[pastAsc.length - 1] : undefined)
 
-  // Recentre la frise sur « Aujourd'hui » au chargement
+  // Rideau ferme : la frise demarre au debut (rideau + « Aujourd'hui » + a venir)
   useEffect(() => {
+    if (!showPast) track.current?.scrollTo({ left: 0, behavior: reduce ? "auto" : "smooth" })
+  }, [showPast, reduce])
+
+  // Rideau ouvert : une fois les passes deroules, on fait glisser la frise
+  // pour montrer les plus recents, juste avant « Aujourd'hui ».
+  const revealPast = () => {
     const el = track.current, mark = todayRef.current
-    if (el && mark) el.scrollLeft = Math.max(0, mark.offsetLeft - el.clientWidth / 2 + 120)
-  }, [axis.length])
+    if (el && mark) el.scrollTo({ left: Math.max(0, mark.offsetLeft - el.clientWidth * 0.62), behavior: reduce ? "auto" : "smooth" })
+  }
 
   const fmt = (d: Date, opts: Intl.DateTimeFormatOptions) => d.toLocaleDateString(LOCALE[language] || "fr-BE", opts)
-  const scrollBy = (dir: number) => track.current?.scrollBy({ left: dir * 520, behavior: "smooth" })
+  const scrollBy = (dir: number) => track.current?.scrollBy({ left: dir * 540, behavior: "smooth" })
 
   const node = ({ e, d }: Dated, i: number) => {
     const isPast = past.some((p) => p.e.id === e.id)
@@ -87,7 +181,7 @@ export function Events({ initial }: { initial: EventItem[] }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.07, ease: EASE }}
-        className={`group relative flex w-56 shrink-0 snap-center flex-col items-center text-center outline-none ${isPast ? "opacity-45 hover:opacity-80" : ""}`}
+        className={`group relative flex w-40 shrink-0 snap-center flex-col items-center text-center outline-none md:w-44 ${isPast ? "opacity-45 hover:opacity-80" : ""}`}
       >
         <span className={`font-display text-5xl leading-none transition-colors ${isActive ? "text-or-clair" : "text-ivoire/80 group-hover:text-or-clair"}`}>
           {d ? String(d.getDate()).padStart(2, "0") : "—"}
@@ -97,7 +191,7 @@ export function Events({ initial }: { initial: EventItem[] }) {
         <span className="relative my-6 grid h-6 place-items-center">
           <span className={`h-3.5 w-3.5 rotate-45 transition-all duration-300 ${isActive ? "scale-125 bg-or shadow-[0_0_18px_rgba(240,179,35,.9)]" : isPast ? "bg-ivoire/40" : "bg-or/80 group-hover:bg-or"}`} />
         </span>
-        <span className={`line-clamp-2 px-3 font-display text-lg leading-snug transition-colors ${isActive ? "text-ivoire" : "text-ivoire/70"}`}>
+        <span className={`line-clamp-3 px-2 font-display text-base leading-snug transition-colors md:text-[1.05rem] ${isActive ? "text-ivoire" : "text-ivoire/70"}`}>
           <Rich text={e.title} />
         </span>
       </motion.button>
@@ -120,7 +214,7 @@ export function Events({ initial }: { initial: EventItem[] }) {
             </h2>
             <p className="mt-4 text-sm text-ivoire/50">{t("home2.timeline.hint")}</p>
           </div>
-          {axis.length > 2 && (
+          {visible.length > 3 && (
             <div className="flex gap-2">
               <button onClick={() => scrollBy(-1)} aria-label={t("home2.timeline.earlier")} className="grid h-12 w-12 place-items-center border border-ivoire/25 hover:border-or hover:text-or-clair">
                 <ArrowLeft className="h-5 w-5" />
@@ -152,7 +246,7 @@ export function Events({ initial }: { initial: EventItem[] }) {
         <>
           {/* La frise */}
           <div ref={track} className="relative mt-14 overflow-x-auto px-6 pb-6 [scrollbar-width:thin] [scrollbar-color:var(--or)_transparent]">
-            <div className="relative mx-auto flex w-max snap-x items-start gap-2 md:px-[max(0px,calc((100vw-80rem)/2))]">
+            <div className="relative mx-auto flex w-max snap-x items-start gap-1 md:px-[max(0px,calc((100vw-80rem)/2))]">
               {/* Axe : ligne de fond puis trace or animee (au niveau des noeuds) */}
               <span aria-hidden className="absolute left-0 right-0 top-[6.35rem] h-px bg-ivoire/15" />
               <motion.span
@@ -161,13 +255,34 @@ export function Events({ initial }: { initial: EventItem[] }) {
                 initial={reduce ? false : { scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
                 transition={{ duration: 1.8, ease: EASE }}
               />
-              {pastAsc.map((x, i) => node(x, i))}
+              {pastAsc.length > 0 && (
+                <Curtain open={showPast} count={pastAsc.length} onToggle={() => setShowPast((v) => !v)} />
+              )}
+              <AnimatePresence initial={false}>
+                {showPast && (
+                  <motion.div
+                    key="passes"
+                    id="frise-passes"
+                    className="flex shrink-0 items-start gap-1 overflow-hidden"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "auto", opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ duration: reduce ? 0 : 0.9, ease: EASE }}
+                    onAnimationComplete={() => { if (showPast) revealPast() }}
+                  >
+                    {pastAsc.map((x, i) => node(x, i))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {/* Repere « Aujourd'hui » */}
-              <div ref={todayRef} className="relative flex w-24 shrink-0 flex-col items-center">
+              <div ref={todayRef} className="relative ml-2 flex w-24 shrink-0 flex-col items-center">
                 <span className="eyebrow mt-10 !text-[9px] text-rouge">{t("home2.timeline.today")}</span>
                 <span aria-hidden className="mt-3 h-14 w-[2px] bg-rouge shadow-[0_0_12px_rgba(239,51,64,.8)]" />
               </div>
-              {next.filter((x) => x.d).map((x, i) => node(x, pastAsc.length + i))}
+              {next.map((x, i) => node(x, i))}
+              {next.length === 0 && (
+                <p className="mt-[5.4rem] w-64 shrink-0 font-display text-lg italic text-ivoire/50">{t("home2.timeline.noneUpcoming")}</p>
+              )}
             </div>
           </div>
 

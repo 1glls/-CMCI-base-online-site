@@ -8,6 +8,7 @@ const { authMiddleware, adminMiddleware } = require('../middleware/auth.middlewa
 const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 const storage = multer.diskStorage({
@@ -131,5 +132,8 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'countdown');
 
 module.exports = router;

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -23,16 +23,31 @@ interface AssemblyMapProps {
   onSelectAssembly: (assembly: Assembly) => void
   /** « dark » : fond de carte CARTO sombre et reperes or (charte Nuit & or). */
   variant?: "light" | "dark"
+  /** Assemblee survolee (dans la liste ou sur la carte) : son repere s'anime. */
+  hoveredId?: string | null
+  /** Survol d'un repere sur la carte (null quand la souris le quitte). */
+  onHoverAssembly?: (id: string | null) => void
 }
 
+/** Texte saisi dans l'admin, insere dans du HTML Leaflet : on l'echappe. */
+const escapeHtml = (s: string) =>
+  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!)
+
+/** Sur grand ecran, la liste des assemblees couvre ~46 % de la carte a gauche. */
+const listCover = (map: L.Map, variant: string) =>
+  variant === "dark" && map.getSize().x >= 1024 ? Math.round(map.getSize().x * 0.46) : 0
+
 // Composant pour ajuster la vue de la carte
-function MapController({ assemblies, selectedAssembly }: { assemblies: Assembly[], selectedAssembly: Assembly | null }) {
+function MapController({ assemblies, selectedAssembly, variant }: { assemblies: Assembly[], selectedAssembly: Assembly | null, variant: string }) {
   const map = useMap()
 
   useEffect(() => {
+    const cover = listCover(map, variant)
     if (selectedAssembly && selectedAssembly.latitude && selectedAssembly.longitude) {
-      // Zoomer sur l'assemblée sélectionnée
-      map.setView([selectedAssembly.latitude, selectedAssembly.longitude], 13)
+      // Zoomer sur l'assemblée sélectionnée, en la gardant hors de la zone de la liste
+      const zoom = 13
+      const point = map.project([selectedAssembly.latitude, selectedAssembly.longitude], zoom).subtract([cover / 2, 0])
+      map.setView(map.unproject(point, zoom), zoom)
     } else {
       // Afficher toutes les assemblées
       const assembliesWithCoords = assemblies.filter(a => a.latitude && a.longitude)
@@ -40,19 +55,20 @@ function MapController({ assemblies, selectedAssembly }: { assemblies: Assembly[
         const bounds = L.latLngBounds(
           assembliesWithCoords.map(a => [a.latitude!, a.longitude!])
         )
-        map.fitBounds(bounds, { padding: [50, 50] })
+        map.fitBounds(bounds, { paddingTopLeft: [cover + 50, 60], paddingBottomRight: [60, 60], maxZoom: 11 })
       } else {
         // Vue par défaut sur la Belgique
         map.setView([50.5039, 4.4699], 8)
       }
     }
-  }, [map, assemblies, selectedAssembly])
+  }, [map, assemblies, selectedAssembly, variant])
 
   return null
 }
 
-export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAssembly, variant = "light" }: AssemblyMapProps) {
+export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAssembly, variant = "light", hoveredId = null, onHoverAssembly }: AssemblyMapProps) {
   const mapRef = useRef<L.Map | null>(null)
+  const markerRefs = useRef<Record<string, L.Marker | null>>({})
 
   // Cleanup de la carte lors du démontage
   useEffect(() => {
@@ -64,18 +80,8 @@ export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAsse
     }
   }, [])
 
-  // Créer une icône personnalisée
+  // Icône de la variante claire (ancienne page Assemblées)
   const createCustomIcon = (isSelected: boolean) => {
-    if (variant === "dark") {
-      // Losange or, rouge quand l'assemblee est selectionnee, halo diffus
-      return L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="width:18px;height:18px;transform:rotate(45deg);background:${isSelected ? '#c8102e' : '#d4a73a'};box-shadow:0 0 0 4px rgba(212,167,58,.25),0 0 22px rgba(212,167,58,.7);"></div>`,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
-        popupAnchor: [0, -12]
-      })
-    }
     return L.divIcon({
       className: 'custom-marker',
       html: `
@@ -105,6 +111,43 @@ export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAsse
 
   const assembliesWithCoords = assemblies.filter(a => a.latitude && a.longitude)
 
+  // Charte sombre : un repere fixe par assemblee (losange, deux ondes, etiquette).
+  // On ne recree jamais l'icone au survol : on pose seulement des classes CSS
+  // (is-active, is-selected), ce qui permet des transitions fluides.
+  const iconsKey = assembliesWithCoords.map((a) => `${a.id}:${a.city}`).join("|")
+  const darkIcons = useMemo(() => {
+    const icons: Record<string, L.DivIcon> = {}
+    for (const a of assembliesWithCoords) {
+      icons[a.id] = L.divIcon({
+        className: "cmci-marker",
+        html:
+          '<span class="cmci-marker__onde"></span><span class="cmci-marker__onde cmci-marker__onde--2"></span>' +
+          '<span class="cmci-marker__losange"></span>' +
+          `<span class="cmci-marker__nom">CMCI ${escapeHtml(a.city)}</span>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        popupAnchor: [0, -12],
+      })
+    }
+    return icons
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [iconsKey])
+
+  const paint = useCallback(() => {
+    if (variant !== "dark") return
+    for (const [id, marker] of Object.entries(markerRefs.current)) {
+      const el = marker?.getElement()
+      if (!marker || !el) continue
+      const active = id === hoveredId
+      const selected = id === selectedAssembly?.id
+      el.classList.toggle("is-active", active)
+      el.classList.toggle("is-selected", selected)
+      marker.setZIndexOffset(active ? 1000 : selected ? 500 : 0)
+    }
+  }, [variant, hoveredId, selectedAssembly])
+
+  useEffect(() => { paint() }, [paint, iconsKey])
+
   // Centre par défaut (Belgique)
   const defaultCenter: [number, number] = [50.5039, 4.4699]
   const defaultZoom = 8
@@ -127,15 +170,19 @@ export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAsse
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      <MapController assemblies={assemblies} selectedAssembly={selectedAssembly} />
+      <MapController assemblies={assemblies} selectedAssembly={selectedAssembly} variant={variant} />
 
       {assembliesWithCoords.map((assembly) => (
         <Marker
           key={assembly.id}
           position={[assembly.latitude!, assembly.longitude!]}
-          icon={createCustomIcon(selectedAssembly?.id === assembly.id)}
+          ref={(m) => { markerRefs.current[assembly.id] = m }}
+          icon={variant === "dark" ? darkIcons[assembly.id] : createCustomIcon(selectedAssembly?.id === assembly.id)}
           eventHandlers={{
-            click: () => onSelectAssembly(assembly)
+            click: () => onSelectAssembly(assembly),
+            add: () => paint(),
+            mouseover: () => onHoverAssembly?.(assembly.id),
+            mouseout: () => onHoverAssembly?.(null),
           }}
         >
           <Popup>

@@ -1,312 +1,234 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+/**
+ * Tableau de bord : une tuile par section (lib/admin-sections.ts) avec le nombre
+ * d'éléments visibles / masqués, et un bloc « À traiter » qui signale ce qui
+ * demande l'attention de l'administrateur.
+ */
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { AlertTriangle, CalendarClock, CalendarX, ChevronDown, ChevronRight, Eye, EyeOff, Info, Link2Off, RefreshCw, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText, Tags, BookOpen, ChevronDown, Timer } from "lucide-react"
-import { API_URL } from "@/lib/api"
+import { adminFetch, adminList, getAdmin } from "@/lib/admin-api"
+import { ADMIN_GROUPS, ADMIN_SECTIONS, type AdminGroup } from "@/lib/admin-sections"
+import { parseEventDate } from "@/lib/event-date"
+
+type Count = { total: number; hidden: number; label?: string }
+type Todo = { key: string; level: "warning" | "info"; icon: typeof Info; text: string; href: string; action: string }
+
+const visible = (s?: string | null) => (s ?? "published") === "published"
 
 export default function AdminDashboard() {
-  const [admin, setAdmin] = useState<any>(null)
-  const [stats, setStats] = useState({
-    heroSlides: 0,
-    events: 0,
-    testimonials: 0,
-    gallery: 0,
-    pendingSocial: 0,
-    assemblies: 0,
-    newsletter: 0,
-    ministries: 0,
-    forms: 0,
-  })
-  // Thèmes dépliés du dashboard : tout ouvert au premier passage, puis
-  // le pliage de l'utilisateur est mémorisé dans localStorage.
-  const [openGroups, setOpenGroups] = useState<Set<string>>(
-    new Set(["content", "publications", "communication", "system"])
-  )
-  const router = useRouter()
+  const [name, setName] = useState("")
+  const [counts, setCounts] = useState<Record<string, Count | null>>({})
+  const [todos, setTodos] = useState<Todo[]>([])
+  const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState<string[]>([])
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(ADMIN_GROUPS.map((g) => g.key)))
 
   useEffect(() => {
-    const saved = localStorage.getItem("adminDashGroups")
-    if (saved) {
-      try { setOpenGroups(new Set(JSON.parse(saved))) } catch { /* ignore */ }
-    }
+    setName(getAdmin()?.name ?? "")
+    try {
+      const saved = localStorage.getItem("adminDashGroups")
+      if (saved) setOpenGroups(new Set(JSON.parse(saved)))
+    } catch { /* préférence illisible : tout reste ouvert */ }
   }, [])
 
-  const toggleGroup = (key: string) => {
+  const toggleGroup = (key: AdminGroup) => {
     setOpenGroups((prev) => {
       const next = new Set(prev)
-      next.has(key) ? next.delete(key) : next.add(key)
-      localStorage.setItem("adminDashGroups", JSON.stringify([...next]))
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      try { localStorage.setItem("adminDashGroups", JSON.stringify([...next])) } catch { /* ignore */ }
       return next
     })
   }
 
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken")
-    if (!token) {
-      router.push("/admin")
-      return
-    }
+  const load = useCallback(async () => {
+    setLoading(true)
+    const errors: string[] = []
+    const result: Record<string, Count | null> = {}
+    const lists: Record<string, any[]> = {}
 
-    const adminData = localStorage.getItem("adminData")
-    if (adminData) {
-      setAdmin(JSON.parse(adminData))
-    }
-
-    // Charger les statistiques
-    fetchStats(token)
-  }, [router])
-
-  const fetchStats = async (token: string) => {
-    try {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      }
-
-      const authFetch = async (url: string) => {
-        const r = await fetch(url, { headers })
-        if (r.status === 401) {
-          localStorage.removeItem("adminToken")
-          localStorage.removeItem("adminData")
-          router.push("/admin")
-          throw new Error("Session expirée")
+    // Sections dont les éléments ont un statut visible / masqué
+    await Promise.all(
+      ADMIN_SECTIONS.filter((s) => s.listUrl).map(async (s) => {
+        try {
+          const list = await adminList(s.listUrl!)
+          lists[s.key] = list
+          result[s.key] = { total: list.length, hidden: list.filter((x) => !visible(x.status)).length }
+        } catch {
+          errors.push(s.title)
+          result[s.key] = null
         }
-        return r.json()
-      }
+      }),
+    )
 
-      const [heroSlides, events, testimonials, gallery, social, assemblies, newsletter, ministries, forms] = await Promise.all([
-        authFetch(`${API_URL}/api/hero/all`),
-        authFetch(`${API_URL}/api/events/all`),
-        authFetch(`${API_URL}/api/testimonials/all`),
-        authFetch(`${API_URL}/api/gallery/all`),
-        authFetch(`${API_URL}/api/social-media/all?status=pending`),
-        authFetch(`${API_URL}/api/assemblies/all`),
-        authFetch(`${API_URL}/api/newsletter/stats`),
-        authFetch(`${API_URL}/api/ministries/all`),
-        authFetch(`${API_URL}/api/forms/all`).catch(() => []),
-      ])
+    // Compteurs particuliers
+    const extra: [string, () => Promise<Count>][] = [
+      ["books", async () => {
+        const books = await adminList<{ hidden: boolean }>("/api/books/all")
+        return { total: books.length, hidden: books.filter((b) => b.hidden).length }
+      }],
+      ["categories", async () => ({ total: (await adminList("/api/categories")).length, hidden: 0, label: "catégories" })],
+      ["newsletter", async () => {
+        const s = await adminFetch<{ active?: number }>("/api/newsletter/stats")
+        return { total: s?.active ?? 0, hidden: 0, label: "abonnés actifs" }
+      }],
+      ["social", async () => {
+        const pending = await adminList("/api/social-media/all?status=pending")
+        return { total: pending.length, hidden: 0, label: "en attente" }
+      }],
+    ]
+    await Promise.all(
+      extra.map(async ([key, fn]) => {
+        try { result[key] = await fn() } catch {
+          errors.push(ADMIN_SECTIONS.find((s) => s.key === key)?.title ?? key)
+          result[key] = null
+        }
+      }),
+    )
 
-      setStats({
-        heroSlides: Array.isArray(heroSlides) ? heroSlides.length : 0,
-        events: Array.isArray(events) ? events.length : 0,
-        testimonials: Array.isArray(testimonials) ? testimonials.length : 0,
-        gallery: Array.isArray(gallery) ? gallery.length : 0,
-        pendingSocial: Array.isArray(social) ? social.length : 0,
-        assemblies: Array.isArray(assemblies) ? assemblies.length : 0,
-        newsletter: newsletter?.active || 0,
-        ministries: Array.isArray(ministries) ? ministries.length : 0,
-        forms: Array.isArray(forms) ? forms.length : 0,
-      })
-    } catch (error) {
-      console.error("Error fetching stats:", error)
+    // Bloc « À traiter »
+    const t: Todo[] = []
+    const pending = result.social?.total ?? 0
+    if (pending > 0) {
+      t.push({ key: "social", level: "warning", icon: Share2, text: `${pending} publication${pending > 1 ? "s" : ""} des réseaux sociaux en attente de tri.`, href: "/admin/social-media", action: "Trier" })
     }
-  }
+    const events = lists.events ?? []
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    const pastVisible = events.filter((e) => visible(e.status) && (parseEventDate(e.date)?.getTime() ?? Infinity) < today.getTime())
+    if (pastVisible.length) {
+      t.push({ key: "past", level: "info", icon: CalendarClock, text: `${pastVisible.length} événement${pastVisible.length > 1 ? "s" : ""} passé${pastVisible.length > 1 ? "s" : ""} encore visible${pastVisible.length > 1 ? "s" : ""} sur la frise de l'Agenda. Masquez-les si vous ne voulez plus les montrer.`, href: "/admin/events", action: "Voir" })
+    }
+    const undated = events.filter((e) => visible(e.status) && !parseEventDate(e.date))
+    if (undated.length) {
+      t.push({ key: "undated", level: "warning", icon: CalendarX, text: `${undated.length} événement${undated.length > 1 ? "s" : ""} dont la date n'est pas reconnue (ex. « ${undated[0].date} ») : ${undated.length > 1 ? "ils sont affichés" : "il est affiché"} comme rendez-vous réguliers, hors de la frise.`, href: "/admin/events", action: "Corriger" })
+    }
+    const hiddenEventIds = new Set(events.filter((e) => !visible(e.status)).map((e) => e.id))
+    const orphanSlides = (lists.hero ?? []).filter((s) => visible(s.status) && s.eventId && hiddenEventIds.has(s.eventId))
+    if (orphanSlides.length) {
+      t.push({ key: "hero", level: "info", icon: Link2Off, text: `${orphanSlides.length} diapositive${orphanSlides.length > 1 ? "s" : ""} du haut de l'accueil ${orphanSlides.length > 1 ? "sont masquées" : "est masquée"} automatiquement, car l'événement lié est masqué.`, href: "/admin/hero", action: "Voir" })
+    }
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken")
-    localStorage.removeItem("adminData")
-    router.push("/admin")
-  }
+    setCounts(result)
+    setTodos(t)
+    setFailed(errors)
+    setLoading(false)
+  }, [])
 
-  if (!admin) return null
-
-  const menuItems = [
-    {
-      title: "Section Hero",
-      description: "Gérer les slides d'accueil",
-      icon: Home,
-      href: "/admin/hero",
-      count: stats.heroSlides,
-    },
-    {
-      title: "Comptes à rebours",
-      description: "Événements longs : décompte et infos pratiques",
-      icon: Timer,
-      href: "/admin/countdowns",
-    },
-    {
-      title: "Événements",
-      description: "Gérer les événements",
-      icon: Calendar,
-      href: "/admin/events",
-      count: stats.events,
-    },
-    {
-      title: "Témoignages",
-      description: "Gérer les témoignages",
-      icon: MessageSquare,
-      href: "/admin/testimonials",
-      count: stats.testimonials,
-    },
-    {
-      title: "Galerie",
-      description: "Gérer les images",
-      icon: Image,
-      href: "/admin/gallery",
-      count: stats.gallery,
-    },
-    {
-      title: "Assemblées",
-      description: "Gérer les assemblées",
-      icon: MapPin,
-      href: "/admin/assemblies",
-      count: stats.assemblies,
-    },
-    {
-      title: "Ministères",
-      description: "Gérer les ministères",
-      icon: Church,
-      href: "/admin/ministries",
-      count: stats.ministries,
-    },
-    {
-      title: "Newsletter",
-      description: "Gérer les abonnés",
-      icon: Mail,
-      href: "/admin/newsletter",
-      count: stats.newsletter,
-    },
-    {
-      title: "Formulaires",
-      description: "Créer et gérer les formulaires",
-      icon: ClipboardList,
-      href: "/admin/forms",
-      count: stats.forms,
-    },
-    {
-      title: "Réseaux Sociaux",
-      description: "Valider les posts",
-      icon: Share2,
-      href: "/admin/social-media",
-      count: stats.pendingSocial,
-      badge: stats.pendingSocial > 0,
-    },
-    {
-      title: "Paramètres",
-      description: "Configuration",
-      icon: Settings,
-      href: "/admin/settings",
-    },
-    {
-      title: "Livres",
-      description: "Catalogue synchronisé depuis ztfbooks",
-      icon: BookOpen,
-      href: "/admin/books",
-    },
-    {
-      title: "Tracts",
-      description: "Tracts imprimés et versions linguistiques",
-      icon: FileText,
-      href: "/admin/tracts",
-    },
-    {
-      title: "Catégories",
-      description: "Classer livres et tracts",
-      icon: Tags,
-      href: "/admin/categories",
-    },
-    {
-      title: "Traductions",
-      description: "Traduction automatique du contenu",
-      icon: Languages,
-      href: "/admin/translations",
-    },
-    {
-      title: "Sauvegardes",
-      description: "Sauvegarder la base de données",
-      icon: DatabaseBackup,
-      href: "/admin/backup",
-    },
-  ]
-
-  // Regroupement des tuiles par theme general, presente en accordeon.
-  const GROUPS = [
-    { key: "content", title: "Contenu du site", titles: ["Section Hero", "Comptes à rebours", "Événements", "Témoignages", "Galerie", "Ministères", "Assemblées"] },
-    { key: "publications", title: "Publications", titles: ["Livres", "Tracts", "Catégories"] },
-    { key: "communication", title: "Communication", titles: ["Newsletter", "Formulaires", "Réseaux Sociaux"] },
-    { key: "system", title: "Système", titles: ["Paramètres", "Traductions", "Sauvegardes"] },
-  ]
-  const groups = GROUPS.map((g) => ({
-    ...g,
-    items: g.titles.map((t) => menuItems.find((m) => m.title === t)).filter(Boolean) as typeof menuItems,
-  }))
+  useEffect(() => { load() }, [load])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Admin CMCI</h1>
-            <p className="text-sm text-gray-500">Bienvenue, {admin.name}</p>
-          </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Button>
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <span className="eyebrow flex items-center gap-3 text-or">
+        <span className="h-px w-10 bg-or" aria-hidden />
+        Tableau de bord
+      </span>
+      <h1 className="mt-3 font-display text-4xl text-foreground sm:text-5xl">
+        Bonjour{name ? ` ${name}` : ""}
+      </h1>
+      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+        Choisissez une section à gérer. Chaque page indique où son contenu apparaît sur le site.
+        Un élément <strong className="text-foreground">masqué</strong> n'est plus affiché aux visiteurs mais n'est pas supprimé.
+      </p>
+
+      {failed.length > 0 && !loading && (
+        <div role="alert" className="mt-6 flex flex-col gap-3 rounded-lg border border-[var(--rouge)]/50 bg-[var(--rouge)]/10 px-4 py-3 text-sm sm:flex-row sm:items-center">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-[var(--rouge-texte)]" />
+          <span className="flex-1">Certains chiffres n'ont pas pu être chargés ({failed.join(", ")}). Les pages restent accessibles.</span>
+          <Button size="sm" variant="outline" onClick={load}><RefreshCw className="h-4 w-4" /> Réessayer</Button>
         </div>
-      </header>
+      )}
 
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="space-y-4">
-          {groups.map((group) => {
-            const isOpen = openGroups.has(group.key)
-            const hasAlert = group.items.some((item) => (item as { badge?: boolean }).badge)
-            return (
-              <div key={group.key} className="rounded-lg border bg-white shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => toggleGroup(group.key)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between px-4 py-4 sm:px-6"
-                >
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-semibold text-gray-900">{group.title}</h2>
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
-                      {group.items.length}
-                    </span>
-                    {hasAlert && (
-                      <span className="h-2.5 w-2.5 rounded-full bg-red-600" title="Éléments en attente" />
-                    )}
-                  </div>
-                  <ChevronDown
-                    className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+      {todos.length > 0 && (
+        <section className="mt-8" aria-labelledby="todo-title">
+          <h2 id="todo-title" className="eyebrow mb-3 text-or">À traiter</h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
+            {todos.map((t) => (
+              <li key={t.key} className="flex items-start gap-3 px-4 py-3 text-sm">
+                <t.icon className={`mt-0.5 h-4 w-4 shrink-0 ${t.level === "warning" ? "text-amber-500" : "text-or"}`} />
+                <span className="flex-1 leading-relaxed">{t.text}</span>
+                <Link href={t.href} className="flex shrink-0 items-center gap-0.5 text-or hover:underline">
+                  {t.action} <ChevronRight className="h-4 w-4" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-                {isOpen && (
-                  <div className="grid grid-cols-1 gap-6 px-4 pb-6 sm:px-6 md:grid-cols-2 lg:grid-cols-3">
-                    {group.items.map((item) => (
-                      <Link key={item.href} href={item.href}>
-                        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                          <CardHeader>
-                            <div className="flex items-center justify-between">
-                              <item.icon className="h-8 w-8 text-blue-600" />
-                              {item.count !== undefined && (
-                                <div
-                                  className={`text-2xl font-bold ${
-                                    item.badge ? "text-red-600" : "text-gray-900"
-                                  }`}
-                                >
-                                  {item.count}
-                                </div>
-                              )}
-                            </div>
-                            <CardTitle className="mt-2">{item.title}</CardTitle>
-                            <CardDescription>{item.description}</CardDescription>
-                          </CardHeader>
-                        </Card>
+      <div className="mt-10 space-y-6">
+        {ADMIN_GROUPS.map((g) => {
+          const items = ADMIN_SECTIONS.filter((s) => s.group === g.key)
+          const isOpen = openGroups.has(g.key)
+          return (
+            <section key={g.key} className="rounded-xl border border-border bg-card/40">
+              <button
+                type="button"
+                onClick={() => toggleGroup(g.key)}
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+              >
+                <span>
+                  <span className="font-display text-2xl text-foreground">{g.title}</span>
+                  <span className="ml-3 text-xs text-muted-foreground">{g.hint}</span>
+                </span>
+                <ChevronDown className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+              </button>
+              {isOpen && (
+                <div className="grid gap-4 px-5 pb-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((s) => {
+                    const c = counts[s.key]
+                    const alert = s.key === "social" && (c?.total ?? 0) > 0
+                    return (
+                      <Link
+                        key={s.key}
+                        href={s.href}
+                        className="group flex flex-col rounded-lg border border-border bg-card p-5 transition-colors hover:border-or/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <s.icon className="h-7 w-7 text-or" />
+                          <TileCount count={c} loading={loading} alert={alert} hasStatus={!!s.listUrl || s.key === "books"} />
+                        </div>
+                        <h3 className="mt-3 text-base font-semibold text-foreground group-hover:text-or">{s.title}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
                       </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </main>
-    </div>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )
+        })}
+      </div>
+    </main>
+  )
+}
+
+function TileCount({ count, loading, alert, hasStatus }: { count: Count | null | undefined; loading: boolean; alert: boolean; hasStatus: boolean }) {
+  if (loading) return <span className="h-6 w-12 animate-pulse rounded bg-muted" aria-label="Chargement" />
+  if (count === undefined) return null
+  if (count === null) return <span className="text-xs text-muted-foreground" title="Chiffre indisponible">—</span>
+  if (!hasStatus) {
+    return (
+      <span className="text-right">
+        <span className={`block font-display text-3xl leading-none ${alert ? "text-[var(--rouge-texte)]" : "text-foreground"}`}>{count.total}</span>
+        {count.label && <span className="text-xs text-muted-foreground">{count.label}</span>}
+      </span>
+    )
+  }
+  const shown = count.total - count.hidden
+  return (
+    <span className="text-right">
+      <span className="flex items-center justify-end gap-1.5 font-display text-3xl leading-none text-foreground" title={`${shown} visible(s) sur le site`}>
+        <Eye className="h-4 w-4 text-or" />{shown}
+      </span>
+      {count.hidden > 0 && (
+        <span className="mt-1 flex items-center justify-end gap-1 text-xs text-muted-foreground" title={`${count.hidden} masqué(s), non supprimé(s)`}>
+          <EyeOff className="h-3 w-3" />{count.hidden} masqué{count.hidden > 1 ? "s" : ""}
+        </span>
+      )}
+    </span>
   )
 }

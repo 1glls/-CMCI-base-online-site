@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 // Configuration Multer
@@ -131,5 +132,8 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'galleryImage');
 
 module.exports = router;

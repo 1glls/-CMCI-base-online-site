@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
-const { authMiddleware } = require('../middleware/auth.middleware');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
 const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
+const { addStatusRoute } = require('../utils/status-route');
 const prisma = new PrismaClient();
 
 // Configuration Multer pour upload d'images
@@ -51,7 +52,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET all ministries including drafts (admin)
-router.get('/all', authMiddleware, async (req, res) => {
+router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const ministries = await prisma.ministry.findMany({
       orderBy: { order: 'asc' }
@@ -80,7 +81,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create ministry (admin)
-router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
   try {
     const { title, description, icon, order, status, link } = req.body;
     
@@ -106,7 +107,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 });
 
 // PUT update ministry (admin)
-router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
+router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
   try {
     const { title, description, icon, order, status, link } = req.body;
     
@@ -142,7 +143,7 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
 });
 
 // DELETE ministry (admin)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const ministry = await prisma.ministry.findUnique({
       where: { id: req.params.id }
@@ -161,5 +162,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Masquer / Afficher sans supprimer
+addStatusRoute(router, prisma, 'ministry');
 
 module.exports = router;

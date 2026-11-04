@@ -12,6 +12,7 @@ import { Trash2, Edit, Plus, ArrowLeft, QrCode, Download } from "lucide-react"
 import { QRCodeCanvas } from "qrcode.react"
 import Link from "next/link"
 import { API_URL } from "@/lib/api"
+import { VisibilityToggle, StatusBadge, VisibilitySummary, hiddenCls } from "@/components/admin/visibility"
 
 export default function AdminEvents() {
   const [events, setEvents] = useState<any[]>([])
@@ -321,9 +322,10 @@ export default function AdminEvents() {
           </Card>
         )}
 
+        <VisibilitySummary items={events} className="mb-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event) => (
-            <Card key={event.id}>
+            <Card key={event.id} className={hiddenCls(event.status)}>
               {event.image && (
                 <div className="relative h-48 w-full overflow-hidden">
                   <img
@@ -334,7 +336,10 @@ export default function AdminEvents() {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-lg">{event.title}</CardTitle>
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="text-lg">{event.title}</CardTitle>
+                  <StatusBadge status={event.status} className="shrink-0" />
+                </div>
                 <p className="text-sm text-gray-500">
                   {event.date} • {event.time}
                 </p>
@@ -347,7 +352,11 @@ export default function AdminEvents() {
                     📝 Inscription: {event.registrationButtonText || "S'inscrire"}
                   </div>
                 )}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <VisibilityToggle
+                    resource="events" id={event.id} status={event.status} label={event.title}
+                    onChange={(status) => setEvents((list) => list.map((x) => (x.id === event.id ? { ...x, status } : x)))}
+                  />
                   <Button size="sm" variant="outline" onClick={() => handleEdit(event)}>
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -400,7 +409,7 @@ export default function AdminEvents() {
               </div>
               {qrUrl && (
                 <div className="flex flex-col items-center gap-4">
-                  <div ref={qrRef} className="bg-white p-4 rounded-lg">
+                  <div ref={qrRef} className="bg-[#fff] p-4 rounded-lg">
                     <QRCodeCanvas
                       value={qrUrl}
                       size={256}
