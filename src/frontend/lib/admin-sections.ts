@@ -8,7 +8,8 @@
 import type { LucideIcon } from "lucide-react"
 import {
   BookOpen, Calendar, Church, ClipboardList, DatabaseBackup, FileText, Image, Languages,
-  LayoutTemplate, Mail, MapPin, MessageSquare, Settings, Share2, Tags, Timer,
+  Layers, LayoutTemplate, Library, Mail, MapPin, Megaphone, MessageSquare, Settings, Settings2,
+  Share2, Tags, Timer,
 } from "lucide-react"
 
 export type AdminGroup = "content" | "publications" | "communication" | "system"
@@ -31,11 +32,11 @@ export interface AdminSection {
   resource?: string
 }
 
-export const ADMIN_GROUPS: { key: AdminGroup; title: string; hint: string }[] = [
-  { key: "content", title: "Contenu du site", hint: "Ce que les visiteurs voient sur les pages" },
-  { key: "publications", title: "Publications", hint: "Livres, tracts et leurs catégories" },
-  { key: "communication", title: "Communication", hint: "Newsletter, formulaires, réseaux sociaux" },
-  { key: "system", title: "Système", hint: "Réglages, traductions, sauvegardes" },
+export const ADMIN_GROUPS: { key: AdminGroup; title: string; hint: string; icon: LucideIcon }[] = [
+  { key: "content", title: "Contenu du site", hint: "Ce que les visiteurs voient sur les pages", icon: Layers },
+  { key: "publications", title: "Publications", hint: "Livres, tracts et leurs catégories", icon: Library },
+  { key: "communication", title: "Communication", hint: "Newsletter, formulaires, réseaux sociaux", icon: Megaphone },
+  { key: "system", title: "Système", hint: "Réglages, traductions, sauvegardes", icon: Settings2 },
 ]
 
 export const ADMIN_SECTIONS: AdminSection[] = [

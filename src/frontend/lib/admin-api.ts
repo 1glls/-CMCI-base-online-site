@@ -149,6 +149,16 @@ export async function adminFetch<T = any>(path: string, init: AdminInit = {}): P
     throw new AdminApiError("Session expirée, reconnectez-vous.", 401)
   }
   if (!res.ok) {
+    // Route inconnue du serveur (page HTML « Cannot PATCH /api/... ») : le backend
+    // tourne avec une ancienne version du code. Arrive quand on déploie sans
+    // redémarrer le serveur (pm2 restart cmci-backend).
+    if (res.status === 404 && typeof data === "string" && /Cannot (GET|POST|PUT|PATCH|DELETE) /.test(data)) {
+      throw new AdminApiError(
+        "Le serveur n'est pas à jour : cette fonction n'existe pas encore sur le backend. Il faut le redémarrer (pm2 restart cmci-backend).",
+        404,
+        data.match(/Cannot [A-Z]+ [^<]+/)?.[0],
+      )
+    }
     const raw = data && typeof data === "object"
       ? [data.error, data.message].filter(Boolean).join(" — ")
       : typeof data === "string" && !data.trimStart().startsWith("<") ? data.slice(0, 300) : ""

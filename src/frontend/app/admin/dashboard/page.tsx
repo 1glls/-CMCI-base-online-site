@@ -1,13 +1,14 @@
 "use client"
 
 /**
- * Tableau de bord : une tuile par section (lib/admin-sections.ts) avec le nombre
- * d'éléments visibles / masqués, et un bloc « À traiter » qui signale ce qui
- * demande l'attention de l'administrateur.
+ * Tableau de bord : les groupes de sections en colonne à gauche (onglets
+ * verticaux) ; à droite, seules les tuiles du groupe choisi. Chaque tuile
+ * (lib/admin-sections.ts) montre le nombre d'éléments visibles / masqués.
+ * Un bloc « À traiter » signale ce qui demande l'attention de l'administrateur.
  */
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { AlertTriangle, CalendarClock, CalendarX, ChevronDown, ChevronRight, Eye, EyeOff, Info, Link2Off, RefreshCw, Share2 } from "lucide-react"
+import { AlertTriangle, CalendarClock, CalendarX, ChevronRight, Eye, EyeOff, Info, Link2Off, RefreshCw, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { adminFetch, adminList, getAdmin } from "@/lib/admin-api"
 import { ADMIN_GROUPS, ADMIN_SECTIONS, type AdminGroup } from "@/lib/admin-sections"
@@ -24,24 +25,31 @@ export default function AdminDashboard() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState<string[]>([])
-  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(ADMIN_GROUPS.map((g) => g.key)))
+  // Groupe affiché à droite, mémorisé dans le navigateur
+  const [group, setGroup] = useState<AdminGroup>("content")
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   useEffect(() => {
     setName(getAdmin()?.name ?? "")
     try {
-      const saved = localStorage.getItem("adminDashGroups")
-      if (saved) setOpenGroups(new Set(JSON.parse(saved)))
-    } catch { /* préférence illisible : tout reste ouvert */ }
+      const saved = localStorage.getItem("adminDashGroup")
+      if (saved && ADMIN_GROUPS.some((g) => g.key === saved)) setGroup(saved as AdminGroup)
+    } catch { /* stockage indisponible : premier groupe */ }
   }, [])
 
-  const toggleGroup = (key: AdminGroup) => {
-    setOpenGroups((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      try { localStorage.setItem("adminDashGroups", JSON.stringify([...next])) } catch { /* ignore */ }
-      return next
-    })
+  const chooseGroup = (key: AdminGroup, focus = false) => {
+    setGroup(key)
+    if (focus) tabRefs.current[key]?.focus()
+    try { localStorage.setItem("adminDashGroup", key) } catch { /* ignore */ }
+  }
+
+  // Clavier : flèches haut/bas (ou gauche/droite sur mobile) pour changer de groupe
+  const onTabKey = (e: React.KeyboardEvent, index: number) => {
+    const delta = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? -1 : 0
+    if (!delta) return
+    e.preventDefault()
+    const next = ADMIN_GROUPS[(index + delta + ADMIN_GROUPS.length) % ADMIN_GROUPS.length]
+    chooseGroup(next.key, true)
   }
 
   const load = useCallback(async () => {
@@ -99,7 +107,7 @@ export default function AdminDashboard() {
     const today = new Date(); today.setHours(0, 0, 0, 0)
     const pastVisible = events.filter((e) => visible(e.status) && (parseEventDate(e.date)?.getTime() ?? Infinity) < today.getTime())
     if (pastVisible.length) {
-      t.push({ key: "past", level: "info", icon: CalendarClock, text: `${pastVisible.length} événement${pastVisible.length > 1 ? "s" : ""} passé${pastVisible.length > 1 ? "s" : ""} encore visible${pastVisible.length > 1 ? "s" : ""} sur la frise de l'Agenda. Masquez-les si vous ne voulez plus les montrer.`, href: "/admin/events", action: "Voir" })
+      t.push({ key: "past", level: "info", icon: CalendarClock, text: `${pastVisible.length} événement${pastVisible.length > 1 ? "s" : ""} passé${pastVisible.length > 1 ? "s" : ""} encore publié${pastVisible.length > 1 ? "s" : ""} : les visiteurs peuvent ${pastVisible.length > 1 ? "les" : "le"} revoir en ouvrant le rideau de l'Agenda. Masquez-${pastVisible.length > 1 ? "les" : "le"} si vous ne voulez plus ${pastVisible.length > 1 ? "les" : "le"} montrer.`, href: "/admin/events", action: "Voir" })
     }
     const undated = events.filter((e) => visible(e.status) && !parseEventDate(e.date))
     if (undated.length) {
@@ -158,46 +166,80 @@ export default function AdminDashboard() {
         </section>
       )}
 
-      <div className="mt-10 space-y-6">
-        {ADMIN_GROUPS.map((g) => {
-          const items = ADMIN_SECTIONS.filter((s) => s.group === g.key)
-          const isOpen = openGroups.has(g.key)
-          return (
-            <section key={g.key} className="rounded-xl border border-border bg-card/40">
+      <div className="mt-10 grid items-start gap-6 lg:grid-cols-[17rem_1fr] lg:gap-10">
+        {/* Colonne des groupes (onglets verticaux ; en ligne défilante sur mobile) */}
+        <div
+          role="tablist"
+          aria-label="Groupes de sections"
+          aria-orientation="vertical"
+          className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:sticky lg:top-24 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
+        >
+          {ADMIN_GROUPS.map((g, i) => {
+            const items = ADMIN_SECTIONS.filter((s) => s.group === g.key)
+            const active = g.key === group
+            const hasAlert = items.some((s) => s.key === "social" && (counts.social?.total ?? 0) > 0)
+            return (
               <button
+                key={g.key}
+                ref={(el) => { tabRefs.current[g.key] = el }}
                 type="button"
-                onClick={() => toggleGroup(g.key)}
-                aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                role="tab"
+                id={`onglet-${g.key}`}
+                aria-selected={active}
+                aria-controls={`groupe-${g.key}`}
+                tabIndex={active ? 0 : -1}
+                onClick={() => chooseGroup(g.key)}
+                onKeyDown={(e) => onTabKey(e, i)}
+                className={`relative flex shrink-0 items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:w-full ${
+                  active ? "border-or/60 bg-or/10 text-foreground" : "border-border text-foreground/75 hover:border-or/40 hover:bg-card"
+                }`}
               >
-                <span>
-                  <span className="font-display text-2xl text-foreground">{g.title}</span>
-                  <span className="ml-3 text-xs text-muted-foreground">{g.hint}</span>
+                <span aria-hidden className={`absolute bottom-3 left-0 top-3 w-[3px] rounded-r bg-or transition-opacity ${active ? "opacity-100" : "opacity-0"}`} />
+                <g.icon className={`h-5 w-5 shrink-0 ${active ? "text-or" : "text-muted-foreground"}`} />
+                <span className="min-w-0 flex-1">
+                  <span className="block whitespace-nowrap font-display text-xl leading-tight">{g.title}</span>
+                  <span className="hidden text-xs text-muted-foreground lg:block">{g.hint}</span>
                 </span>
-                <ChevronDown className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                {hasAlert && <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--rouge)]" title="Éléments en attente" />}
+                <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">{items.length}</span>
               </button>
-              {isOpen && (
-                <div className="grid gap-4 px-5 pb-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {items.map((s) => {
-                    const c = counts[s.key]
-                    const alert = s.key === "social" && (c?.total ?? 0) > 0
-                    return (
-                      <Link
-                        key={s.key}
-                        href={s.href}
-                        className="group flex flex-col rounded-lg border border-border bg-card p-5 transition-colors hover:border-or/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <s.icon className="h-7 w-7 text-or" />
-                          <TileCount count={c} loading={loading} alert={alert} hasStatus={!!s.listUrl || s.key === "books"} />
-                        </div>
-                        <h3 className="mt-3 text-base font-semibold text-foreground group-hover:text-or">{s.title}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
-                      </Link>
-                    )
-                  })}
-                </div>
-              )}
+            )
+          })}
+        </div>
+
+        {/* Seules les sections du groupe choisi */}
+        {ADMIN_GROUPS.filter((g) => g.key === group).map((g) => {
+          const items = ADMIN_SECTIONS.filter((s) => s.group === g.key)
+          return (
+            <section
+              key={g.key}
+              role="tabpanel"
+              id={`groupe-${g.key}`}
+              aria-labelledby={`onglet-${g.key}`}
+              className="min-w-0 animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+            >
+              <h2 className="font-display text-3xl text-foreground">{g.title}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{g.hint}</p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {items.map((s) => {
+                  const c = counts[s.key]
+                  const alert = s.key === "social" && (c?.total ?? 0) > 0
+                  return (
+                    <Link
+                      key={s.key}
+                      href={s.href}
+                      className="group flex flex-col rounded-lg border border-border bg-card p-5 transition-colors hover:border-or/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <s.icon className="h-7 w-7 text-or" />
+                        <TileCount count={c} loading={loading} alert={alert} hasStatus={!!s.listUrl || s.key === "books"} />
+                      </div>
+                      <h3 className="mt-3 text-base font-semibold text-foreground group-hover:text-or">{s.title}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
+                    </Link>
+                  )
+                })}
+              </div>
             </section>
           )
         })}
