@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, RefreshCw, Eye, EyeOff, Star, ExternalLink, Loader2, Link2, Link2Off, BarChart3, Heart } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Eye, EyeOff, Star, ExternalLink, Loader2, Link2, Link2Off, BarChart3, Heart, Sparkles, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL, getImageUrl } from '@/lib/api';
 
@@ -15,6 +15,7 @@ interface Book {
   language: string | null; languageCode: string | null;
   priceLabel: string | null; externalLink: string | null; source: string | null;
   coverDisplay: string | null; featured: boolean; hidden: boolean;
+  heroFeatured: boolean; heroOrder: number;
   status: string; categories: Category[]; workKey: string | null;
   views: number; likes: number;
 }
@@ -26,6 +27,9 @@ interface Stats {
   totalBooks: number;
 }
 
+/** Nombre de livres que le hero de l'accueil sait afficher (cf. GET /api/books/hero). */
+const HERO_LIMIT = 8;
+
 export default function AdminBooksPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -35,6 +39,7 @@ export default function AdminBooksPage() {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<Stats | null>(null);
+  const [heroOnly, setHeroOnly] = useState(false);
 
   const token = () => localStorage.getItem('adminToken');
 
@@ -134,7 +139,43 @@ export default function AdminBooksPage() {
     fetchBooks();
   };
 
+  const heroBooks = books
+    .filter((b) => b.heroFeatured)
+    .sort((a, b) => a.heroOrder - b.heroOrder || a.title.localeCompare(b.title));
+
+  const toggleHero = async (b: Book) => {
+    if (!b.heroFeatured && heroBooks.length >= HERO_LIMIT) {
+      toast({
+        title: `Maximum ${HERO_LIMIT} livres dans le hero`,
+        description: 'Retirez-en un avant d\'en ajouter un autre.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    // Un nouveau livre se place en dernier
+    await patch(b.id, b.heroFeatured
+      ? { heroFeatured: false }
+      : { heroFeatured: true, heroOrder: heroBooks.length });
+  };
+
+  /** Echange un livre avec son voisin puis renumerote toute la selection 0..n. */
+  const moveHero = async (index: number, delta: -1 | 1) => {
+    const target = index + delta;
+    if (target < 0 || target >= heroBooks.length) return;
+    const next = [...heroBooks];
+    [next[index], next[target]] = [next[target], next[index]];
+    await Promise.all(next.map((b, i) => {
+      const fd = new FormData();
+      fd.append('heroOrder', String(i));
+      return fetch(`${API_URL}/api/books/${b.id}`, {
+        method: 'PUT', headers: { Authorization: `Bearer ${token()}` }, body: fd
+      });
+    }));
+    fetchBooks();
+  };
+
   const visible = books.filter((b) => {
+    if (heroOnly && !b.heroFeatured) return false;
     if (!query) return true;
     const q = query.toLowerCase();
     return b.title.toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q);
@@ -196,6 +237,47 @@ export default function AdminBooksPage() {
               </Button>
               <span className="text-sm text-gray-600">{ztfCount} livre(s) ztfbooks</span>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />Hero de l'accueil
+              <span className="ml-auto text-sm font-normal text-gray-500">{heroBooks.length}/{HERO_LIMIT} sélectionnés</span>
+            </CardTitle>
+            <CardDescription>
+              Les livres mis en avant en haut de la page d'accueil, dans cet ordre. Ajoutez-en depuis le catalogue
+              avec le bouton <Sparkles className="inline h-3.5 w-3.5" />. Ce choix n'est jamais modifié par la synchronisation.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {heroBooks.length === 0 && (
+              <p className="text-sm text-gray-400">Aucun livre choisi : le hero affichera seulement le message d'accueil.</p>
+            )}
+            <ol className="space-y-2">
+              {heroBooks.map((b, i) => (
+                <li key={b.id} className="flex items-center gap-3 rounded-lg border p-2">
+                  <span className="w-5 text-center text-sm font-semibold text-gray-400">{i + 1}</span>
+                  {b.coverDisplay && (
+                    <img src={getImageUrl(b.coverDisplay)} alt="" className="h-12 w-9 shrink-0 rounded object-cover" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{b.title}</p>
+                    <p className="truncate text-xs text-gray-500">{b.author} · {b.language}{b.hidden && ' · masqué (non affiché)'}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" title="Monter" disabled={i === 0} onClick={() => moveHero(i, -1)}>
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" title="Descendre" disabled={i === heroBooks.length - 1} onClick={() => moveHero(i, 1)}>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" title="Retirer du hero" onClick={() => toggleHero(b)}>
+                    <X className="h-4 w-4 text-red-500" />
+                  </Button>
+                </li>
+              ))}
+            </ol>
           </CardContent>
         </Card>
 
@@ -328,6 +410,10 @@ export default function AdminBooksPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
+            <label className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={heroOnly} onChange={(e) => setHeroOnly(e.target.checked)} />
+              Afficher seulement les livres du hero
+            </label>
           </CardHeader>
           <CardContent>
             {loading && <p className="text-gray-500">Chargement…</p>}
@@ -362,6 +448,13 @@ export default function AdminBooksPage() {
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
+                    <Button
+                      variant="ghost" size="sm"
+                      title={b.heroFeatured ? 'Retirer du hero de l\'accueil' : 'Afficher dans le hero de l\'accueil'}
+                      onClick={() => toggleHero(b)}
+                    >
+                      <Sparkles className={`h-4 w-4 ${b.heroFeatured ? 'fill-amber-400 text-amber-500' : 'text-gray-400'}`} />
+                    </Button>
                     <Button
                       variant="ghost" size="sm" title={b.featured ? 'Retirer de la banderole' : 'Mettre en avant'}
                       onClick={() => patch(b.id, { featured: !b.featured })}

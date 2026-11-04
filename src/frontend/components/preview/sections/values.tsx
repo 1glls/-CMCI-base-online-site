@@ -6,6 +6,8 @@ import { PvCard } from '../card';
 import { useReveal } from '../use-reveal';
 import type { StyleConfig } from '../styles';
 
+const ROMAN = ['I', 'II', 'III', 'IV'];
+
 const VALUES = [
   { n: '01', icon: Heart, title: 'Communauté', text: 'Une famille spirituelle unie par l’amour du Christ, vivant la communion fraternelle.' },
   { n: '02', icon: Send, title: 'Missionnaire', text: 'Appelés à porter l’Évangile partout, faisant des disciples dans toutes les nations.' },
@@ -27,15 +29,23 @@ export function Values({ config }: { config: StyleConfig }) {
                 <div className="flex items-center gap-3">
                   <span
                     className="grid h-11 w-11 place-items-center rounded-full"
-                    style={{ background: 'color-mix(in srgb, var(--pv-accent) 16%, transparent)', color: 'var(--pv-accent)' }}
+                    style={config.ornate
+                      ? { border: '1px solid var(--pv-gold)', color: 'var(--pv-gold)' }
+                      : { background: 'color-mix(in srgb, var(--pv-accent) 16%, transparent)', color: 'var(--pv-accent)' }}
                   >
                     <v.icon className="h-5 w-5" />
                   </span>
-                  <span className="pv-heading text-2xl font-bold" style={{ color: 'color-mix(in srgb, var(--pv-fg) 25%, var(--pv-accent))' }}>
-                    {v.n}
-                  </span>
+                  {config.ornate ? (
+                    <span className="pv-caps text-xl font-semibold" style={{ color: 'var(--pv-rubric)' }}>
+                      {ROMAN[i]}
+                    </span>
+                  ) : (
+                    <span className="pv-heading text-2xl font-bold" style={{ color: 'color-mix(in srgb, var(--pv-fg) 25%, var(--pv-accent))' }}>
+                      {v.n}
+                    </span>
+                  )}
                 </div>
-                <h3 className="pv-heading mt-4 text-xl font-bold" style={{ color: 'var(--pv-fg)' }}>{v.title}</h3>
+                <h3 className={`pv-heading mt-4 font-bold ${config.ornate ? 'text-2xl' : 'text-xl'}`} style={{ color: 'var(--pv-fg)' }}>{v.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--pv-muted)' }}>{v.text}</p>
               </PvCard>
             </div>

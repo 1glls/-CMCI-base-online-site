@@ -56,18 +56,18 @@ export function CategoryFilter({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm transition-colors hover:border-primary/50 focus:border-primary focus:outline-none"
+        className="flex items-center gap-2 border border-or/40 bg-transparent px-4 py-2 text-sm text-ivoire transition-colors hover:border-or focus:border-or-clair focus:outline-none"
       >
         <span className="max-w-[180px] truncate">{selectedLabel}</span>
         <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="absolute left-1/2 z-40 mt-2 max-h-80 w-72 -translate-x-1/2 overflow-auto rounded-xl border border-border bg-card p-1 text-left shadow-lg">
+        <div className="absolute left-1/2 z-40 mt-2 max-h-80 w-72 -translate-x-1/2 overflow-auto border border-or/30 bg-nuit/95 p-1 text-left text-ivoire shadow-2xl backdrop-blur">
           <button
             onClick={() => pick('__all__')}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-              value === '__all__' ? 'bg-primary/10 font-medium text-primary' : 'hover:bg-muted'
+            className={`block w-full px-3 py-2 text-left text-sm transition-colors ${
+              value === '__all__' ? 'bg-or/15 font-medium text-or-clair' : 'hover:bg-ivoire/5'
             }`}
           >
             {t('books.allCategories')}
@@ -81,19 +81,19 @@ export function CategoryFilter({
               <div key={g}>
                 <button
                   onClick={() => toggle(g)}
-                  className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                  className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm font-semibold text-ivoire transition-colors hover:bg-ivoire/5"
                 >
                   <span>{t(`books.groups.${g}`)}</span>
                   {isOpen
-                    ? <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    : <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />}
+                    ? <ChevronDown className="h-4 w-4 shrink-0 text-or" />
+                    : <ChevronRight className="h-4 w-4 shrink-0 text-or" />}
                 </button>
                 {isOpen && items.map((c) => (
                   <button
                     key={c.slug}
                     onClick={() => pick(c.slug)}
-                    className={`block w-full rounded-lg py-1.5 pl-6 pr-3 text-left text-sm transition-colors ${
-                      value === c.slug ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground hover:bg-muted'
+                    className={`block w-full py-1.5 pl-6 pr-3 text-left text-sm transition-colors ${
+                      value === c.slug ? 'bg-or/15 font-medium text-or-clair' : 'text-ivoire/65 hover:bg-ivoire/5'
                     }`}
                   >
                     {c.name}

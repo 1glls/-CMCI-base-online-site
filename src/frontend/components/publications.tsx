@@ -12,6 +12,9 @@ const foldAccents = (s: string) =>
 import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { Rich } from '@/components/site/rich-text';
+import { CmfiLink } from '@/components/site/cmfi-link';
+import { CMFI } from '@/lib/cmfi';
 
 /** Les descriptions ztfbooks contiennent du HTML : on n'affiche que le texte. */
 function stripHtml(s: string): string {
@@ -73,7 +76,7 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
 
   return (
     <section
-      className="relative h-[60vh] max-h-[560px] min-h-[420px] w-full overflow-hidden bg-primary"
+      className="relative h-[78vh] max-h-[720px] min-h-[540px] w-full overflow-hidden bg-nuit"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -100,23 +103,25 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
               />
               {/* Voile leger d'ensemble + halo sombre au centre, la ou vit le
                   texte : lisibilite sans noircir l'image. */}
-              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-nuit/35" />
               <div
                 className="absolute inset-0"
-                style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%)' }}
+                style={{ background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--nuit) 60%, transparent) 0%, color-mix(in srgb, var(--nuit) 15%, transparent) 70%)' }}
               />
             </>
           ) : (
             // Ni illustration ni apercu : degrade aux couleurs du site, pour
             // qu'une banderole ne soit jamais vide. Deja assez sombre pour
             // porter du texte blanc.
-            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-accent/50" />
+            <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_45%,rgba(240,179,35,0.22),transparent_70%)]" />
           )}
         </div>
       ))}
 
       {/* Contenu */}
-      <div className="relative z-20 flex h-full flex-col items-center justify-center px-6 text-center text-white">
+      {/* Fondu vers la page en bas de la banderole */}
+      <div aria-hidden className="absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-nuit to-transparent" />
+      <div className="relative z-20 flex h-full flex-col items-center justify-center px-6 pt-24 text-center text-ivoire">
         {slides.map((s, i) => (
           <div
             key={s.key}
@@ -126,20 +131,20 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
             )}
             style={{ display: i === index ? 'block' : 'none' }}
           >
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            <span className="eyebrow text-or-clair">
               {s.kind === 'tract' ? t('books.tractsTitle') : t('books.featured')}
             </span>
-            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-              {s.title}
+            <h2 className="mt-4 font-display text-4xl font-medium leading-tight sm:text-5xl md:text-6xl">
+              <Rich text={s.title} />
             </h2>
-            {s.subtitle && <p className="mt-2 text-white/80">{s.subtitle}</p>}
-            <p className="mx-auto mt-4 max-w-2xl text-white/90 line-clamp-3">{s.description}</p>
+            {s.subtitle && <p className="mt-2 text-ivoire/80">{s.subtitle}</p>}
+            <p className="mx-auto mt-4 max-w-2xl text-ivoire/80 line-clamp-3"><Rich text={s.description} /></p>
 
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               {s.href && (
                 <Link
                   href={s.href}
-                  className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+                  className="inline-flex items-center gap-2 bg-or px-7 py-3.5 font-caps text-xs uppercase tracking-[0.2em] text-nuit transition-colors hover:bg-or-clair"
                 >
                   <Eye className="h-4 w-4" />{s.kind === 'tract' ? t('books.viewTract') : t('books.detail.viewBook')}
                 </Link>
@@ -147,7 +152,7 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
               {s.book && (s.book.preview || s.book.file) && (
                 <button
                   onClick={() => onPreview(s.book!)}
-                  className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+                  className="inline-flex items-center gap-2 bg-or px-7 py-3.5 font-caps text-xs uppercase tracking-[0.2em] text-nuit transition-colors hover:bg-or-clair"
                 >
                   <Eye className="h-4 w-4" />{t('books.preview')}
                 </button>
@@ -155,7 +160,7 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
               {s.file && (
                 <a
                   href={getFileUrl(s.file)} download
-                  className="inline-flex items-center gap-2 rounded-full border border-white/50 px-7 py-3 font-semibold transition-colors hover:bg-white/10"
+                  className="inline-flex items-center gap-2 border border-ivoire/40 px-7 py-3.5 font-caps text-xs uppercase tracking-[0.2em] transition-colors hover:border-or hover:text-or-clair"
                 >
                   <Download className="h-4 w-4" />{t('books.download')}
                 </a>
@@ -169,14 +174,14 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
         <>
           <button
             onClick={() => go(-1)}
-            className="absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-black/30 p-3 text-white transition-colors hover:bg-black/50 sm:block"
+            className="absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 border border-ivoire/30 bg-nuit/40 p-3 text-ivoire transition-colors hover:border-or hover:text-or-clair sm:block"
             aria-label="Précédent"
           >
             <ChevronLeft size={22} />
           </button>
           <button
             onClick={() => go(1)}
-            className="absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-black/30 p-3 text-white transition-colors hover:bg-black/50 sm:block"
+            className="absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 border border-ivoire/30 bg-nuit/40 p-3 text-ivoire transition-colors hover:border-or hover:text-or-clair sm:block"
             aria-label="Suivant"
           >
             <ChevronRight size={22} />
@@ -187,8 +192,8 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
                 key={i}
                 onClick={() => { setPaused(true); setIndex(i); }}
                 className={cn(
-                  "h-2 rounded-full transition-all",
-                  i === index ? "w-7 bg-accent" : "w-2 bg-white/50 hover:bg-white/80"
+                  "h-[3px] transition-all",
+                  i === index ? "w-10 bg-or" : "w-4 bg-ivoire/30 hover:bg-ivoire/60"
                 )}
                 aria-label={`${i + 1}`}
               />
@@ -312,44 +317,49 @@ export function Publications() {
   ].slice(0, 6);
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-nuit text-ivoire">
       {/* Banderole pleine largeur, hors du conteneur : elle doit toucher les
           bords de l'ecran comme le hero de l'accueil. */}
-      {!loading && featured.length > 0 && (
+      {!loading && featured.length > 0 ? (
         <FeaturedCarousel slides={featured} onPreview={setPreviewed} />
+      ) : (
+        // Sans banderole, laisse la place a l'en-tete fixe (bandeau + menu)
+        <div className="h-32" aria-hidden />
       )}
 
-      <div className="container mx-auto px-4 pb-20 pt-12">
+      <div className="mx-auto max-w-7xl px-6 pb-28 pt-16">
 
-        <header className="mb-10 text-center">
-          <span className="text-sm font-semibold uppercase tracking-wider text-accent">
-            {t('books.label')}
+        <header className="mb-16 text-center">
+          <span className="eyebrow inline-flex items-center gap-3 text-or">
+            <span className="h-1.5 w-1.5 rotate-45 bg-rouge" aria-hidden />{t('books.label')}
           </span>
-          <h1 className="mt-3 font-serif text-3xl font-bold text-primary md:text-4xl">
+          <h1 className="mt-5 font-display text-5xl font-medium text-ivoire md:text-6xl">
             {t('books.title')}
           </h1>
-          <div className="mx-auto mt-4 h-1 w-20 bg-accent" />
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+          <p className="mx-auto mt-5 max-w-2xl text-ivoire/65">
             {t('books.subtitle')}
           </p>
+          <div className="mt-5">
+            <CmfiLink href={CMFI.books}>{t('home2.cmfi.books')}</CmfiLink>
+          </div>
 
           {/* Recherche + filtre categorie. Les 54 series ztfbooks sont rangees
               sous des themes generaux (<optgroup>) pour rester scannables. */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-or" />
               <input
                 type="search"
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setBooksShown(24); }}
                 placeholder={t('books.searchPlaceholder')}
-                className="w-64 rounded-full border border-border bg-card py-2 pl-9 pr-4 text-sm focus:border-primary focus:outline-none"
+                className="w-64 border-b border-or/50 bg-transparent py-2 pl-9 pr-4 text-sm text-ivoire placeholder:text-ivoire/40 focus:border-or-clair focus:outline-none"
               />
             </div>
 
             {categories.length > 0 && (
               <>
-                <label className="text-sm font-medium text-muted-foreground">
+                <label className="text-sm font-medium text-ivoire/60">
                   {t('books.filterByCategory')}
                 </label>
                 <CategoryFilter
@@ -363,7 +373,7 @@ export function Publications() {
           </div>
         </header>
 
-        {loading && <p className="text-center text-muted-foreground">{t('books.loading')}</p>}
+        {loading && <p className="text-center text-ivoire/60">{t('books.loading')}</p>}
 
         {!loading && (
           <>
@@ -372,13 +382,13 @@ export function Publications() {
                 pas partie des resultats et brouilleraient la lecture. */}
             {!q && (
             <section className="mb-16">
-              <h2 className="font-serif text-2xl font-bold text-primary">
+              <h2 className="font-display text-4xl text-ivoire">
                 {t('books.tractsTitle')}
               </h2>
-              <p className="mb-6 text-muted-foreground">{t('books.tractsSubtitle')}</p>
+              <p className="mb-8 mt-2 text-ivoire/60">{t('books.tractsSubtitle')}</p>
 
               {shownTracts.length === 0 ? (
-                <p className="text-muted-foreground">
+                <p className="text-ivoire/60">
                   {activeCat === '__all__' ? t('books.noTracts') : t('books.noMatch')}
                 </p>
               ) : (
@@ -386,29 +396,29 @@ export function Publications() {
                   {shownTracts.map((tr) => (
                     <Link
                       key={tr.id} href={`/t/${tr.slug}`}
-                      className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
+                      className="group block"
                     >
                       {tr.cover && (
                         <div className="aspect-[4/3] overflow-hidden">
                           <img
                             src={getFileUrl(tr.cover)} alt={tr.title}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            className="fondu-bas h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
                         </div>
                       )}
-                      <div className="p-5">
-                        <h3 className="font-serif text-lg font-bold text-primary group-hover:text-accent">
-                          {tr.title}
+                      <div className="pt-1">
+                        <h3 className="font-display text-2xl text-ivoire transition-colors group-hover:text-or-clair">
+                          <Rich text={tr.title} />
                         </h3>
-                        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                          {tr.description}
+                        <p className="mt-1 line-clamp-2 text-sm text-ivoire/60">
+                          <Rich text={tr.description} />
                         </p>
                         <div className="mt-3 flex items-center justify-between text-sm">
-                          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 text-ivoire/55">
                             <Languages className="h-4 w-4" />
                             {tr.languageCount} {t('books.languages')}
                           </span>
-                          <span className="font-medium text-accent">{t('books.viewTract')} →</span>
+                          <span className="font-caps text-[11px] uppercase tracking-[0.18em] text-or-clair">{t('books.viewTract')} →</span>
                         </div>
                       </div>
                     </Link>
@@ -420,20 +430,20 @@ export function Publications() {
 
             {/* Livres */}
             <section>
-              <h2 className="font-serif text-2xl font-bold text-primary">
+              <h2 className="font-display text-4xl text-ivoire">
                 {t('books.booksTitle')}
               </h2>
-              <p className="mb-4 text-muted-foreground">{t('books.booksSubtitle')}</p>
+              <p className="mb-6 mt-2 text-ivoire/60">{t('books.booksSubtitle')}</p>
 
               {/* Filtre par langue — sur code stable, jamais sur le libelle */}
               {languages.length > 1 && (
                 <div className="mb-6 flex flex-wrap gap-2">
                   <button
                     onClick={() => { setActiveLang('__all__'); setBooksShown(24); }}
-                    className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                    className={`border px-3 py-1 text-sm transition-colors ${
                       activeLang === '__all__'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-card hover:border-primary/50'
+                        ? 'border-or bg-or text-nuit'
+                        : 'border-ivoire/25 text-ivoire/75 hover:border-or hover:text-or-clair'
                     }`}
                   >
                     {t('books.allLanguages')}
@@ -442,10 +452,10 @@ export function Publications() {
                     <button
                       key={code}
                       onClick={() => { setActiveLang(code!); setBooksShown(24); }}
-                      className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                      className={`border px-3 py-1 text-sm transition-colors ${
                         activeLang === code
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-card hover:border-primary/50'
+                          ? 'border-or bg-or text-nuit'
+                          : 'border-ivoire/25 text-ivoire/75 hover:border-or hover:text-or-clair'
                       }`}
                     >
                       {name}
@@ -454,7 +464,7 @@ export function Publications() {
                   {otherLangs.length > 0 && (
                     <button
                       onClick={() => setShowAllLangs((v) => !v)}
-                      className="rounded-full border border-dashed border-border bg-card px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/50"
+                      className="border border-dashed border-ivoire/30 px-3 py-1 text-sm text-ivoire/60 transition-colors hover:border-or hover:text-or-clair"
                     >
                       {showAllLangs
                         ? t('books.fewerLanguages')
@@ -465,7 +475,7 @@ export function Publications() {
               )}
 
               {shownBooks.length === 0 ? (
-                <p className="text-muted-foreground">
+                <p className="text-ivoire/60">
                   {q
                     ? t('books.noSearchMatch')
                     : activeCat === '__all__' && activeLang === '__all__'
@@ -474,15 +484,15 @@ export function Publications() {
                 </p>
               ) : (
                 <>
-                <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {shownBooks.slice(0, booksShown).map((b) => (
                     <Link
                       key={b.id}
                       href={`/livres/${b.id}`}
-                      className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-lg"
+                      className="group flex flex-col"
                     >
                       {b.cover && (
-                        <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
+                        <div className="relative aspect-[3/4] overflow-hidden bg-charbon shadow-[0_24px_50px_-24px_rgba(0,0,0,0.9)] ring-1 ring-ivoire/10 transition-all duration-500 group-hover:-translate-y-1.5 group-hover:shadow-[0_0_40px_-6px_rgba(240,179,35,0.45)] group-hover:ring-or/50">
                           <img
                             src={getFileUrl(b.cover)} alt={b.title}
                             loading="lazy"
@@ -497,7 +507,7 @@ export function Publications() {
                             return langs.length > 0 && (
                               <span className="absolute right-2 top-2 flex max-w-[85%] flex-wrap justify-end gap-1">
                                 {langs.map((name) => (
-                                  <span key={name} className="rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
+                                  <span key={name} className="bg-nuit/80 px-2 py-0.5 text-[10px] text-or-clair backdrop-blur">
                                     {name}
                                   </span>
                                 ))}
@@ -506,18 +516,18 @@ export function Publications() {
                           })()}
                         </div>
                       )}
-                      <div className="flex flex-1 flex-col p-3">
-                        <h3 className="font-serif text-sm font-bold leading-tight text-primary line-clamp-2 group-hover:underline">{b.title}</h3>
+                      <div className="flex flex-1 flex-col pt-4">
+                        <h3 className="line-clamp-2 font-display text-lg leading-tight text-ivoire transition-colors group-hover:text-or-clair"><Rich text={b.title} /></h3>
                         {b.author && (
-                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                          <p className="mt-1 truncate text-xs text-ivoire/50">
                             {b.author}
                           </p>
                         )}
                         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
                           {b.priceLabel && (
-                            <span className="text-xs font-semibold text-primary">{b.priceLabel}</span>
+                            <span className="text-xs font-semibold text-or">{b.priceLabel}</span>
                           )}
-                          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-accent">
+                          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-or-clair opacity-0 transition-opacity group-hover:opacity-100">
                             {t('books.detail.viewBook')}<ChevronRight className="h-3.5 w-3.5" />
                           </span>
                         </div>
@@ -529,7 +539,7 @@ export function Publications() {
                   <div className="mt-8 text-center">
                     <button
                       onClick={() => setBooksShown((n) => n + 24)}
-                      className="rounded-full border-2 border-primary px-6 py-2.5 font-medium text-primary transition-colors hover:bg-primary hover:text-white"
+                      className="border border-or px-7 py-3.5 font-caps text-xs uppercase tracking-[0.2em] text-or-clair transition-colors hover:bg-or hover:text-nuit"
                     >
                       {t('books.seeMore')} ({shownBooks.length - booksShown})
                     </button>

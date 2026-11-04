@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText, Tags, BookOpen, ChevronDown } from "lucide-react"
+import { Calendar, MessageSquare, Image, Share2, Settings, LogOut, Home, MapPin, Mail, Church, ClipboardList, DatabaseBackup, Languages, FileText, Tags, BookOpen, ChevronDown, Timer } from "lucide-react"
 import { API_URL } from "@/lib/api"
 
 export default function AdminDashboard() {
@@ -122,6 +122,12 @@ export default function AdminDashboard() {
       count: stats.heroSlides,
     },
     {
+      title: "Comptes à rebours",
+      description: "Événements longs : décompte et infos pratiques",
+      icon: Timer,
+      href: "/admin/countdowns",
+    },
+    {
       title: "Événements",
       description: "Gérer les événements",
       icon: Calendar,
@@ -218,7 +224,7 @@ export default function AdminDashboard() {
 
   // Regroupement des tuiles par theme general, presente en accordeon.
   const GROUPS = [
-    { key: "content", title: "Contenu du site", titles: ["Section Hero", "Événements", "Témoignages", "Galerie", "Ministères", "Assemblées"] },
+    { key: "content", title: "Contenu du site", titles: ["Section Hero", "Comptes à rebours", "Événements", "Témoignages", "Galerie", "Ministères", "Assemblées"] },
     { key: "publications", title: "Publications", titles: ["Livres", "Tracts", "Catégories"] },
     { key: "communication", title: "Communication", titles: ["Newsletter", "Formulaires", "Réseaux Sociaux"] },
     { key: "system", title: "Système", titles: ["Paramètres", "Traductions", "Sauvegardes"] },

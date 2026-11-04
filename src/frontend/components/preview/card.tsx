@@ -23,6 +23,15 @@ export function PvCard({
     case 'outline':
       style = { ...base, background: 'transparent', border: '1px solid var(--pv-border)' };
       break;
+    case 'manuscript':
+      // Double filet doré, comme le cadre d'une page enluminée.
+      style = {
+        ...base,
+        background: 'var(--pv-surface)',
+        border: '1px solid color-mix(in srgb, var(--pv-gold) 70%, transparent)',
+        boxShadow: 'inset 0 0 0 4px var(--pv-surface), inset 0 0 0 5px color-mix(in srgb, var(--pv-gold) 45%, transparent), var(--pv-shadow)',
+      };
+      break;
   }
 
   return (

@@ -25,6 +25,13 @@ function numberStyleFor(kind: StyleConfig['numberStyle']): CSSProperties {
       };
     case 'elegant':
       return { color: 'var(--pv-accent)', fontFamily: 'var(--pv-serif)' };
+    case 'illuminated':
+      // Or d'enluminure : dégradé de feuille d'or sur la nuit lapis.
+      return {
+        backgroundImage: 'linear-gradient(180deg, #f6e2a4 0%, var(--pv-gold-soft) 40%, #a67c22 100%)',
+        WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+        fontWeight: 600,
+      };
     default:
       return { color: 'var(--pv-band-fg)' };
   }

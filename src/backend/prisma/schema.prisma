@@ -148,6 +148,31 @@ model Ministry {
   @@map("ministries")
 }
 
+/// Compte a rebours d'un evenement long ou a venir (ex. But Quinquennal).
+/// Avant `startsAt` : « commence dans » ; jusqu'a `endsAt` : « en cours » ;
+/// ensuite il disparait seul du site public.
+model Countdown {
+  id         String   @id @default(uuid())
+  title      String
+  subtitle   String?
+  startsAt   DateTime
+  endsAt     DateTime
+  location   String?
+  schedule   String?
+  info       String?  // infos pratiques, texte libre
+  linkUrl    String?
+  linkLabel  String?
+  image      String?
+  showBanner Boolean  @default(true)  // bandeau en haut de toutes les pages
+  showHome   Boolean  @default(true)  // grand bloc sur la page /temps-forts
+  priority   Int      @default(0)     // le plus petit passe en premier
+  status     String   @default("published") // published, draft
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("countdowns")
+}
+
 model Form {
   id             String   @id @default(uuid())
   title          String
@@ -254,6 +279,10 @@ model Book {
   likes              Int      @default(0)  // « J'aime » sur notre site
   order        Int      @default(0)
   featured     Boolean  @default(true)   // apparait dans la banderole
+  // Choix CMCI pour le hero de l'accueil. Distinct de `featured`, que la
+  // synchro ztfbooks reecrit : ces champs-ci ne sont jamais touches par elle.
+  heroFeatured Boolean  @default(false)
+  heroOrder    Int      @default(0)
   categories   Category[] @relation("BookCategories")
   status       String   @default("published")
   createdAt    DateTime @default(now())

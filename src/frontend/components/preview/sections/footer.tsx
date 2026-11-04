@@ -8,7 +8,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-14 sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <div className="pv-heading text-2xl font-bold">
-            CMCI <span style={{ color: 'var(--pv-accent)' }}>Belgique</span>
+            CMCI <span style={{ color: 'var(--pv-band-accent, var(--pv-accent))' }}>Belgique</span>
           </div>
           <p className="mt-3 max-w-sm text-sm" style={{ color: 'color-mix(in srgb, var(--pv-band-fg) 70%, transparent)' }}>
             Une famille de disciples dévoués à Jésus-Christ, notre modèle en toutes choses.
@@ -27,7 +27,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="pv-heading text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--pv-accent)' }}>
+          <h4 className="pv-heading text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--pv-band-accent, var(--pv-accent))' }}>
             Liens rapides
           </h4>
           <ul className="mt-4 space-y-2 text-sm" style={{ color: 'color-mix(in srgb, var(--pv-band-fg) 78%, transparent)' }}>
@@ -36,7 +36,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="pv-heading text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--pv-accent)' }}>
+          <h4 className="pv-heading text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--pv-band-accent, var(--pv-accent))' }}>
             Contact
           </h4>
           <p className="mt-4 text-sm" style={{ color: 'color-mix(in srgb, var(--pv-band-fg) 78%, transparent)' }}>

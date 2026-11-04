@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { SiteHeader } from '@/components/site/header';
+import { SiteFooter } from '@/components/site/footer';
+import { fetchSettings } from '@/lib/server-data';
+import { HOME_PATH } from '@/lib/site';
 import { Publications } from '@/components/publications';
 
 const DESCRIPTION =
@@ -21,14 +23,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LivresPage() {
+export default async function LivresPage() {
+  const settings = await fetchSettings();
   // Aucun layout public partage n'existe : la page monte elle-meme
   // l'en-tete et le pied de page, comme app/page.tsx.
   return (
-    <>
-      <Header />
+    <div className="grain-page bg-nuit">
+      <SiteHeader home={HOME_PATH} />
       <Publications />
-      <Footer />
-    </>
+      <SiteFooter home={HOME_PATH} settings={settings} />
+    </div>
   );
 }

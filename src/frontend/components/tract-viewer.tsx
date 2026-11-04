@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Rich } from '@/components/site/rich-text';
 import { Download, FileText, X, ArrowLeft } from 'lucide-react';
 import { getFileUrl } from '@/lib/api';
 
@@ -56,12 +57,12 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
   if (!current) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-        <h1 className="mb-2 font-serif text-2xl font-bold">{tract.title}</h1>
-        <p className="text-muted-foreground">
+        <FileText className="mx-auto mb-4 h-12 w-12 text-or/60" />
+        <h1 className="mb-2 font-display text-4xl"><Rich text={tract.title} /></h1>
+        <p className="text-ivoire/60">
           Aucune version n&apos;est encore disponible au téléchargement.
         </p>
-        <Link href="/livres" className="mt-6 inline-block text-primary underline">
+        <Link href="/livres" className="mt-6 inline-block text-or-clair underline">
           Voir nos autres publications
         </Link>
       </main>
@@ -69,20 +70,20 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-16 pt-6" dir={current.dir}>
+    <main className="mx-auto max-w-3xl px-6 pb-24 pt-8 text-ivoire" dir={current.dir}>
       {/* Titre */}
-      <header className="mb-6 text-center">
-        <h1 className="font-serif text-2xl font-bold leading-tight text-primary sm:text-3xl">
-          {current.title || tract.title}
+      <header className="mb-10 text-center">
+        <h1 className="font-display text-4xl font-medium leading-tight sm:text-5xl">
+          <Rich text={current.title || tract.title} />
         </h1>
         {tract.description && (
-          <p className="mt-2 text-sm text-muted-foreground">{tract.description}</p>
+          <p className="mt-4 text-ivoire/65"><Rich text={tract.description} /></p>
         )}
       </header>
 
       {/* Accueil si l'on vient d'un tract papier */}
       {fromVersion && (
-        <p className="mb-5 rounded-lg bg-secondary px-4 py-3 text-center text-sm">
+        <p className="mb-6 border-l-2 border-rouge bg-charbon px-4 py-3 text-center text-sm">
           Vous avez ce tract en <strong>{fromVersion.label}</strong>.
           {tract.versions.length > 1 && ' Il existe aussi dans ces langues :'}
         </p>
@@ -91,7 +92,7 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
       {/* Choix de la langue — mis en evidence, jamais dans un menu */}
       {tract.versions.length > 1 && (
         <section className="mb-6">
-          <h2 className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <h2 className="mb-2 text-center eyebrow !text-[10px] text-or">
             Choisissez votre langue
           </h2>
           <div className="flex flex-wrap justify-center gap-2">
@@ -101,10 +102,10 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
                 onClick={() => select(v)}
                 lang={v.language}
                 dir={v.dir}
-                className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                className={`border px-4 py-2 text-sm transition-colors ${
                   v.id === current.id
-                    ? 'border-primary bg-primary text-primary-foreground font-semibold'
-                    : 'border-border bg-card hover:border-primary/50'
+                    ? 'border-or bg-or font-semibold text-nuit'
+                    : 'border-ivoire/25 text-ivoire/80 hover:border-or hover:text-or-clair'
                 }`}
               >
                 {v.label}
@@ -119,7 +120,7 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
         <a
           href={getFileUrl(current.file)}
           download
-          className="mb-8 flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-6 py-4 text-base font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent/90"
+          className="mb-10 flex w-full items-center justify-center gap-2 bg-or px-6 py-4 font-caps text-sm uppercase tracking-[0.18em] text-nuit transition-colors hover:bg-or-clair"
         >
           <Download className="h-5 w-5" />
           Télécharger le PDF
@@ -129,7 +130,7 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
       {/* Apercu dans le flux */}
       {current.previews.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <h2 className="mb-3 text-center eyebrow !text-[10px] text-or">
             Aperçu
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -137,7 +138,7 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
               <button
                 key={src}
                 onClick={() => setZoom(getFileUrl(src))}
-                className="overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"
+                className="overflow-hidden bg-white shadow-[0_30px_60px_-25px_rgba(0,0,0,0.9)] ring-1 ring-ivoire/10 transition-all hover:ring-or/60"
               >
                 <img
                   src={getFileUrl(src)}
@@ -150,7 +151,7 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
           </div>
         </section>
       ) : (
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-ivoire/55">
           L&apos;aperçu de cette version n&apos;est pas encore disponible.
         </p>
       )}
@@ -158,7 +159,7 @@ export function TractViewer({ tract, from }: { tract: Tract; from?: string }) {
       <div className="mt-10 text-center">
         <Link
           href="/livres"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+          className="inline-flex items-center gap-2 font-caps text-[11px] uppercase tracking-[0.2em] text-ivoire/55 hover:text-or-clair"
         >
           <ArrowLeft className="h-4 w-4" />
           Nos livres et publications

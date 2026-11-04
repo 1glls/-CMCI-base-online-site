@@ -1,20 +1,21 @@
 import type { Metadata } from "next"
-import { Header } from "@/components/header"
-import { Hero, type HeroSlide } from "@/components/hero"
-import { Vision } from "@/components/vision"
-import { About } from "@/components/about"
-import { Values } from "@/components/values"
-import Ministries from "@/components/ministries"
-import { Events } from "@/components/events"
-import { Assemblies, type Assembly } from "@/components/assemblies"
-import { Gallery } from "@/components/gallery"
-import { Testimonials } from "@/components/testimonials"
-import { Newsletter } from "@/components/newsletter"
-import { Footer } from "@/components/footer"
-import { HashScroll } from "@/components/hash-scroll"
+import { SiteHeader } from "@/components/site/header"
+import { SiteFooter } from "@/components/site/footer"
+import { SectionReveal, SectionSeam } from "@/components/site/section-transition"
+import { Hero, type HeroMode, type Slide } from "@/components/home/hero"
+import { FeaturedStrip } from "@/components/home/featured-strip"
+import { AboutTeaser } from "@/components/home/about-teaser"
+import { Values } from "@/components/home/values"
+import { Ministries, type Ministry } from "@/components/home/ministries"
+import { Events, type EventItem } from "@/components/home/events"
+import { Assemblies } from "@/components/home/assemblies"
+import { GalleryTeaser, type GalleryImage } from "@/components/home/gallery-teaser"
+import type { HeroBook } from "@/components/home/book-fan"
+import type { Assembly } from "@/components/assemblies"
+import type { Countdown } from "@/lib/countdown"
+import { ChurchJsonLd } from "@/lib/church-jsonld"
 import { fetchApi, fetchSettings } from "@/lib/server-data"
-
-const SITE = "https://www.cmcibelgique.org"
+import { HOME_PATH } from "@/lib/site"
 
 // Regenere toutes les 5 minutes : les modifications de l'admin apparaissent
 // vite, sans interroger l'API a chaque visite.
@@ -33,71 +34,50 @@ export const metadata: Metadata = {
   },
 }
 
-const withProtocol = (url: string) => (/^https?:\/\//.test(url) ? url : `https://${url}`)
+const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : [])
 
-/** Fiche d'identite lue par Google (donnees structurees schema.org). */
-function churchJsonLd(settings: Record<string, string>, assemblies: Assembly[]) {
-  const sameAs = Object.entries(settings)
-    .filter(([key, value]) => key.startsWith("social_") && value && value !== "#")
-    .map(([, value]) => withProtocol(value))
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "Church",
-    name: "CMCI Belgique",
-    alternateName: "Communauté Missionnaire Chrétienne Internationale",
-    url: SITE,
-    logo: `${SITE}/cmci-logo.png`,
-    image: `${SITE}/cmci-logo.png`,
-    description:
-      settings.site_description || "Communauté Missionnaire Chrétienne Internationale en Belgique",
-    ...(settings.contact_phone && { telephone: settings.contact_phone }),
-    ...(settings.contact_email && { email: settings.contact_email }),
-    ...(settings.contact_address && { address: settings.contact_address }),
-    ...(sameAs.length > 0 && { sameAs }),
-    ...(assemblies.length > 0 && {
-      location: assemblies.map((a) => ({
-        "@type": "Place",
-        name: `CMCI ${a.city}`,
-        address: a.address,
-        ...(a.latitude != null && a.longitude != null && {
-          geo: { "@type": "GeoCoordinates", latitude: a.latitude, longitude: a.longitude },
-        }),
-      })),
-    }),
-  }
-}
-
+/**
+ * Page d'accueil « Nuit & or ». Toutes les donnees viennent de l'admin et sont
+ * rendues cote serveur (lisibles par Google) ; le mode du hero (« livres » ou
+ * « diaporama ») est le reglage Parametres → Haut de la page d'accueil.
+ */
 export default async function HomePage() {
-  const [slides, assemblies, settings] = await Promise.all([
-    fetchApi<HeroSlide[]>("/api/hero?lang=fr", []),
-    fetchApi<Assembly[]>("/api/assemblies?lang=fr", []),
+  const [slides, books, countdowns, events, ministries, gallery, assemblies, settings] = await Promise.all([
+    fetchApi<Slide[]>("/api/hero?lang=fr", [], 60),
+    fetchApi<HeroBook[]>("/api/books/hero", [], 60),
+    fetchApi<Countdown[]>("/api/countdowns?lang=fr", [], 60),
+    fetchApi<EventItem[]>("/api/events?lang=fr", [], 60),
+    fetchApi<Ministry[]>("/api/ministries?lang=fr", [], 60),
+    fetchApi<GalleryImage[]>("/api/gallery", [], 60),
+    fetchApi<Assembly[]>("/api/assemblies?lang=fr", [], 60),
     fetchSettings(),
   ])
-  const heroSlides = Array.isArray(slides) ? slides : []
-  const assemblyList = Array.isArray(assemblies) ? assemblies : []
+  const mode: HeroMode = settings.hero_mode === "diaporama" ? "diaporama" : "livres"
+  const heroSlides = arr<Slide>(slides)
+  const assemblyList = arr<Assembly>(assemblies)
 
+  // Ordre valide : hero, a la une, mieux nous connaitre, identite, ministeres,
+  // agenda, assemblees, galerie, puis contact + pied de page fusionnes.
   return (
-    <main>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(churchJsonLd(settings, assemblyList)).replace(/</g, "\\u003c"),
-        }}
-      />
-      <HashScroll />
-      <Header />
-      <Hero initialSlides={heroSlides} />
-      <Vision />
-      <About />
+    <main className="grain-page bg-nuit">
+      <ChurchJsonLd settings={settings} assemblies={assemblyList} />
+      <SiteHeader home={HOME_PATH} countdowns={arr<Countdown>(countdowns)} />
+      <Hero mode={mode} initialSlides={heroSlides} books={arr<HeroBook>(books)} />
+      {/* Entre les sections : couture doree animee, et chaque section monte en apparaissant */}
+      {mode === "livres" && <SectionReveal><FeaturedStrip slides={heroSlides} /></SectionReveal>}
+      <SectionSeam />
+      <SectionReveal><AboutTeaser /></SectionReveal>
+      {/* Notre identite a ses propres arches d'entree et de sortie */}
       <Values />
-      <Ministries />
-      <Events />
-      <Assemblies initialAssemblies={assemblyList} />
-      <Gallery />
-      <Testimonials />
-      <Newsletter initialSettings={settings} />
-      <Footer />
+      <SectionReveal><Ministries initial={arr<Ministry>(ministries)} /></SectionReveal>
+      <SectionSeam />
+      <SectionReveal><Events initial={arr<EventItem>(events)} /></SectionReveal>
+      <SectionSeam />
+      <SectionReveal><Assemblies initial={assemblyList} /></SectionReveal>
+      <SectionSeam />
+      <SectionReveal><GalleryTeaser images={arr<GalleryImage>(gallery)} /></SectionReveal>
+      <SectionSeam />
+      <SiteFooter home={HOME_PATH} settings={settings} />
     </main>
   )
 }

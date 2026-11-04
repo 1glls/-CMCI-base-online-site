@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { SiteHeader } from '@/components/site/header';
+import { SiteFooter } from '@/components/site/footer';
+import { fetchSettings } from '@/lib/server-data';
+import { HOME_PATH } from '@/lib/site';
 import { TractViewer } from '@/components/tract-viewer';
 import { API_URL, getFileUrl } from '@/lib/api';
 
@@ -57,16 +59,16 @@ export default async function TractPage({
   const { slug } = await params;
   const { de, lang } = await searchParams;
 
-  const tract = await fetchTract(slug);
+  const [tract, settings] = await Promise.all([fetchTract(slug), fetchSettings()]);
   if (!tract) notFound();
 
   return (
-    <>
-      <Header />
-      <div className="pt-24">
+    <div className="grain-page bg-nuit">
+      <SiteHeader home={HOME_PATH} />
+      <div className="pt-36">
         <TractViewer tract={tract} from={lang || de} />
       </div>
-      <Footer />
-    </>
+      <SiteFooter home={HOME_PATH} settings={settings} />
+    </div>
   );
 }

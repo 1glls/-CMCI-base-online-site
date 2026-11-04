@@ -21,6 +21,8 @@ interface AssemblyMapProps {
   assemblies: Assembly[]
   selectedAssembly: Assembly | null
   onSelectAssembly: (assembly: Assembly) => void
+  /** « dark » : fond de carte CARTO sombre et reperes or (charte Nuit & or). */
+  variant?: "light" | "dark"
 }
 
 // Composant pour ajuster la vue de la carte
@@ -49,7 +51,7 @@ function MapController({ assemblies, selectedAssembly }: { assemblies: Assembly[
   return null
 }
 
-export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAssembly }: AssemblyMapProps) {
+export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAssembly, variant = "light" }: AssemblyMapProps) {
   const mapRef = useRef<L.Map | null>(null)
 
   // Cleanup de la carte lors du démontage
@@ -64,6 +66,16 @@ export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAsse
 
   // Créer une icône personnalisée
   const createCustomIcon = (isSelected: boolean) => {
+    if (variant === "dark") {
+      // Losange or, rouge quand l'assemblee est selectionnee, halo diffus
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="width:18px;height:18px;transform:rotate(45deg);background:${isSelected ? '#c8102e' : '#d4a73a'};box-shadow:0 0 0 4px rgba(212,167,58,.25),0 0 22px rgba(212,167,58,.7);"></div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        popupAnchor: [0, -12]
+      })
+    }
     return L.divIcon({
       className: 'custom-marker',
       html: `
@@ -108,6 +120,8 @@ export default function AssemblyMap({ assemblies, selectedAssembly, onSelectAsse
         mapRef.current = map.target
       }}
     >
+      {/* En sombre, le parent (.map-nuit) inverse les tuiles OSM en CSS : les
+          fonds sombres CARTO exigent desormais une cle d'API. */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -112,6 +112,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/books/hero — livres choisis par la CMCI pour le hero de l'accueil.
+ * Route litterale : declaree avant les routes /:id.
+ */
+const HERO_LIMIT = 8;
+router.get('/hero', async (req, res) => {
+  try {
+    const books = await prisma.book.findMany({
+      where: { status: 'published', hidden: false, heroFeatured: true },
+      orderBy: [{ heroOrder: 'asc' }, { title: 'asc' }],
+      take: HERO_LIMIT
+    });
+    res.json(books.map((b) => ({
+      id: b.id, title: b.title, author: b.author, cover: coverUrl(b),
+      languageCode: b.languageCode, priceLabel: b.priceLabel
+    })));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 /** GET /api/books/:id/cover — relais vers la couverture ztfbooks (lien presigne). */
 router.get('/:id/cover', async (req, res) => {
   try {
@@ -323,7 +344,7 @@ router.post('/', authMiddleware, adminMiddleware, uploadFields, async (req, res)
 
 router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, res) => {
   try {
-    const { title, author, description, externalLink, order, status, featured, hidden, categoryIds } = req.body;
+    const { title, author, description, externalLink, order, status, featured, hidden, heroFeatured, heroOrder, categoryIds } = req.body;
     const data = {};
     if (title !== undefined) data.title = title;
     if (author !== undefined) data.author = author || null;
@@ -333,6 +354,8 @@ router.put('/:id', authMiddleware, adminMiddleware, uploadFields, async (req, re
     if (status !== undefined) data.status = status;
     if (featured !== undefined) data.featured = featured === 'true' || featured === true;
     if (hidden !== undefined) data.hidden = hidden === 'true' || hidden === true;
+    if (heroFeatured !== undefined) data.heroFeatured = heroFeatured === 'true' || heroFeatured === true;
+    if (heroOrder !== undefined) data.heroOrder = Number(heroOrder) || 0;
     if (req.files?.cover?.[0]) data.cover = rel(req.files.cover[0]);
     if (req.files?.file?.[0]) data.file = rel(req.files.file[0]);
     if (req.files?.preview?.[0]) data.preview = rel(req.files.preview[0]);

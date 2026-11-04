@@ -218,5 +218,213 @@
     "moreLanguages": "+ {n} more languages",
     "fewerLanguages": "Fewer languages",
     "noSearchMatch": "No book matches your search."
+  },
+  "home2": {
+    "hero": {
+      "eyebrow": "CMCI Belgium — International Christian Missionary Community",
+      "title": "Jesus Christ, our model in all things",
+      "lead": "A family of disciples who have chosen to make the Lord Jesus their way, their truth and their life. Seeking God, wanting to grow in faith or to visit us? You are welcome.",
+      "agenda": "See the calendar",
+      "library": "Our library",
+      "booksLabel": "Featured in our library",
+      "readBook": "View the book",
+      "librarySlideTitle": "Books to grow in faith",
+      "librarySlideText": "The teachings of Professor Zacharias Tanee Fomum and other authors, in French and many other languages.",
+      "scroll": "Scroll",
+      "prev": "Previous slide",
+      "next": "Next slide"
+    },
+    "countdown": {
+      "startsIn": "Starts in",
+      "running": "In progress · ends in",
+      "info": "Practical info",
+      "close": "Close",
+      "hide": "Hide the banner",
+      "elapsed": "of the period elapsed",
+      "where": "Place",
+      "when": "Times",
+      "more": "Learn more",
+      "units": {
+        "years": "yrs",
+        "months": "mo",
+        "days": "d",
+        "hours": "h",
+        "mins": "min",
+        "secs": "s"
+      },
+      "unitsLong": {
+        "years": "Years",
+        "months": "Months",
+        "days": "Days",
+        "hours": "Hours",
+        "mins": "Minutes",
+        "secs": "Seconds"
+      },
+      "allEvents": "See highlights"
+    },
+    "featured": {
+      "label": "Highlights",
+      "title": "What's happening",
+      "more": "Also discover",
+      "promote": "Feature this"
+    },
+    "about": {
+      "label": "Who we are",
+      "title": "A people of disciples in the heart of Belgium",
+      "circular": "Go and make disciples of all nations · Matthew 28:19 · "
+    },
+    "vision": {
+      "label": "Our vision",
+      "title": "Transforming the world through the Gospel",
+      "people": "people to reach with the Gospel",
+      "disciples": "disciples trained",
+      "nations": "nations reached",
+      "deadline": "horizon of the vision",
+      "billions": "billion",
+      "billion": "billion"
+    },
+    "values": {
+      "label": "Our identity",
+      "title": "What defines us",
+      "subtitle": "Four letters. One identity. The heart of who we are."
+    },
+    "ministries": {
+      "label": "Ministries",
+      "title": "What we live together"
+    },
+    "events": {
+      "label": "Calendar",
+      "title": "Upcoming gatherings",
+      "past": "Past events",
+      "none": "No gathering announced yet."
+    },
+    "library": {
+      "label": "Library",
+      "title": "Our books",
+      "text": "The teachings of Professor Zacharias Tanee Fomum and other authors — prayer, discipleship, vision and Christian life — in French and many other languages.",
+      "cta": "Explore the library"
+    },
+    "assemblies": {
+      "label": "Find us",
+      "title": "Our assemblies",
+      "route": "Directions"
+    },
+    "testimonials": {
+      "label": "Testimonies",
+      "title": "What God has done"
+    },
+    "contact": {
+      "label": "Contact",
+      "title": "Come as you are",
+      "text": "A question about faith, a prayer need or a wish to visit us? Write to us or come and see us."
+    },
+    "nav": {
+      "knowUs": "Get to know us",
+      "identity": "Our identity",
+      "agenda": "Calendar",
+      "highlights": "Highlights",
+      "gallery": "Gallery"
+    },
+    "teaser": {
+      "label": "Get to know us",
+      "title": "A family of disciples, a vision for the nations",
+      "text": "Who we are, what we believe and the goal God has entrusted to us: discover CMCI Belgium.",
+      "cta": "Get to know us"
+    },
+    "timeline": {
+      "regular": "Regular gatherings",
+      "today": "Today",
+      "details": "See details",
+      "hint": "Hover an event for a preview, click for full details.",
+      "earlier": "Earlier",
+      "later": "Later",
+      "past": "Past"
+    },
+    "galleryTeaser": {
+      "label": "Gallery",
+      "title": "Our moments in pictures",
+      "cta": "See the whole gallery"
+    },
+    "footer": {
+      "write": "Write to us"
+    },
+    "pages": {
+      "knowUs": {
+        "title": "Get to know us",
+        "lead": "A community of disciples devoted to Jesus Christ, our model in all things. Here is who we are, what God has put on our hearts and how to join us.",
+        "who": "Who we are",
+        "founder": "Our founder"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "lead": "Services, conferences, times of fellowship: the life of CMCI Belgium in pictures.",
+        "all": "All",
+        "empty": "The first photos are coming soon.",
+        "close": "Close",
+        "prev": "Previous photo",
+        "next": "Next photo",
+        "exhibition": "Exhibition",
+        "catalogue": "Catalogue",
+        "oneByOne": "Photo by photo",
+        "oneByOneHint": "Each image in large format",
+        "catalogueHint": "All the images at a glance",
+        "viewLabel": "Choose the gallery view",
+        "play": "Play",
+        "pause": "Pause"
+      },
+      "highlights": {
+        "title": "Highlights",
+        "lead": "The major gatherings we are preparing or living together, with their countdown and all the practical information.",
+        "empty": "No highlight under way at the moment. See the calendar for our next gatherings.",
+        "agenda": "See the calendar",
+        "international": "Highlights of CMFI worldwide"
+      }
+    },
+    "verses": {
+      "mission": {
+        "text": "Go ye therefore, and teach all nations, baptizing them in the name of the Father, and of the Son, and of the Holy Ghost: teaching them to observe all things whatsoever I have commanded you: and, lo, I am with you alway, even unto the end of the world.",
+        "ref": "Jesus Christ — Matthew 28:19-20"
+      },
+      "contact": {
+        "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
+        "ref": "Jesus Christ — Matthew 11:28"
+      }
+    },
+    "founder": {
+      "label": "Our founder",
+      "name": "Professor Zacharias Tanee Fomum",
+      "years": "1945 — 2009",
+      "p1": "In May 1975, in Yaoundé, Cameroon, Professor Zacharias Tanee Fomum and his companions received the burden of taking the message of God's saving love to their city and country. From that obedience the Christian Missionary Fellowship International was born.",
+      "p2": "A man of science and a man of God, he knew and served the Lord Jesus Christ for 53 years, seeking to give the Church a model of a disciple: a life of prayer and fasting, a love for Christ that never stopped growing, and a written work read today in many languages.",
+      "p3": "His vision still carries us: God's saving love in 250 nations, on all six continents, by 2065.",
+      "quote": "Be ye followers of me, even as I also am of Christ.",
+      "quoteRef": "1 Corinthians 11:1",
+      "chaptersTitle": "His life in nine chapters",
+      "cta": "Discover his life and legacy",
+      "chapters": {
+        "introduction": "Introduction",
+        "science": "The man of science",
+        "god": "The man of God",
+        "joyful": "A joyful servant",
+        "suffering": "The man of sufferings",
+        "prayer": "The man of prayer",
+        "finances": "The man of finances",
+        "fasting": "The man of fasting",
+        "word": "The minister of the Word"
+      }
+    },
+    "cmfi": {
+      "worldVision": "CMFI's worldwide vision",
+      "inTheWorld": "CMFI around the world",
+      "vision": "Our vision",
+      "history": "Our history",
+      "fiveYearGoal": "The Five-Year Goal",
+      "international": "Highlights of CMFI worldwide",
+      "books": "International library (ZTF Books)",
+      "footerTitle": "CMFI worldwide",
+      "site": "cmfinternational.org",
+      "founder": "Our founder",
+      "contact": "International contact"
+    }
   }
 }

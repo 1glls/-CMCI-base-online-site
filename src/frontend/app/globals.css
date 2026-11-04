@@ -166,6 +166,8 @@
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+  /* En-tete fixe (bandeau + menu) : les ancres #section n'atterrissent pas dessous */
+  scroll-padding-top: 7.5rem;
 }
 
 /* Custom animations */
@@ -237,4 +239,172 @@ html {
 
 .animation-delay-600 {
   animation-delay: 600ms;
+}
+
+/* ============================ CHARTE « NUIT & OR » ============================
+   Noir, or, rouge et blanc (couleurs belges). Utilisee par la nouvelle page
+   d'accueil (components/home, components/site). Le rouge ne sert qu'aux
+   filets, puces et decomptes : jamais pour du texte courant sur fond noir. */
+:root {
+  --nuit: #0b0a08;
+  --charbon: #15130f;
+  --ivoire: #f6f1e7;
+  --or: #f0b323;
+  --or-clair: #ffd866;
+  --rouge: #ef3340; /* rouge du drapeau belge */
+  --banner-edge: #3d0a12; /* bords du bandeau de compte a rebours */
+}
+
+/* Mode clair (bouton soleil/lune de l'en-tete, attribut pose par next-themes).
+   Les noms restent ceux de la charte : « nuit » = fond, « ivoire » = texte ;
+   seules les valeurs s'inversent, donc tous les composants suivent seuls. */
+:root[data-theme="light"] {
+  --nuit: #f8f3e9;
+  --charbon: #efe6d4;
+  --ivoire: #17130c;
+  --or: #a87408;
+  --or-clair: #8a5a00;
+  --rouge: #d21f2e;
+  --banner-edge: #f6d9d3;
+}
+
+/* Intensite des decors : les photos de fond et les halos regles pour le noir
+   s'effacent sur l'ivoire, on les renforce donc en mode clair. */
+:root { --photo-fond: .5; --halo: 1; --filigrane: .07; }
+:root[data-theme="light"] { --photo-fond: .85; --halo: 2.2; --filigrane: .16; }
+.photo-fond { opacity: var(--photo-fond); }
+.halo { opacity: calc(var(--halo) * .1); }
+
+/* Bande « sable » : en mode clair, donne du rythme a une section sur deux,
+   fondue en haut et en bas (sans couture). Invisible en sombre. */
+.bande { background: var(--nuit); }
+:root[data-theme="light"] .bande {
+  background: linear-gradient(to bottom, var(--nuit), var(--charbon) 18%, var(--charbon) 82%, var(--nuit));
+}
+
+/* Logo : version or/ivoire sur fond sombre, version d'origine sur fond clair */
+.only-light { display: none !important; }
+:root[data-theme="light"] .only-dark { display: none !important; }
+:root[data-theme="light"] .only-light { display: block !important; }
+
+@theme inline {
+  --color-nuit: var(--nuit);
+  --color-charbon: var(--charbon);
+  --color-ivoire: var(--ivoire);
+  --color-or: var(--or);
+  --color-or-clair: var(--or-clair);
+  --color-rouge: var(--rouge);
+  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-caps: 'Cinzel', Georgia, serif; /* @fontsource/cinzel, importee dans app/layout.tsx */
+}
+
+/* Titres en Garamond : chiffres alignes (sinon « 10 » se lit « Io »). */
+.font-display { font-variant-numeric: lining-nums; }
+
+/* Surtitre grave : petites capitales tres espacees. */
+.eyebrow {
+  font-family: var(--font-caps);
+  font-size: .72rem;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+
+/* Images fondues : les photos s'effacent dans le fond au lieu d'avoir des
+   bords nets (mask-image : le noir garde l'image, le transparent l'efface). */
+/* Quatre bords fondus (intersection d'un masque horizontal et d'un vertical) :
+   ni bord ni coin visibles, l'image se dissout dans le fond. */
+.fondu {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 24%, #000 76%, transparent), linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 24%, #000 76%, transparent), linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+  mask-composite: intersect;
+}
+/* Image pleine d'un cote, qui se dissout vers le texte (et en haut/bas) */
+.fondu-vers-gauche {
+  -webkit-mask-image: linear-gradient(to left, #000 45%, transparent 100%), linear-gradient(to bottom, transparent, #000 18%, #000 80%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to left, #000 45%, transparent 100%), linear-gradient(to bottom, transparent, #000 18%, #000 80%, transparent);
+  mask-composite: intersect;
+}
+.fondu-vers-droite {
+  -webkit-mask-image: linear-gradient(to right, #000 45%, transparent 100%), linear-gradient(to bottom, transparent, #000 18%, #000 80%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, #000 45%, transparent 100%), linear-gradient(to bottom, transparent, #000 18%, #000 80%, transparent);
+  mask-composite: intersect;
+}
+.fondu-bas {
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+}
+.fondu-cotes {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
+}
+/* Fond plein cadre qui s'efface vers la gauche et vers le bas (ministeres) */
+.fondu-fond {
+  -webkit-mask-image: linear-gradient(to left, #000 25%, transparent 85%), linear-gradient(to bottom, #000 55%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to left, #000 25%, transparent 85%), linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Lettres en contour (valeurs C·M·C·I, filigranes). */
+.text-outline-or {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--or);
+}
+
+/* Mode clair : deux lavis tres doux (or en haut a droite, rose en bas a
+   gauche) sous tout le contenu, pour que l'ivoire ne soit pas un aplat. */
+:root[data-theme="light"] .grain-page { position: relative; isolation: isolate; }
+:root[data-theme="light"] .grain-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 45% at 88% 8%, rgba(240, 179, 35, .16), transparent 70%),
+    radial-gradient(50% 45% at 6% 92%, rgba(210, 31, 46, .08), transparent 70%);
+}
+:root[data-theme="light"] .grain-page::after { opacity: .12; mix-blend-mode: multiply; }
+/* Les sections a fond uni laissent voir ces lavis (le fond de la page est
+   deja ivoire) ; les menus et fenetres gardent leur fond opaque. */
+:root[data-theme="light"] .grain-page section.bg-nuit { background-color: transparent; }
+
+/* Grain tres leger, pose une seule fois pour toute la page (fixe) : par
+   section, il dessinait une couture visible a chaque changement de section. */
+.grain-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: .07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Carte des assemblees en sombre : tuiles OSM inversees, desaturees et
+   legerement dorees pour se fondre dans la page. */
+.map-nuit .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) grayscale(.85) sepia(.25) brightness(.62) contrast(1.15);
+}
+:root[data-theme="light"] .map-nuit .leaflet-tile-pane {
+  filter: grayscale(.7) sepia(.3) brightness(1.02);
+}
+
+/* Proximite du curseur (valeurs C·M·C·I) : --heat va de 0 (loin) a 1
+   (dessus), posee en JS ; les couleurs qui en dependent ont leur propre
+   transition CSS (cf. components/home/values.tsx). */
+.heat {
+  --heat: 0;
+}
+.heat:focus-within { --heat: 1; }
+
+@keyframes nuit-spin { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: nuit-spin 40s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow { animation: none; }
 }

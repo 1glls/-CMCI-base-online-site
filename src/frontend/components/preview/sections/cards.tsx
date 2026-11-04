@@ -5,6 +5,7 @@ import { SectionHeading } from '../section-heading';
 import { PvCard } from '../card';
 import { useReveal } from '../use-reveal';
 import type { StyleConfig } from '../styles';
+import { Fleuron } from '../ornaments';
 
 const EVENTS = [
   { date: '12 juil. 2026', title: 'Barbecue 2026', text: 'Un moment de communion, de louange et de bonne humeur dans la présence de Dieu.', time: '12h00', place: 'Seraing' },
@@ -23,26 +24,39 @@ export function Cards({ config }: { config: StyleConfig }) {
           {EVENTS.map((e, i) => (
             <div key={e.title} className={`pv-reveal ${inView ? 'pv-in' : ''}`} style={{ transitionDelay: `${i * 110}ms` }}>
               <PvCard config={config} className="h-full">
-                {/* Zone visuelle (dégradé de marque en l'absence de photo) */}
-                <div
-                  className="-mx-6 -mt-6 mb-5 flex h-36 items-end p-4"
-                  style={{ background: 'var(--pv-hero-bg)' }}
-                >
-                  <span
-                    className="rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{ background: 'var(--pv-accent)', color: 'var(--pv-accent-ink)' }}
+                {config.ornate ? (
+                  // Miniature enluminée : jour en grand, mois en capitales gravées.
+                  <div className="pv-miniature mb-5 flex h-36 flex-col items-center justify-center text-center">
+                    <span className="pv-heading text-5xl leading-none" style={{ color: 'var(--pv-gold-soft)', fontWeight: 600 }}>
+                      {e.date.split(' ')[0]}
+                    </span>
+                    <span className="pv-caps mt-1 text-[11px] uppercase" style={{ color: '#f4e8cc' }}>
+                      {e.date.split(' ').slice(1).join(' ')}
+                    </span>
+                    <Fleuron className="mt-2 h-4 w-28" color="var(--pv-gold-soft)" />
+                  </div>
+                ) : (
+                  /* Zone visuelle (dégradé de marque en l'absence de photo) */
+                  <div
+                    className="-mx-6 -mt-6 mb-5 flex h-36 items-end p-4"
+                    style={{ background: 'var(--pv-hero-bg)' }}
                   >
-                    {e.date}
-                  </span>
-                </div>
-                <h3 className="pv-heading text-xl font-bold" style={{ color: 'var(--pv-fg)' }}>{e.title}</h3>
+                    <span
+                      className="rounded-full px-3 py-1 text-xs font-semibold"
+                      style={{ background: 'var(--pv-accent)', color: 'var(--pv-accent-ink)' }}
+                    >
+                      {e.date}
+                    </span>
+                  </div>
+                )}
+                <h3 className={`pv-heading font-bold ${config.ornate ? 'text-2xl' : 'text-xl'}`} style={{ color: 'var(--pv-fg)' }}>{e.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--pv-muted)' }}>{e.text}</p>
                 <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs" style={{ color: 'var(--pv-muted)' }}>
                   <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{e.time}</span>
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{e.place}</span>
                 </div>
                 <a
-                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold"
+                  className="pv-btn mt-5 inline-flex items-center gap-1.5 text-sm font-semibold"
                   style={{ color: 'var(--pv-accent)' }}
                 >
                   Explorer <ArrowRight className="h-4 w-4" />

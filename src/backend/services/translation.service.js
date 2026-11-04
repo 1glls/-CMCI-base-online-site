@@ -230,7 +230,8 @@ const TRANSLATABLE = {
   // Titre et description de catalogue. `author` n'est pas traduit : c'est un
   // nom de personne.
   Book: ['title', 'description'],
-  Tract: ['title', 'description']
+  Tract: ['title', 'description'],
+  Countdown: ['title', 'subtitle', 'location', 'schedule', 'info', 'linkLabel']
 };
 
 /**

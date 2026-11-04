@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Settings as SettingsIcon, Save, Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube, LayoutTemplate } from 'lucide-react';
 import { FaTiktok, FaTelegram, FaWhatsapp } from 'react-icons/fa';
 import { API_URL } from '@/lib/api';
 
@@ -97,7 +97,9 @@ export default function SettingsPage() {
   // Grouper les paramètres par catégorie
   const contactSettings = settings.filter(s => s.key.startsWith('contact_'));
   const socialSettings = settings.filter(s => s.key.startsWith('social_'));
-  const otherSettings = settings.filter(s => !s.key.startsWith('contact_') && !s.key.startsWith('social_'));
+  // hero_mode a son propre bloc (choix entre deux valeurs, pas un champ libre)
+  const otherSettings = settings.filter(s => !s.key.startsWith('contact_') && !s.key.startsWith('social_') && s.key !== 'hero_mode');
+  const heroMode = settings.find(s => s.key === 'hero_mode')?.value || 'livres';
 
   const getSettingIcon = (key: string) => {
     if (key.includes('phone')) return <Phone className="w-4 h-4" />;
@@ -191,6 +193,36 @@ export default function SettingsPage() {
             Retour au Dashboard
           </Button>
         </div>
+
+        <Card className="p-6 mb-6">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+            <LayoutTemplate className="w-5 h-5" />
+            Haut de la page d'accueil (hero)
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Les livres affichés se choisissent dans <a href="/admin/books" className="underline">Livres</a> (bouton ✦),
+            les diapositives dans <a href="/admin/hero" className="underline">Section Hero</a>.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { value: 'livres', title: 'Message + livres', text: "Message d'accueil fixe et livres choisis en éventail. Les diapositives passent dans « À la une » juste en dessous." },
+              { value: 'diaporama', title: 'Diaporama + livres', text: 'Les diapositives défilent en plein écran ; une diapositive « Bibliothèque » présente les livres choisis.' },
+            ].map((opt) => (
+              <label
+                key={opt.value}
+                className={`cursor-pointer rounded-lg border p-4 transition-colors ${heroMode === opt.value ? 'border-amber-500 bg-amber-50' : 'hover:bg-gray-50'}`}
+              >
+                <input
+                  type="radio" name="hero_mode" className="mr-2" value={opt.value}
+                  checked={heroMode === opt.value} disabled={saving}
+                  onChange={() => handleUpdateSetting('hero_mode', opt.value)}
+                />
+                <span className="font-medium">{opt.title}</span>
+                <p className="mt-1 text-xs text-gray-500">{opt.text}</p>
+              </label>
+            ))}
+          </div>
+        </Card>
 
         {renderSettingGroup('Informations de Contact', contactSettings)}
         {renderSettingGroup('Réseaux Sociaux', socialSettings)}

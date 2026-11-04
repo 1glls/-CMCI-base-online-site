@@ -1,6 +1,7 @@
 'use client';
 
-import { Sun, Moon, Palette, Check } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Sun, Moon, Palette, Check, X } from 'lucide-react';
 import { STYLES, ACCENTS, type StyleKey, type ThemeKey, type AccentKey } from './styles';
 
 /**
@@ -15,10 +16,29 @@ export function StyleSwitcher({
   theme: ThemeKey; setTheme: (t: ThemeKey) => void;
   accent: AccentKey; setAccent: (a: AccentKey) => void;
 }) {
+  // Replié par défaut sur téléphone : le panneau couvrirait toute la page.
+  const [open, setOpen] = useState(true);
+  useEffect(() => { setOpen(window.innerWidth >= 768); }, []);
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="fixed bottom-4 right-4 z-[100] grid h-12 w-12 place-items-center rounded-full border border-white/10 bg-neutral-900/95 text-white shadow-2xl backdrop-blur"
+        aria-label="Ouvrir le banc d'essai"
+      >
+        <Palette className="h-5 w-5" />
+      </button>
+    );
+  }
+
   return (
     <div className="fixed bottom-4 right-4 z-[100] w-64 rounded-2xl border border-white/10 bg-neutral-900/95 p-3 text-white shadow-2xl backdrop-blur">
       <div className="mb-2 flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wider text-white/60">
         <Palette className="h-4 w-4" /> Banc d'essai — styles
+        <button onClick={() => setOpen(false)} className="ml-auto rounded p-0.5 hover:bg-white/10" aria-label="Replier le banc d'essai">
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="space-y-1">

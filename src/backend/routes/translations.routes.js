@@ -29,7 +29,8 @@ const MODELS = {
   HeroSlide: (id) => prisma.heroSlide.findUnique({ where: { id } }),
   Category: (id) => prisma.category.findUnique({ where: { id } }),
   Book: (id) => prisma.book.findUnique({ where: { id } }),
-  Tract: (id) => prisma.tract.findUnique({ where: { id } })
+  Tract: (id) => prisma.tract.findUnique({ where: { id } }),
+  Countdown: (id) => prisma.countdown.findUnique({ where: { id } })
 };
 
 // --- Comptes fournisseurs ---------------------------------------------------
@@ -181,7 +182,8 @@ const BACKFILL = {
   Testimonial: () => prisma.testimonial.findMany(),
   HeroSlide: () => prisma.heroSlide.findMany(),
   Category: () => prisma.category.findMany(),
-  Tract: () => prisma.tract.findMany()
+  Tract: () => prisma.tract.findMany(),
+  Countdown: () => prisma.countdown.findMany()
 };
 const BACKFILL_LANGS = ['en', 'nl'];
 

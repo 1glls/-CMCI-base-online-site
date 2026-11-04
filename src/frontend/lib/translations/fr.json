@@ -218,5 +218,213 @@
     "moreLanguages": "+ {n} autres langues",
     "fewerLanguages": "Moins de langues",
     "noSearchMatch": "Aucun livre ne correspond à votre recherche."
+  },
+  "home2": {
+    "hero": {
+      "eyebrow": "CMCI Belgique — Communauté Missionnaire Chrétienne Internationale",
+      "title": "Jésus-Christ, notre modèle en toutes choses",
+      "lead": "Une famille de disciples qui ont choisi de faire du Seigneur Jésus leur chemin, leur vérité et leur vie. Vous cherchez Dieu, voulez grandir dans la foi ou nous rendre visite ? Vous êtes les bienvenus.",
+      "agenda": "Voir l'agenda",
+      "library": "Notre bibliothèque",
+      "booksLabel": "À l'affiche de la bibliothèque",
+      "readBook": "Voir le livre",
+      "librarySlideTitle": "Des livres pour grandir dans la foi",
+      "librarySlideText": "Les enseignements du Professeur Zacharias Tanee Fomum et d'autres auteurs, en français et dans de nombreuses langues.",
+      "scroll": "Défiler",
+      "prev": "Diapositive précédente",
+      "next": "Diapositive suivante"
+    },
+    "countdown": {
+      "startsIn": "Commence dans",
+      "running": "En cours · se termine dans",
+      "info": "Infos pratiques",
+      "close": "Fermer",
+      "hide": "Masquer le bandeau",
+      "elapsed": "de la période écoulée",
+      "where": "Lieu",
+      "when": "Horaires",
+      "more": "En savoir plus",
+      "units": {
+        "years": "ans",
+        "months": "mois",
+        "days": "j",
+        "hours": "h",
+        "mins": "min",
+        "secs": "s"
+      },
+      "unitsLong": {
+        "years": "Années",
+        "months": "Mois",
+        "days": "Jours",
+        "hours": "Heures",
+        "mins": "Minutes",
+        "secs": "Secondes"
+      },
+      "allEvents": "Voir les temps forts"
+    },
+    "featured": {
+      "label": "À la une",
+      "title": "Ce qui se passe chez nous",
+      "more": "Découvrir aussi",
+      "promote": "Mettre en avant"
+    },
+    "about": {
+      "label": "Qui sommes-nous",
+      "title": "Un peuple de disciples au cœur de la Belgique",
+      "circular": "Allez, faites de toutes les nations des disciples · Matthieu 28:19 · "
+    },
+    "vision": {
+      "label": "Notre vision",
+      "title": "Transformer le monde par l'Évangile",
+      "people": "personnes à atteindre par l'Évangile",
+      "disciples": "disciples formés",
+      "nations": "nations touchées",
+      "deadline": "horizon de la vision",
+      "billions": "milliards",
+      "billion": "milliard"
+    },
+    "values": {
+      "label": "Notre identité",
+      "title": "Ce qui nous caractérise",
+      "subtitle": "Quatre lettres. Une identité. Le cœur de qui nous sommes."
+    },
+    "ministries": {
+      "label": "Ministères",
+      "title": "Ce que nous vivons ensemble"
+    },
+    "events": {
+      "label": "Agenda",
+      "title": "Prochains rendez-vous",
+      "past": "Déjà vécus",
+      "none": "Aucun rendez-vous annoncé pour l'instant."
+    },
+    "library": {
+      "label": "Bibliothèque",
+      "title": "Nos livres",
+      "text": "Les enseignements du Professeur Zacharias Tanee Fomum et d'autres auteurs — prière, vie de disciple, vision et vie chrétienne — à lire en français et dans de nombreuses langues.",
+      "cta": "Explorer la bibliothèque"
+    },
+    "assemblies": {
+      "label": "Nous trouver",
+      "title": "Nos assemblées",
+      "route": "Itinéraire"
+    },
+    "testimonials": {
+      "label": "Témoignages",
+      "title": "Ce que Dieu a fait"
+    },
+    "contact": {
+      "label": "Contact",
+      "title": "Venez comme vous êtes",
+      "text": "Une question sur la foi, un besoin de prière ou l'envie de nous rendre visite ? Écrivez-nous ou passez nous voir."
+    },
+    "nav": {
+      "knowUs": "Mieux nous connaître",
+      "identity": "Notre identité",
+      "agenda": "Agenda",
+      "highlights": "Temps forts",
+      "gallery": "Galerie"
+    },
+    "teaser": {
+      "label": "Mieux nous connaître",
+      "title": "Une famille de disciples, une vision pour les nations",
+      "text": "Qui nous sommes, ce que nous croyons et le but que Dieu nous a confié : découvrez la CMCI Belgique.",
+      "cta": "Mieux nous connaître"
+    },
+    "timeline": {
+      "regular": "Rendez-vous réguliers",
+      "today": "Aujourd'hui",
+      "details": "Voir le détail",
+      "hint": "Survolez un événement pour l'aperçu, cliquez pour tout savoir.",
+      "earlier": "Plus tôt",
+      "later": "Plus tard",
+      "past": "Passé"
+    },
+    "galleryTeaser": {
+      "label": "Galerie",
+      "title": "Nos moments en images",
+      "cta": "Voir toute la galerie"
+    },
+    "footer": {
+      "write": "Nous écrire"
+    },
+    "pages": {
+      "knowUs": {
+        "title": "Mieux nous connaître",
+        "lead": "Une communauté de disciples dévoués à Jésus-Christ, notre modèle en toutes choses. Voici qui nous sommes, ce que Dieu a mis à cœur et comment nous rejoindre.",
+        "who": "Qui sommes-nous",
+        "founder": "Notre fondateur"
+      },
+      "gallery": {
+        "title": "Galerie",
+        "lead": "Cultes, conférences, moments fraternels : la vie de la CMCI Belgique en images.",
+        "all": "Toutes",
+        "empty": "Les premières photos arrivent bientôt.",
+        "close": "Fermer",
+        "prev": "Photo précédente",
+        "next": "Photo suivante",
+        "exhibition": "Exposition",
+        "catalogue": "Catalogue",
+        "oneByOne": "Photo par photo",
+        "oneByOneHint": "Chaque image en grand format",
+        "catalogueHint": "Toutes les images d'un seul regard",
+        "viewLabel": "Choisir la vue de la galerie",
+        "play": "Lecture",
+        "pause": "Pause"
+      },
+      "highlights": {
+        "title": "Temps forts",
+        "lead": "Les grands rendez-vous que nous préparons ou vivons ensemble, avec leur compte à rebours et toutes les infos pratiques.",
+        "empty": "Aucun temps fort en cours pour le moment. Consultez l'agenda pour nos prochains rendez-vous.",
+        "agenda": "Voir l'agenda",
+        "international": "Les temps forts de la CMCI internationale"
+      }
+    },
+    "verses": {
+      "mission": {
+        "text": "Allez, faites de toutes les nations des disciples, les baptisant au nom du Père, du Fils et du Saint-Esprit, et enseignez-leur à observer tout ce que je vous ai prescrit. Et voici, je suis avec vous tous les jours, jusqu'à la fin du monde.",
+        "ref": "Jésus-Christ — Matthieu 28 : 19-20"
+      },
+      "contact": {
+        "text": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
+        "ref": "Jésus-Christ — Matthieu 11 : 28"
+      }
+    },
+    "founder": {
+      "label": "Notre fondateur",
+      "name": "Professeur Zacharias Tanee Fomum",
+      "years": "1945 — 2009",
+      "p1": "En mai 1975, à Yaoundé, au Cameroun, le Professeur Zacharias Tanee Fomum et ses compagnons ont reçu le fardeau de porter le message de l'amour salvateur de Dieu à leur ville et à leur pays. De cette obéissance est née la Communauté Missionnaire Chrétienne Internationale.",
+      "p2": "Homme de science et homme de Dieu, il a connu et servi le Seigneur Jésus-Christ pendant 53 ans, en cherchant à offrir un modèle de disciple à l'Église : une vie de prière et de jeûne, un amour pour Christ qui n'a cessé de grandir, et une œuvre écrite aujourd'hui lue dans de nombreuses langues.",
+      "p3": "Sa vision nous porte encore : l'amour salvateur de Dieu dans 250 nations, sur les six continents, d'ici 2065.",
+      "quote": "Soyez mes imitateurs, comme je le suis moi-même de Christ.",
+      "quoteRef": "1 Corinthiens 11 : 1",
+      "chaptersTitle": "Sa vie en neuf chapitres",
+      "cta": "Découvrir sa vie et son héritage",
+      "chapters": {
+        "introduction": "Introduction",
+        "science": "L'homme de science",
+        "god": "L'homme de Dieu",
+        "joyful": "Un serviteur joyeux",
+        "suffering": "L'homme des souffrances",
+        "prayer": "L'homme de prière",
+        "finances": "L'homme et les finances",
+        "fasting": "L'homme du jeûne",
+        "word": "Le ministre de la Parole"
+      }
+    },
+    "cmfi": {
+      "worldVision": "La vision mondiale de la CMCI",
+      "inTheWorld": "La CMCI dans le monde",
+      "vision": "Notre vision",
+      "history": "Notre histoire",
+      "fiveYearGoal": "Le But Quinquennal",
+      "international": "Les temps forts de la CMCI internationale",
+      "books": "Bibliothèque internationale (ZTF Books)",
+      "footerTitle": "CMCI internationale",
+      "site": "cmfinternational.org",
+      "founder": "Notre fondateur",
+      "contact": "Contact international"
+    }
   }
 }

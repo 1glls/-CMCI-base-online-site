@@ -6,6 +6,7 @@ import { StyleSwitcher } from '@/components/preview/style-switcher';
 import { STYLE_CONFIG, type StyleKey, type ThemeKey, type AccentKey } from '@/components/preview/styles';
 import { QuinquennialBar } from '@/components/preview/sections/quinquennial-bar';
 import { Hero } from '@/components/preview/sections/hero';
+import { About } from '@/components/preview/sections/about';
 import { KeyFigures } from '@/components/preview/sections/key-figures';
 import { Values } from '@/components/preview/sections/values';
 import { Cards } from '@/components/preview/sections/cards';
@@ -21,9 +22,9 @@ function PreviewNav() {
           CMCI <span style={{ color: 'var(--pv-accent)' }}>Belgique</span>
         </span>
         <div className="hidden gap-6 text-sm md:flex" style={{ color: 'var(--pv-muted)' }}>
-          {NAV.map((x) => <span key={x}>{x}</span>)}
+          {NAV.map((x) => <span key={x} className="pv-nav-link">{x}</span>)}
         </div>
-        <span className="rounded-full px-4 py-2 text-xs font-semibold" style={{ background: 'var(--pv-accent)', color: 'var(--pv-accent-ink)' }}>
+        <span className="pv-btn rounded-full px-4 py-2 text-xs font-semibold" style={{ background: 'var(--pv-accent)', color: 'var(--pv-accent-ink)' }}>
           Nous rejoindre
         </span>
       </div>
@@ -32,15 +33,17 @@ function PreviewNav() {
 }
 
 export default function PreviewPage() {
-  const [style, setStyle] = useState<StyleKey>('editorial');
+  const [style, setStyle] = useState<StyleKey>('manuscrit');
   const [theme, setTheme] = useState<ThemeKey>('light');
-  const [accent, setAccent] = useState<AccentKey>('feu');
+  const [accent, setAccent] = useState<AccentKey>('rubrique');
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const s = localStorage.getItem('pvStyle') as StyleKey | null;
-    const t = localStorage.getItem('pvTheme') as ThemeKey | null;
-    const a = localStorage.getItem('pvAccent') as AccentKey | null;
+    // Cles « pv2 » : la serie d'essais Manuscrit s'ouvre sur son propre style
+    // plutot que sur le dernier choix de la serie precedente.
+    const s = localStorage.getItem('pv2Style') as StyleKey | null;
+    const t = localStorage.getItem('pv2Theme') as ThemeKey | null;
+    const a = localStorage.getItem('pv2Accent') as AccentKey | null;
     if (s && STYLE_CONFIG[s]) setStyle(s);
     if (t === 'light' || t === 'dark') setTheme(t);
     if (a) setAccent(a);
@@ -49,9 +52,9 @@ export default function PreviewPage() {
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem('pvStyle', style);
-    localStorage.setItem('pvTheme', theme);
-    localStorage.setItem('pvAccent', accent);
+    localStorage.setItem('pv2Style', style);
+    localStorage.setItem('pv2Theme', theme);
+    localStorage.setItem('pv2Accent', accent);
   }, [style, theme, accent, ready]);
 
   // Changer de style adopte son thème conseillé, tout en laissant l'utilisateur
@@ -59,6 +62,8 @@ export default function PreviewPage() {
   const chooseStyle = (s: StyleKey) => {
     setStyle(s);
     setTheme(STYLE_CONFIG[s].defaultTheme);
+    const a = STYLE_CONFIG[s].defaultAccent;
+    if (a) setAccent(a);
   };
 
   const config = STYLE_CONFIG[style];
@@ -68,6 +73,7 @@ export default function PreviewPage() {
       <QuinquennialBar />
       <PreviewNav />
       <Hero config={config} />
+      <About config={config} />
       <KeyFigures config={config} />
       <Values config={config} />
       <Cards config={config} />

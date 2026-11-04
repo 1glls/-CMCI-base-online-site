@@ -1,7 +1,12 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Montserrat, Open_Sans } from 'next/font/google'
+import { Montserrat, Open_Sans, Cormorant_Garamond } from 'next/font/google'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import { ThemeProvider } from '@/components/theme-provider'
+// Cinzel est auto-hebergee (@fontsource) : Google la sert desormais via des
+// URL « l/font?kit=… » que next/font (Turbopack) ne sait pas resoudre.
+import '@fontsource/cinzel/latin-400.css'
+import '@fontsource/cinzel/latin-600.css'
 import './globals.css'
 
 const _montserrat = Montserrat({ 
@@ -15,6 +20,15 @@ const _openSans = Open_Sans({
   weight: ['300', '400', '500', '600', '700'],
   variable: '--font-open-sans'
 });
+
+// Charte « Nuit & or » : titres en Garamond, surtitres en capitales gravees
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-cormorant',
+});
+
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cmcibelgique.org'),
@@ -36,22 +50,15 @@ export const metadata: Metadata = {
     images: ['/cmci-logo.png'],
   },
   icons: {
+    // Logo adapte (arc or, medaillon, drapeau) detoure, fond transparent
+    // (cf. otherthings/make_icons.py).
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.png',
-        type: 'image/png',
-      },
+      // ?v= : change a chaque nouvelle icone, sinon les navigateurs gardent l'ancienne en cache
+      { url: '/favicon.ico?v=3', sizes: '48x48' },
+      { url: '/icon.png?v=3', type: 'image/png', sizes: '512x512' },
     ],
-    apple: '/apple-icon.png',
-    shortcut: '/favicon.ico',
+    apple: '/apple-icon.png?v=3',
+    shortcut: '/favicon.ico?v=3',
   },
 }
 
@@ -67,11 +74,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr">
+    // suppressHydrationWarning : next-themes pose data-theme avant l'affichage
+    // (pas de flash), donc l'attribut differe volontairement du rendu serveur.
+    <html lang="fr" className={cormorant.variable} suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
+        {/* Theme sombre par defaut (charte Nuit & or), clair au choix du visiteur */}
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false} storageKey="cmci-theme">
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

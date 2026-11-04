@@ -218,5 +218,213 @@
     "moreLanguages": "+ {n} meer talen",
     "fewerLanguages": "Minder talen",
     "noSearchMatch": "Geen boek komt overeen met uw zoekopdracht."
+  },
+  "home2": {
+    "hero": {
+      "eyebrow": "CMCI België — Internationale Christelijke Missionaire Gemeenschap",
+      "title": "Jezus Christus, ons voorbeeld in alles",
+      "lead": "Een familie van discipelen die ervoor gekozen hebben de Heer Jezus tot hun weg, hun waarheid en hun leven te maken. Zoekt u God, wilt u groeien in geloof of ons bezoeken? U bent welkom.",
+      "agenda": "Bekijk de agenda",
+      "library": "Onze bibliotheek",
+      "booksLabel": "Uitgelicht in onze bibliotheek",
+      "readBook": "Bekijk het boek",
+      "librarySlideTitle": "Boeken om te groeien in geloof",
+      "librarySlideText": "De onderwijzingen van professor Zacharias Tanee Fomum en andere auteurs, in het Frans en in vele andere talen.",
+      "scroll": "Scrollen",
+      "prev": "Vorige dia",
+      "next": "Volgende dia"
+    },
+    "countdown": {
+      "startsIn": "Begint over",
+      "running": "Bezig · eindigt over",
+      "info": "Praktische info",
+      "close": "Sluiten",
+      "hide": "Banner verbergen",
+      "elapsed": "van de periode verstreken",
+      "where": "Plaats",
+      "when": "Uren",
+      "more": "Meer weten",
+      "units": {
+        "years": "jr",
+        "months": "mnd",
+        "days": "d",
+        "hours": "u",
+        "mins": "min",
+        "secs": "s"
+      },
+      "unitsLong": {
+        "years": "Jaren",
+        "months": "Maanden",
+        "days": "Dagen",
+        "hours": "Uren",
+        "mins": "Minuten",
+        "secs": "Seconden"
+      },
+      "allEvents": "Bekijk de hoogtepunten"
+    },
+    "featured": {
+      "label": "In de kijker",
+      "title": "Wat er bij ons gebeurt",
+      "more": "Ontdek ook",
+      "promote": "Uitlichten"
+    },
+    "about": {
+      "label": "Wie we zijn",
+      "title": "Een volk van discipelen in het hart van België",
+      "circular": "Gaat dan heen, maakt al de volken tot mijn discipelen · Matteüs 28:19 · "
+    },
+    "vision": {
+      "label": "Onze visie",
+      "title": "De wereld veranderen door het Evangelie",
+      "people": "mensen te bereiken met het Evangelie",
+      "disciples": "discipelen gevormd",
+      "nations": "naties bereikt",
+      "deadline": "horizon van de visie",
+      "billions": "miljard",
+      "billion": "miljard"
+    },
+    "values": {
+      "label": "Onze identiteit",
+      "title": "Wat ons kenmerkt",
+      "subtitle": "Vier letters. Eén identiteit. Het hart van wie we zijn."
+    },
+    "ministries": {
+      "label": "Ministeries",
+      "title": "Wat we samen beleven"
+    },
+    "events": {
+      "label": "Agenda",
+      "title": "Komende samenkomsten",
+      "past": "Voorbije evenementen",
+      "none": "Nog geen samenkomst aangekondigd."
+    },
+    "library": {
+      "label": "Bibliotheek",
+      "title": "Onze boeken",
+      "text": "De onderwijzingen van professor Zacharias Tanee Fomum en andere auteurs — gebed, discipelschap, visie en christelijk leven — in het Frans en in vele andere talen.",
+      "cta": "Ontdek de bibliotheek"
+    },
+    "assemblies": {
+      "label": "Ons vinden",
+      "title": "Onze gemeentes",
+      "route": "Routebeschrijving"
+    },
+    "testimonials": {
+      "label": "Getuigenissen",
+      "title": "Wat God gedaan heeft"
+    },
+    "contact": {
+      "label": "Contact",
+      "title": "Kom zoals u bent",
+      "text": "Een vraag over het geloof, een gebedsnood of zin om ons te bezoeken? Schrijf ons of kom langs."
+    },
+    "nav": {
+      "knowUs": "Leer ons kennen",
+      "identity": "Onze identiteit",
+      "agenda": "Agenda",
+      "highlights": "Hoogtepunten",
+      "gallery": "Galerij"
+    },
+    "teaser": {
+      "label": "Leer ons kennen",
+      "title": "Een familie van discipelen, een visie voor de naties",
+      "text": "Wie we zijn, wat we geloven en het doel dat God ons heeft toevertrouwd: ontdek CMCI België.",
+      "cta": "Leer ons kennen"
+    },
+    "timeline": {
+      "regular": "Vaste samenkomsten",
+      "today": "Vandaag",
+      "details": "Details bekijken",
+      "hint": "Beweeg over een evenement voor een voorproefje, klik voor alle details.",
+      "earlier": "Eerder",
+      "later": "Later",
+      "past": "Voorbij"
+    },
+    "galleryTeaser": {
+      "label": "Galerij",
+      "title": "Onze momenten in beeld",
+      "cta": "Bekijk de hele galerij"
+    },
+    "footer": {
+      "write": "Schrijf ons"
+    },
+    "pages": {
+      "knowUs": {
+        "title": "Leer ons kennen",
+        "lead": "Een gemeenschap van discipelen toegewijd aan Jezus Christus, ons voorbeeld in alles. Wie we zijn, wat God ons op het hart heeft gelegd en hoe u zich bij ons aansluit.",
+        "who": "Wie we zijn",
+        "founder": "Onze stichter"
+      },
+      "gallery": {
+        "title": "Galerij",
+        "lead": "Erediensten, conferenties, momenten van gemeenschap: het leven van CMCI België in beeld.",
+        "all": "Alle",
+        "empty": "De eerste foto's komen binnenkort.",
+        "close": "Sluiten",
+        "prev": "Vorige foto",
+        "next": "Volgende foto",
+        "exhibition": "Tentoonstelling",
+        "catalogue": "Catalogus",
+        "oneByOne": "Foto per foto",
+        "oneByOneHint": "Elke afbeelding groot",
+        "catalogueHint": "Alle beelden in één oogopslag",
+        "viewLabel": "Kies de weergave van de galerij",
+        "play": "Afspelen",
+        "pause": "Pauze"
+      },
+      "highlights": {
+        "title": "Hoogtepunten",
+        "lead": "De grote samenkomsten die we samen voorbereiden of beleven, met aftelling en alle praktische informatie.",
+        "empty": "Momenteel geen hoogtepunt aan de gang. Bekijk de agenda voor onze volgende samenkomsten.",
+        "agenda": "Bekijk de agenda",
+        "international": "Hoogtepunten van CMCI wereldwijd"
+      }
+    },
+    "verses": {
+      "mission": {
+        "text": "Gaat dan heen, onderwijst al de volken, hen dopende in den Naam des Vaders, en des Zoons, en des Heiligen Geestes; lerende hen onderhouden alles, wat Ik u geboden heb. En ziet, Ik ben met ulieden al de dagen tot de voleinding der wereld.",
+        "ref": "Jezus Christus — Matteüs 28:19-20"
+      },
+      "contact": {
+        "text": "Komt herwaarts tot Mij, allen die vermoeid en belast zijt, en Ik zal u rust geven.",
+        "ref": "Jezus Christus — Matteüs 11:28"
+      }
+    },
+    "founder": {
+      "label": "Onze stichter",
+      "name": "Professor Zacharias Tanee Fomum",
+      "years": "1945 — 2009",
+      "p1": "In mei 1975, in Yaoundé (Kameroen), ontvingen professor Zacharias Tanee Fomum en zijn metgezellen de last om de boodschap van Gods reddende liefde naar hun stad en hun land te brengen. Uit die gehoorzaamheid is de Internationale Christelijke Missionaire Gemeenschap ontstaan.",
+      "p2": "Als man van de wetenschap en man van God kende en diende hij de Heer Jezus Christus 53 jaar lang, met de wens de Kerk een voorbeeld van een discipel te geven: een leven van gebed en vasten, een liefde voor Christus die bleef groeien, en een geschreven werk dat vandaag in vele talen gelezen wordt.",
+      "p3": "Zijn visie draagt ons nog steeds: Gods reddende liefde in 250 naties, op alle zes continenten, tegen 2065.",
+      "quote": "Zijt mijn navolgers, gelijk ook ik van Christus.",
+      "quoteRef": "1 Korinthe 11:1",
+      "chaptersTitle": "Zijn leven in negen hoofdstukken",
+      "cta": "Ontdek zijn leven en nalatenschap",
+      "chapters": {
+        "introduction": "Inleiding",
+        "science": "De man van de wetenschap",
+        "god": "De man van God",
+        "joyful": "Een blijmoedige dienaar",
+        "suffering": "De man van het lijden",
+        "prayer": "De man van het gebed",
+        "finances": "De man en de financiën",
+        "fasting": "De man van het vasten",
+        "word": "De bedienaar van het Woord"
+      }
+    },
+    "cmfi": {
+      "worldVision": "De wereldwijde visie van CMCI",
+      "inTheWorld": "CMCI in de wereld",
+      "vision": "Onze visie",
+      "history": "Onze geschiedenis",
+      "fiveYearGoal": "Het Vijfjarendoel",
+      "international": "Hoogtepunten van CMCI wereldwijd",
+      "books": "Internationale bibliotheek (ZTF Books)",
+      "footerTitle": "CMCI wereldwijd",
+      "site": "cmfinternational.org",
+      "founder": "Onze stichter",
+      "contact": "Internationaal contact"
+    }
   }
 }

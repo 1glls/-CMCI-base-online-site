@@ -1,4 +1,5 @@
 import type { StyleConfig } from './styles';
+import { Fleuron } from './ornaments';
 
 export function SectionHeading({
   eyebrow, title, subtitle, config, center = true, onDark = false
@@ -8,11 +9,15 @@ export function SectionHeading({
 }) {
   const fg = onDark ? 'var(--pv-band-fg)' : 'var(--pv-fg)';
   const muted = onDark ? 'color-mix(in srgb, var(--pv-band-fg) 70%, transparent)' : 'var(--pv-muted)';
+  // Manuscrit : surtitre en rouge rubrique (or sur les bandes sombres).
+  const eyebrowColor = config.ornate
+    ? (onDark ? 'var(--pv-gold-soft)' : 'var(--pv-rubric)')
+    : 'var(--pv-accent)';
   return (
     <div className={center ? 'text-center' : ''}>
       <span
-        className="text-xs font-semibold uppercase tracking-[0.22em]"
-        style={{ color: 'var(--pv-accent)' }}
+        className="pv-eyebrow text-xs font-semibold uppercase tracking-[0.22em]"
+        style={{ color: eyebrowColor }}
       >
         {eyebrow}
       </span>
@@ -22,6 +27,12 @@ export function SectionHeading({
       >
         {title}
       </h2>
+      {config.ornate && (
+        <Fleuron
+          className={`mt-4 ${center ? 'mx-auto' : ''}`}
+          color={onDark ? 'var(--pv-gold-soft)' : 'var(--pv-gold)'}
+        />
+      )}
       {config.accentUnderline && (
         <div
           className="mt-4 h-1 w-16 rounded"

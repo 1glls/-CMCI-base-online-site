@@ -54,11 +54,11 @@ export function QuinquennialBar() {
         <div className="flex items-center gap-2">
           <span
             className="grid h-7 w-7 place-items-center rounded-full"
-            style={{ background: 'color-mix(in srgb, var(--pv-accent) 22%, transparent)' }}
+            style={{ background: 'color-mix(in srgb, var(--pv-band-accent, var(--pv-accent)) 22%, transparent)' }}
           >
-            <Target className="h-4 w-4" style={{ color: 'var(--pv-accent)' }} />
+            <Target className="h-4 w-4" style={{ color: 'var(--pv-band-accent, var(--pv-accent))' }} />
           </span>
-          <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--pv-accent)' }}>
+          <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--pv-band-accent, var(--pv-accent))' }}>
             Le But Quinquennal
           </span>
           <span className="hidden text-xs opacity-70 md:inline">2026–2030 · Un Don de Dieu pour notre Communauté</span>

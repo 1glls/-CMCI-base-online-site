@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { SiteHeader } from '@/components/site/header';
+import { SiteFooter } from '@/components/site/footer';
+import { fetchSettings } from '@/lib/server-data';
+import { HOME_PATH } from '@/lib/site';
 import { BookDetail, type BookDetailData } from '@/components/book-detail';
 import { API_URL, getFileUrl } from '@/lib/api';
 
@@ -42,16 +44,16 @@ export async function generateMetadata({
 
 export default async function BookPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const book = await fetchBook(id);
+  const [book, settings] = await Promise.all([fetchBook(id), fetchSettings()]);
   if (!book) notFound();
 
   return (
-    <>
-      <Header />
-      <main className="pt-24">
+    <div className="grain-page bg-nuit">
+      <SiteHeader home={HOME_PATH} />
+      <main className="pt-36">
         <BookDetail book={book} />
       </main>
-      <Footer />
-    </>
+      <SiteFooter home={HOME_PATH} settings={settings} />
+    </div>
   );
 }

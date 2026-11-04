@@ -139,9 +139,130 @@
   --pv-hero-fg: #f5f5f4;
 }
 
+/* ============================ MANUSCRIT SACRÉ ============================
+   Parchemin, encre, or d'enluminure et rouge rubrique ; bandes en bleu
+   lapis étoilé. Variante sombre « veillée » : nuit d'encre et lueur de bougie.
+   --pv-gold / --pv-rubric restent fixes : l'axe d'accent ne pilote que les
+   boutons et liens. */
+[data-style="manuscrit"] {
+  --pv-gold: #a67c22;
+  --pv-gold-soft: #e2c47c;
+  --pv-rubric: #8c1d18;
+  --pv-bg: #f3e8cf;
+  --pv-surface: #f8efd9;
+  --pv-fg: #2b2117;
+  --pv-muted: #66563f;
+  --pv-border: #dbc79b;
+  --pv-primary: #2b2117;
+  --pv-heading: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --pv-heading-weight: 600;
+  --pv-caps: 'Cinzel', Georgia, serif;
+  --pv-radius: 3px;
+  --pv-shadow: 0 22px 44px -28px rgb(70 45 10 / .55);
+  --pv-stars:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgb(240 214 150 / .75), transparent 60%),
+    radial-gradient(1px 1px at 31% 71%, rgb(240 214 150 / .55), transparent 60%),
+    radial-gradient(1.5px 1.5px at 54% 12%, rgb(240 214 150 / .6), transparent 60%),
+    radial-gradient(1px 1px at 68% 48%, rgb(240 214 150 / .5), transparent 60%),
+    radial-gradient(2px 2px at 83% 26%, rgb(240 214 150 / .7), transparent 60%),
+    radial-gradient(1px 1px at 91% 78%, rgb(240 214 150 / .5), transparent 60%),
+    radial-gradient(1.5px 1.5px at 6% 86%, rgb(240 214 150 / .55), transparent 60%);
+  --pv-band-bg: var(--pv-stars), linear-gradient(170deg, #1c3160 0%, #121d3b 55%, #0d1530 100%);
+  --pv-band-fg: #f4e8cc;
+  /* Sur les bandes lapis, le rouge rubrique serait illisible : on passe à l'or. */
+  --pv-band-accent: var(--pv-gold-soft);
+  --pv-hero-bg:
+    radial-gradient(60% 55% at 50% 0%, rgb(255 240 196 / .95) 0%, transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(150 105 40 / .25) 100%),
+    #efe1c0;
+  --pv-hero-fg: #2b2117;
+}
+[data-style="manuscrit"][data-theme="dark"] {
+  --pv-gold: #d2ae5c;
+  --pv-gold-soft: #ead08a;
+  --pv-rubric: #d0574a;
+  --pv-bg: #13141d;
+  --pv-surface: #1b1c28;
+  --pv-fg: #efe4ca;
+  --pv-muted: #b3a688;
+  --pv-border: #34324a;
+  --pv-primary: #efe4ca;
+  --pv-shadow: 0 24px 50px -26px rgb(0 0 0 / .8);
+  --pv-band-bg: var(--pv-stars), linear-gradient(170deg, #0f1530 0%, #090c1c 100%);
+  --pv-band-fg: #f1e5c8;
+  --pv-hero-bg:
+    radial-gradient(55% 50% at 50% 0%, rgb(222 170 80 / .30) 0%, transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 50%, rgb(0 0 0 / .45) 100%),
+    #13141d;
+  --pv-hero-fg: #f1e5c8;
+}
+
+/* Grain de papier sur toute la page (bruit SVG, aucun fichier image). */
+[data-style="manuscrit"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: .3;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .38 0 0 0 0 .27 0 0 0 0 .12 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-style="manuscrit"][data-theme="dark"]::after { opacity: .12; mix-blend-mode: screen; }
+
+/* Typographie : petites capitales gravées, titres en Garamond. */
+[data-style="manuscrit"] .pv-eyebrow,
+[data-style="manuscrit"] .pv-caps,
+[data-style="manuscrit"] .pv-nav-link,
+[data-style="manuscrit"] .pv-btn {
+  font-family: var(--pv-caps);
+  letter-spacing: .2em;
+}
+[data-style="manuscrit"] .pv-nav-link { font-size: .72rem; }
+/* Garamond utilise des chiffres « à l'ancienne » (10 se lirait « Io »). */
+[data-style="manuscrit"] .pv-heading { font-variant-numeric: lining-nums; }
+[data-style="manuscrit"] .pv-btn { border-radius: 2px; font-size: .72rem; }
+[data-style="manuscrit"] .pv-h1-illum::first-letter { color: var(--pv-rubric); }
+
+/* Lettrine enluminée : lettre or sur carré rubrique à double filet. */
+[data-style="manuscrit"] .pv-dropcap::first-letter {
+  float: left;
+  margin: .08em .16em 0 0;
+  padding: .12em .14em .04em;
+  font-family: var(--pv-heading);
+  font-weight: 700;
+  font-size: 4em;
+  line-height: .8;
+  color: var(--pv-gold-soft);
+  background: var(--pv-rubric);
+  box-shadow: inset 0 0 0 3px var(--pv-rubric), inset 0 0 0 4px var(--pv-gold-soft);
+}
+
+/* Lumière dorée qui descend sur la page (hero). */
+.pv-rays {
+  background: repeating-conic-gradient(from 180deg at 50% -8%, rgb(255 222 140 / .24) 0deg 3deg, transparent 3deg 8deg);
+  -webkit-mask-image: radial-gradient(75% 85% at 50% 0%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(75% 85% at 50% 0%, #000 0%, transparent 75%);
+  animation: pv-rays 9s ease-in-out infinite alternate;
+}
+[data-theme="dark"] .pv-rays {
+  background: repeating-conic-gradient(from 180deg at 50% -8%, rgb(230 178 90 / .13) 0deg 3deg, transparent 3deg 8deg);
+}
+@keyframes pv-rays { from { opacity: .55; } to { opacity: 1; } }
+
+/* Miniature de carte d'événement : panneau lapis à double filet doré. */
+.pv-miniature {
+  background: var(--pv-stars), radial-gradient(90% 90% at 50% 0%, #2a4580 0%, #121d3b 75%);
+  box-shadow: inset 0 0 0 1px var(--pv-gold), inset 0 0 0 5px #121d3b, inset 0 0 0 6px color-mix(in srgb, var(--pv-gold) 55%, transparent);
+}
+
+/* Le rouge rubrique s'éclaircit la nuit pour rester lisible. */
+[data-style="manuscrit"][data-theme="dark"][data-accent="rubrique"] { --pv-accent: #d4574a; }
+
 /* ===================== COULEUR D'ACCENT VIVE (axe séparé) ===============
    Déclaré APRÈS les styles → l'emporte sur leur --pv-accent par défaut.
    Inspiré des références chaudes (sunmetalon, cmgi-nl) : pas de bleu. */
+[data-accent="rubrique"] { --pv-accent: #8c1d18; --pv-accent-2: #b8862b; --pv-accent-ink: #fbf3e2; }
 [data-accent="feu"]      { --pv-accent: #f24d1e; --pv-accent-2: #ffab00; --pv-accent-ink: #ffffff; }
 [data-accent="ambre"]    { --pv-accent: #f0920f; --pv-accent-2: #ff6a1a; --pv-accent-ink: #241a08; }
 [data-accent="corail"]   { --pv-accent: #fb5a5a; --pv-accent-2: #ff9d5c; --pv-accent-ink: #ffffff; }
@@ -169,5 +290,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pv-reveal { opacity: 1; transform: none; transition: none; }
-  .pv-float { animation: none; }
+  .pv-float, .pv-rays { animation: none; }
 }
