@@ -11,6 +11,8 @@ import { CircularText, WordsReveal } from "@/components/site/motion-kit"
 import { Rich } from "@/components/site/rich-text"
 import { Logo } from "@/components/site/logo"
 import { BookFan, type HeroBook } from "./book-fan"
+import { SocialAction, SocialBadge, mergeSocialSlides, useVideoPlayer, type SlideSocial, type SocialPost } from "./social-badge"
+import { useTiming } from "@/components/site/timing-provider"
 
 export interface Slide {
   id: string
@@ -21,6 +23,8 @@ export interface Slide {
   buttonText?: string | null
   buttonUrl?: string | null
   linkedEvent?: { date: string; time: string; location: string } | null
+  /** Publication d'un reseau social affichee comme annonce (components/home/social-badge.tsx). */
+  social?: SlideSocial | null
 }
 
 export type HeroMode = "livres" | "diaporama"
@@ -138,12 +142,13 @@ function HeroLivres({ slides, books }: { slides: Slide[]; books: HeroBook[] }) {
   )
 }
 
-const SLIDE_MS = 8000
-
 /** Mode « Diaporama + livres » : slides plein ecran, puis une slide Bibliotheque. */
 function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }) {
   const { t } = useLanguage()
   const reduce = useReducedMotion()
+  // Duree d'une diapositive : Parametres → Rythmes et automatismes
+  const SLIDE_MS = useTiming("timing_hero_slide")
+  const player = useVideoPlayer()
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const total = slides.length + (books.length > 0 ? 1 : 0)
@@ -154,7 +159,7 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
     if (total < 2 || paused) return
     const id = setTimeout(() => setIndex((i) => (i + 1) % total), SLIDE_MS)
     return () => clearTimeout(id)
-  }, [index, total, paused])
+  }, [index, total, paused, SLIDE_MS])
 
   const go = (d: number) => setIndex((i) => (i + d + total) % total)
 
@@ -201,6 +206,7 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
             className={isLibrary ? "grid items-center gap-12 lg:grid-cols-[1.2fr_1fr]" : ""}
           >
             <div className="max-w-3xl">
+              {!isLibrary && slide?.social && <SocialBadge social={slide.social} className="mb-5" />}
               <h2 className="font-display text-[clamp(2.6rem,6vw,5.6rem)] font-medium leading-[1] text-ivoire">
                 <Rich text={isLibrary ? t("home2.hero.librarySlideTitle") : slide?.title ?? t("home2.hero.title")} />
               </h2>
@@ -212,6 +218,8 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
                   <Link href="/livres" className="inline-flex items-center gap-3 bg-or px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-nuit hover:bg-or-clair">
                     {t("home2.hero.library")} <ArrowRight className="h-4 w-4" />
                   </Link>
+                ) : slide?.social ? (
+                  <SocialAction social={slide.social} big onPlay={() => player.open(slide)} />
                 ) : slide?.buttonText && slide.buttonUrl ? (
                   <a href={slide.buttonUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-or px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-nuit hover:bg-or-clair">
                     {slide.buttonText} <ExternalLink className="h-4 w-4" />
@@ -259,14 +267,22 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
           </div>
         )}
       </div>
+      {player.dialog}
     </section>
   )
 }
 
-export function Hero({ mode, initialSlides, books }: { mode: HeroMode; initialSlides: Slide[]; books: HeroBook[] }) {
+export function Hero({ mode, initialSlides, books, posts = [], socialCount = 3 }: {
+  mode: HeroMode
+  initialSlides: Slide[]
+  books: HeroBook[]
+  /** Publications des reseaux validees : en mode Diaporama, elles rejoignent les diapositives. */
+  posts?: SocialPost[]
+  socialCount?: number
+}) {
   const slides = useLocalizedData<Slide[]>("/api/hero", initialSlides)
   const list = Array.isArray(slides) ? slides : []
   return mode === "diaporama"
-    ? <HeroDiaporama slides={list} books={books} />
+    ? <HeroDiaporama slides={mergeSocialSlides(list, posts, socialCount)} books={books} />
     : <HeroLivres slides={list} books={books} />
 }

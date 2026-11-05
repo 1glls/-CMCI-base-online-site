@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useTiming } from "@/components/site/timing-provider"
 import { useLocalizedData } from "@/hooks/use-localized-data"
 import { Reveal } from "@/components/site/motion-kit"
 import { Rich } from "@/components/site/rich-text"
@@ -54,12 +55,13 @@ export function Testimonials({ initial }: { initial: Testimonial[] }) {
   const list = Array.isArray(data) ? data : []
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
+  const every = useTiming("timing_testimonials")
 
   useEffect(() => {
     if (list.length < 2 || paused || reduce) return
-    const id = setTimeout(() => setIndex((i) => (i + 1) % list.length), 7000)
+    const id = setTimeout(() => setIndex((i) => (i + 1) % list.length), every)
     return () => clearTimeout(id)
-  }, [index, list.length, paused, reduce])
+  }, [index, list.length, paused, reduce, every])
 
   if (list.length === 0) return null
   const item = list[index % list.length]

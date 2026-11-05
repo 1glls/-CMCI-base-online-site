@@ -11,6 +11,7 @@ const foldAccents = (s: string) =>
   s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 import { API_URL, getFileUrl } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTiming } from '@/components/site/timing-provider'
 import { cn } from '@/lib/utils';
 import { Rich } from '@/components/site/rich-text';
 import { CmfiLink } from '@/components/site/cmfi-link';
@@ -60,12 +61,13 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const every = useTiming('timing_books_banner');
 
   useEffect(() => {
     if (paused || slides.length <= 1) return;
-    timer.current = setInterval(() => setIndex((i) => (i + 1) % slides.length), 7000);
+    timer.current = setInterval(() => setIndex((i) => (i + 1) % slides.length), every);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [paused, slides.length]);
+  }, [paused, slides.length, every]);
 
   if (slides.length === 0) return null;
 

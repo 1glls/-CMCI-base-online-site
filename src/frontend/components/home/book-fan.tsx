@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ArrowUpRight } from "lucide-react"
 import { getFileUrl } from "@/lib/api"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useTiming } from "@/components/site/timing-provider"
 
 export interface HeroBook {
   id: string
@@ -49,12 +50,13 @@ export function BookFan({ books, size = "lg" }: { books: HeroBook[]; size?: "lg"
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
   const n = books.length
+  const every = useTiming("timing_book_fan")
 
   useEffect(() => {
     if (n < 2 || paused || reduce) return
-    const id = setInterval(() => setActive((a) => (a + 1) % n), 5000)
+    const id = setInterval(() => setActive((a) => (a + 1) % n), every)
     return () => clearInterval(id)
-  }, [n, paused, reduce])
+  }, [n, paused, reduce, every])
 
   if (n === 0) return null
   const w = size === "lg" ? "w-[clamp(150px,19vw,250px)]" : "w-[clamp(130px,15vw,200px)]"

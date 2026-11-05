@@ -3,6 +3,9 @@ import type { Metadata, Viewport } from 'next'
 import { Montserrat, Open_Sans, Cormorant_Garamond } from 'next/font/google'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { ThemeProvider } from '@/components/theme-provider'
+import { TimingProvider } from '@/components/site/timing-provider'
+import { fetchSettings } from '@/lib/server-data'
+import { parseTimings } from '@/lib/timings'
 // Cinzel est auto-hebergee (@fontsource) : Google la sert desormais via des
 // URL « l/font?kit=… » que next/font (Turbopack) ne sait pas resoudre.
 import '@fontsource/cinzel/latin-400.css'
@@ -68,11 +71,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Durees de defilement reglees dans l'admin (Parametres → Rythmes et automatismes)
+  const timings = parseTimings(await fetchSettings())
   return (
     // suppressHydrationWarning : next-themes pose data-theme avant l'affichage
     // (pas de flash), donc l'attribut differe volontairement du rendu serveur.
@@ -81,7 +86,7 @@ export default function RootLayout({
         {/* Theme sombre par defaut (charte Nuit & or), clair au choix du visiteur */}
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false} storageKey="cmci-theme">
           <LanguageProvider>
-            {children}
+            <TimingProvider value={timings}>{children}</TimingProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

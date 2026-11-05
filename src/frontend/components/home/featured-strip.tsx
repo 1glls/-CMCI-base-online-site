@@ -1,18 +1,17 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, LayoutGroup, motion, useInView, useReducedMotion } from "motion/react"
-import { ArrowUpRight, Calendar, MapPin } from "lucide-react"
+import { ArrowUpRight, Calendar, MapPin, Play } from "lucide-react"
 import { getImageUrl } from "@/lib/api"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { Reveal, WordsReveal } from "@/components/site/motion-kit"
 import { Rich } from "@/components/site/rich-text"
 import type { Slide } from "./hero"
-import { SocialRow, type SocialPost } from "./social-row"
+import { SocialAction, SocialBadge, SOCIAL_ICONS, isPlayable, mergeSocialSlides, useVideoPlayer, type SocialPost } from "./social-badge"
+import { useTiming } from "@/components/site/timing-provider"
 
 const FEATURED = 3
-/** Duree d'affichage d'une annonce en grand avant de passer a la suivante. */
-const AUTO_MS = 7000
 const EASE = [0.16, 1, 0.3, 1] as const
 const FALLBACK = "/images/hero-worship.jpg"
 
@@ -37,13 +36,17 @@ function SlideLink({ s, big = false }: { s: Slide; big?: boolean }) {
  * « Decouvrir aussi » : un clic sur l'une d'elles la fait passer en grand.
  * Defilement automatique : toutes les 7 s l'annonce suivante passe en grand
  * (pause au survol, au clavier et hors de l'ecran).
- * Les annonces sont les diapositives de l'admin « Section Hero ».
- * En dessous, « Sur nos reseaux » : les publications validees dans l'admin
- * Reseaux sociaux (seule cette rangee s'affiche en mode Diaporama).
+ * Les annonces sont les diapositives de l'admin « Section Hero », plus les
+ * publications des reseaux validees dans l'admin (mention « Sur nos reseaux »),
+ * la plus recente en premier (components/home/social-badge.tsx).
+ * Duree d'affichage reglable : Parametres → Rythmes et automatismes.
  */
-export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?: SocialPost[] }) {
+export function FeaturedStrip({ slides: baseSlides, posts = [], socialCount = 3 }: { slides: Slide[]; posts?: SocialPost[]; socialCount?: number }) {
   const { t } = useLanguage()
   const reduce = useReducedMotion()
+  const AUTO_MS = useTiming("timing_featured")
+  const player = useVideoPlayer()
+  const slides = useMemo(() => mergeSocialSlides(baseSlides, posts, socialCount), [baseSlides, posts, socialCount])
   const [order, setOrder] = useState<string[]>(() => slides.map((s) => s.id))
   const sectionRef = useRef<HTMLElement>(null)
   const inView = useInView(sectionRef, { amount: 0.3 })
@@ -67,7 +70,7 @@ export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?:
 
   const byId = new Map(slides.map((s) => [s.id, s]))
   const ordered = order.map((id) => byId.get(id)).filter(Boolean) as Slide[]
-  if (ordered.length === 0 && posts.length === 0) return null
+  if (ordered.length === 0) return null
   const [main, ...secondary] = ordered.slice(0, FEATURED)
   const rest = ordered.slice(FEATURED)
 
@@ -111,8 +114,19 @@ export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?:
                     className="fondu h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]"
                   />
                   <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-nuit via-nuit/30 to-transparent" />
+                  {isPlayable(main.social) && (
+                    <button
+                      type="button" onClick={() => player.open(main)} aria-label={`${t("home2.featured.watch")} : ${main.title}`}
+                      className="absolute inset-0 grid place-items-center"
+                    >
+                      <span className="grid h-20 w-20 place-items-center rounded-full border border-or/70 bg-nuit/50 text-or-clair backdrop-blur-sm transition-colors hover:bg-or hover:text-nuit">
+                        <Play className="ml-1 h-8 w-8" />
+                      </span>
+                    </button>
+                  )}
                 </div>
-                <div className="relative -mt-36 px-2 md:-mt-44 md:px-8">
+                <div className="pointer-events-none relative -mt-36 px-2 md:-mt-44 md:px-8 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+                  {main.social && <SocialBadge social={main.social} className="mb-3" />}
                   {(main.linkedEvent?.date || main.linkedEvent?.location) && (
                     <p className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-ivoire/70">
                       {main.linkedEvent?.date && <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 text-or" />{main.linkedEvent.date}</span>}
@@ -121,7 +135,7 @@ export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?:
                   )}
                   <h3 className="mt-3 font-display text-[clamp(2rem,4vw,3.4rem)] leading-[1.02]"><Rich text={main.title} /></h3>
                   <p className="mt-3 line-clamp-2 max-w-2xl text-ivoire/70"><Rich text={main.subtitle} /></p>
-                  <SlideLink s={main} big />
+                  {main.social ? <div className="mt-6"><SocialAction social={main.social} big onPlay={() => player.open(main)} /></div> : <SlideLink s={main} big />}
                   {/* Temps restant avant l'annonce suivante */}
                   {slides.length > 1 && !reduce && (
                     <div aria-hidden className="mt-8 h-px w-full max-w-xs bg-ivoire/15">
@@ -151,12 +165,12 @@ export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?:
                       <img src={getImageUrl(s.image, FALLBACK)} alt="" className="fondu h-full w-full scale-110 object-cover transition-transform duration-[1.2s] group-hover:scale-[1.16]" />
                     </button>
                     <div>
-                      {s.linkedEvent?.date && <p className="eyebrow !text-[9px] text-or">{s.linkedEvent.date}</p>}
+                      {s.social ? <SocialBadge social={s.social} className="!text-[9px]" /> : s.linkedEvent?.date && <p className="eyebrow !text-[9px] text-or">{s.linkedEvent.date}</p>}
                       <h3 className="mt-2 font-display text-2xl leading-tight">
                         <button type="button" onClick={() => promote(s.id)} className="text-left transition-colors hover:text-or-clair"><Rich text={s.title} /></button>
                       </h3>
                       <p className="mt-2 line-clamp-2 text-sm text-ivoire/60"><Rich text={s.subtitle} /></p>
-                      <SlideLink s={s} />
+                      {s.social ? <div className="mt-3"><SocialAction social={s.social} onPlay={() => player.open(s)} /></div> : <SlideLink s={s} />}
                     </div>
                   </motion.article>
                 ))}
@@ -180,7 +194,8 @@ export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?:
                   <img src={getImageUrl(s.image, FALLBACK)} alt="" className="fondu h-20 w-24 shrink-0 object-cover opacity-70 transition-opacity group-hover:opacity-100" />
                   <span>
                     <span className="line-clamp-2 font-display text-lg leading-snug text-ivoire/80 transition-colors group-hover:text-or-clair"><Rich text={s.title} /></span>
-                    {s.linkedEvent?.date && <span className="mt-1 block text-[11px] text-ivoire/45">{s.linkedEvent.date}</span>}
+                    {s.social ? (() => { const Icon = SOCIAL_ICONS[s.social.platform]; return <span className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-or/80"><Icon className="h-3 w-3" />{t("home2.featured.social")}</span> })()
+                      : s.linkedEvent?.date && <span className="mt-1 block text-[11px] text-ivoire/45">{s.linkedEvent.date}</span>}
                   </span>
                 </button>
               ))}
@@ -188,7 +203,7 @@ export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?:
           </div>
         )}
 
-        <SocialRow posts={posts} separated={!!main} />
+        {player.dialog}
       </div>
     </section>
   )

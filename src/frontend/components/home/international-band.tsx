@@ -16,7 +16,7 @@ export function InternationalBand({ images }: { images: string[] }) {
   return (
     <section className="relative overflow-hidden text-ivoire">
       {images.length > 0 && (
-        <AutoSlideshow images={images} interval={5000} className="fondu photo-fond h-[70vh] min-h-[420px] w-full" />
+        <AutoSlideshow images={images} className="fondu photo-fond h-[70vh] min-h-[420px] w-full" />
       )}
       <div className={`${images.length > 0 ? "absolute inset-x-0 bottom-[14%]" : "py-20"} mx-auto max-w-7xl px-6`}>
         <Reveal>

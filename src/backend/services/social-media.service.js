@@ -407,16 +407,6 @@ async function syncAll() {
   return results;
 }
 
-/** Synchronisation automatique toutes les 6 heures (a h+15). */
-function setupSocialCron() {
-  const cron = require('node-cron');
-  cron.schedule('15 */6 * * *', async () => {
-    const results = await syncAll();
-    const summary = results.map((r) => `${r.platform}:${r.ok ? `+${r.nouveaux}` : r.code}`).join(' ');
-    console.log(`🔄 Synchro reseaux sociaux : ${summary}`);
-  });
-}
-
 /* ------------------------------ connexion TikTok ----------------------------- */
 
 const TIKTOK_SCOPES = 'user.info.basic,video.list';
@@ -467,7 +457,6 @@ module.exports = {
   testPlatform,
   syncPlatform,
   syncAll,
-  setupSocialCron,
   tiktokAuthorizeUrl,
   tiktokExchangeCode,
 };

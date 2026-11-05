@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site/footer"
 import { SectionReveal, SectionSeam } from "@/components/site/section-transition"
 import { Hero, type HeroMode, type Slide } from "@/components/home/hero"
 import { FeaturedStrip } from "@/components/home/featured-strip"
-import type { SocialPost } from "@/components/home/social-row"
+import type { SocialPost } from "@/components/home/social-badge"
 import { AboutTeaser } from "@/components/home/about-teaser"
 import { Values } from "@/components/home/values"
 import { Ministries, type Ministry } from "@/components/home/ministries"
@@ -58,6 +58,8 @@ export default async function HomePage() {
   const heroSlides = arr<Slide>(slides)
   const assemblyList = arr<Assembly>(assemblies)
   const posts = arr<SocialPost>(socialPosts)
+  // Nombre de publications des reseaux dans le haut de l'accueil (admin Reseaux sociaux)
+  const socialCount = Math.max(0, Math.min(6, parseInt(settings.social_hero_count ?? "3", 10) || 0))
 
   // Ordre valide : hero, a la une, mieux nous connaitre, identite, ministeres,
   // agenda, assemblees, galerie, puis contact + pied de page fusionnes.
@@ -65,11 +67,11 @@ export default async function HomePage() {
     <main className="grain-page bg-nuit">
       <ChurchJsonLd settings={settings} assemblies={assemblyList} />
       <SiteHeader home={HOME_PATH} countdowns={arr<Countdown>(countdowns)} />
-      <Hero mode={mode} initialSlides={heroSlides} books={arr<HeroBook>(books)} />
+      <Hero mode={mode} initialSlides={heroSlides} books={arr<HeroBook>(books)} posts={posts} socialCount={socialCount} />
       {/* Entre les sections : couture doree animee, et chaque section monte en apparaissant */}
-      {/* « A la une » : annonces (mode Message + livres) et publications des reseaux sociaux */}
-      {(mode === "livres" || posts.length > 0) && (
-        <SectionReveal><FeaturedStrip slides={mode === "livres" ? heroSlides : []} posts={posts} /></SectionReveal>
+      {/* « A la une » (mode Message + livres) : annonces + publications des reseaux */}
+      {mode === "livres" && (
+        <SectionReveal><FeaturedStrip slides={heroSlides} posts={posts} socialCount={socialCount} /></SectionReveal>
       )}
       <SectionSeam />
       <SectionReveal><AboutTeaser /></SectionReveal>

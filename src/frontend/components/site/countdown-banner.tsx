@@ -5,6 +5,7 @@ import Link from "next/link"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ArrowRight, ChevronDown, ExternalLink, MapPin, Clock, X } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useTiming } from "@/components/site/timing-provider"
 import { type Countdown, phaseOf, progressOf, remaining, targetOf, visibleUnits } from "@/lib/countdown"
 
 const HIDE_KEY = "cmciCountdownBannerHidden"
@@ -27,6 +28,7 @@ export function useNow(): Date | null {
  * venir, infos pratiques depliables. Plusieurs comptes : rotation toutes les 8 s.
  */
 export function CountdownBanner({ countdowns }: { countdowns: Countdown[] }) {
+  const rotateEvery = useTiming("timing_countdown_banner")
   const { t } = useLanguage()
   const now = useNow()
   const [index, setIndex] = useState(0)
@@ -52,9 +54,9 @@ export function CountdownBanner({ countdowns }: { countdowns: Countdown[] }) {
 
   useEffect(() => {
     if (live.length < 2 || open) return
-    const id = setInterval(() => setIndex((i) => (i + 1) % live.length), 8000)
+    const id = setInterval(() => setIndex((i) => (i + 1) % live.length), rotateEvery)
     return () => clearInterval(id)
-  }, [live.length, open])
+  }, [live.length, open, rotateEvery])
 
   if (live.length === 0 || hidden) return null
   const c = live[index % live.length]

@@ -22,7 +22,7 @@ export function GalleryTeaser({ images }: { images: GalleryImage[] }) {
     <section id="galerie" className="relative overflow-hidden bg-nuit text-ivoire">
       {/* Image : moitie droite de l'ecran, fondue vers la gauche et en haut/bas */}
       <Link href="/galerie" aria-label={t("home2.galleryTeaser.cta")} className="absolute inset-y-0 right-0 hidden w-[62%] md:block">
-        <AutoSlideshow images={srcs} interval={5500} className="fondu-vers-gauche h-full w-full" />
+        <AutoSlideshow images={srcs} className="fondu-vers-gauche h-full w-full" />
       </Link>
 
       <div className="relative mx-auto flex min-h-[34rem] max-w-7xl items-center px-6 py-24 md:min-h-[40rem]">
@@ -46,7 +46,7 @@ export function GalleryTeaser({ images }: { images: GalleryImage[] }) {
 
       {/* Mobile : l'image passe sous le texte, fondue sur tous les bords */}
       <Link href="/galerie" aria-label={t("home2.galleryTeaser.cta")} className="block md:hidden">
-        <AutoSlideshow images={srcs} interval={5500} className="fondu -mt-10 h-80 w-full" />
+        <AutoSlideshow images={srcs} className="fondu -mt-10 h-80 w-full" />
       </Link>
     </section>
   )

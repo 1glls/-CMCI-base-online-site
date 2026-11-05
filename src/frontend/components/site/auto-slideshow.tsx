@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react"
 import { getImageUrl } from "@/lib/api"
+import { useTiming } from "@/components/site/timing-provider"
 
 /**
  * Diaporama automatique, sans vignettes, points ni fleches : les photos se
@@ -13,8 +14,11 @@ import { getImageUrl } from "@/lib/api"
  * `className` porte la forme du fondu (.fondu, .fondu-vers-gauche…).
  */
 export function AutoSlideshow({
-  images, interval = 6000, className = "", imgClassName = "",
+  images, interval: forced, className = "", imgClassName = "",
 }: { images: string[]; interval?: number; className?: string; imgClassName?: string }) {
+  // Duree par defaut reglable : Parametres → Rythmes et automatismes
+  const setting = useTiming("timing_photo_slideshow")
+  const interval = forced ?? setting
   const reduce = useReducedMotion()
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { amount: 0.2 })

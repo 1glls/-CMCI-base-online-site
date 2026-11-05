@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Settings as SettingsIcon, Save, Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube, LayoutTemplate } from 'lucide-react';
 import { FaTiktok, FaTelegram, FaWhatsapp } from 'react-icons/fa';
 import { API_URL } from '@/lib/api';
+import { TimingSettings } from '@/components/admin/timing-settings';
 
 interface Settings {
   id: string;
@@ -95,10 +96,16 @@ export default function SettingsPage() {
   }
 
   // Grouper les paramètres par catégorie
+  // Liens des réseaux sociaux (pied de page) : seulement ces clés-là
+  const SOCIAL_LINK_KEYS = ['social_facebook', 'social_instagram', 'social_youtube', 'social_tiktok', 'social_telegram', 'social_whatsapp'];
+  // Réglages gérés par des blocs dédiés (Rythmes et automatismes, page Newsletter,
+  // page Réseaux sociaux) : jamais affichés comme champs texte bruts
+  const isManaged = (key: string) =>
+    key === 'hero_mode' || key.startsWith('timing_') || key.startsWith('translation_') ||
+    key.startsWith('newsletter_') || key.startsWith('job_') || key === 'social_sync_hours' || key === 'social_hero_count';
   const contactSettings = settings.filter(s => s.key.startsWith('contact_'));
-  const socialSettings = settings.filter(s => s.key.startsWith('social_'));
-  // hero_mode a son propre bloc (choix entre deux valeurs, pas un champ libre)
-  const otherSettings = settings.filter(s => !s.key.startsWith('contact_') && !s.key.startsWith('social_') && s.key !== 'hero_mode');
+  const socialSettings = settings.filter(s => SOCIAL_LINK_KEYS.includes(s.key));
+  const otherSettings = settings.filter(s => !s.key.startsWith('contact_') && !SOCIAL_LINK_KEYS.includes(s.key) && !isManaged(s.key));
   const heroMode = settings.find(s => s.key === 'hero_mode')?.value || 'livres';
 
   const getSettingIcon = (key: string) => {
@@ -224,6 +231,8 @@ export default function SettingsPage() {
           </div>
         </Card>
 
+        <TimingSettings />
+
         {renderSettingGroup('Informations de Contact', contactSettings)}
         {renderSettingGroup('Réseaux Sociaux', socialSettings)}
         {renderSettingGroup('Autres Paramètres', otherSettings)}
@@ -247,19 +256,13 @@ export default function SettingsPage() {
         <Card className="p-6 mt-6 bg-yellow-50">
           <h3 className="font-bold mb-2 flex items-center">
             <SettingsIcon className="w-5 h-5 mr-2" />
-            Configuration des réseaux sociaux
+            Comptes des réseaux sociaux
           </h3>
-          <p className="text-sm text-gray-700 mb-4">
-            Pour configurer les clés API des réseaux sociaux (YouTube, Facebook, Instagram, TikTok), 
-            modifiez le fichier <code className="bg-gray-200 px-1 py-0.5 rounded">.env</code> dans 
-            le dossier <code className="bg-gray-200 px-1 py-0.5 rounded">src/backend/</code>.
+          <p className="text-sm text-gray-700">
+            Les clés et jetons de YouTube, Facebook, Instagram et TikTok se configurent désormais directement dans la page{' '}
+            <a href="/admin/social-media" className="underline">Réseaux sociaux</a> (avec un guide pas à pas pour chaque réseau).
+            Plus besoin de modifier le fichier <code className="bg-gray-200 px-1 py-0.5 rounded">.env</code> du serveur.
           </p>
-          <div className="text-xs text-gray-600 space-y-1">
-            <div>• YOUTUBE_API_KEY et YOUTUBE_CHANNEL_ID</div>
-            <div>• FACEBOOK_PAGE_ID et FACEBOOK_ACCESS_TOKEN</div>
-            <div>• INSTAGRAM_USER_ID et INSTAGRAM_ACCESS_TOKEN</div>
-            <div>• TIKTOK_ACCESS_TOKEN</div>
-          </div>
         </Card>
       </div>
     </div>

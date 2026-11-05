@@ -299,6 +299,27 @@ async function applyTranslations(model, records, language) {
 const TARGET_LANGUAGES = ['en', 'nl'];
 
 /**
+ * Mode de traduction des nouveaux contenus (Parametres → Rythmes et automatismes) :
+ *   immediate : a chaque enregistrement (comportement historique)
+ *   scheduled : regroupe, par le planificateur (services/scheduler.service.js)
+ *   manual    : seulement via le bouton de la page Traductions
+ * Lu en base au plus une fois par minute.
+ */
+let modeCache = { value: 'immediate', at: 0 };
+async function translationMode() {
+  if (Date.now() - modeCache.at < 60 * 1000) return modeCache.value;
+  try {
+    const row = await prisma.settings.findUnique({ where: { key: 'translation_mode' } });
+    const v = row?.value;
+    modeCache = { value: ['immediate', 'scheduled', 'manual'].includes(v) ? v : 'immediate', at: Date.now() };
+  } catch {
+    modeCache = { value: 'immediate', at: Date.now() };
+  }
+  return modeCache.value;
+}
+function resetTranslationModeCache() { modeCache.at = 0; }
+
+/**
  * Traduit un enregistrement en arriere-plan, sans bloquer la reponse HTTP
  * ni la faire echouer : une panne de DeepL ne doit pas empecher un
  * administrateur d'enregistrer son contenu.
@@ -314,6 +335,8 @@ function autoTranslate(model, record, changedFields = null) {
   if (changedFields && changedFields.length === 0) return;
 
   setImmediate(async () => {
+    // En mode planifie ou manuel, le contenu sera traduit plus tard (rattrapage)
+    if ((await translationMode()) !== 'immediate') return;
     for (const lang of TARGET_LANGUAGES) {
       try {
         await translateRecord(model, record.id, record, lang, changedFields);
@@ -348,7 +371,62 @@ async function translateHtmlDocument(html, targetLang) {
   });
 }
 
+/**
+ * Modeles dont le contenu est redige en admin et doit exister en en/nl.
+ * `Book` en est volontairement absent : les livres ztfbooks arrivent deja
+ * dans leur langue de publication, on ne traduit pas leur titre.
+ */
+const BACKFILL = {
+  Event: () => prisma.event.findMany(),
+  Ministry: () => prisma.ministry.findMany(),
+  Assembly: () => prisma.assembly.findMany(),
+  Testimonial: () => prisma.testimonial.findMany(),
+  HeroSlide: () => prisma.heroSlide.findMany(),
+  Category: () => prisma.category.findMany(),
+  Tract: () => prisma.tract.findMany(),
+  Countdown: () => prisma.countdown.findMany()
+};
+
+/**
+ * Traduit tout ce qui manque, en une passe (page Traductions et planificateur).
+ * Idempotent : ne touche qu'aux champs sans traduction pour la langue visee ;
+ * une traduction relue (qui a donc une ligne) n'est jamais reecrite.
+ * dryRun : estime le cout en caracteres sans appeler DeepL.
+ */
+async function backfillMissing({ dryRun = false } = {}) {
+  const summary = {};
+  let characters = 0;
+  let records = 0;
+  for (const [model, load] of Object.entries(BACKFILL)) {
+    const fields = TRANSLATABLE[model] || [];
+    const list = await load();
+    summary[model] = { records: list.length, translated: 0, filled: 0 };
+    for (const record of list) {
+      const existing = await prisma.contentTranslation.findMany({
+        where: { model, recordId: record.id },
+        select: { language: true, field: true }
+      });
+      const have = new Set(existing.map((e) => `${e.language}.${e.field}`));
+      for (const lang of TARGET_LANGUAGES) {
+        const missing = fields.filter((f) => record[f] && String(record[f]).trim() && !have.has(`${lang}.${f}`));
+        if (missing.length === 0) continue;
+        characters += missing.reduce((n, f) => n + String(record[f]).length, 0);
+        if (!dryRun) {
+          await translateRecord(model, record.id, record, lang, missing);
+          summary[model].translated += 1;
+        }
+        summary[model].filled += missing.length;
+        records += 1;
+      }
+    }
+  }
+  return { dryRun, characters, records, summary };
+}
+
 module.exports = {
+  backfillMissing,
+  translationMode,
+  resetTranslationModeCache,
   translateHtmlDocument,
   autoTranslate,
   changedTranslatableFields,

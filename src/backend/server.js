@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { setupCronJobs } = require('./services/newsletter-cron.service');
+const { setupScheduler } = require('./services/scheduler.service');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -53,11 +53,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   
-  // Initialize newsletter cron jobs
-  setupCronJobs();
-  console.log('📧 Newsletter cron jobs initialized');
-
-  // Reseaux sociaux : recuperation automatique toutes les 6 heures
-  require('./services/social-media.service').setupSocialCron();
-  console.log('🔄 Social media sync cron initialized');
+  // Taches automatiques (reseaux, traductions, newsletter) selon les reglages de l'admin
+  setupScheduler();
+  console.log('⏱️  Planificateur des taches automatiques demarre (passage toutes les 5 min)');
 });

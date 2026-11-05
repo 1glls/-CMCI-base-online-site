@@ -13,14 +13,19 @@ const POST_STATUSES = ['pending', 'approved', 'rejected', 'hidden'];
 
 /* ---------------------------------- public ---------------------------------- */
 
-// Publications approuvees, affichees dans « A la une » de l'accueil
+// Publications approuvees, affichees dans « A la une » de l'accueil.
+// Jusqu'a PER_PLATFORM par reseau (un reseau tres actif ne masque pas les
+// autres), du plus recent au plus ancien ; le site les range par reseau.
+const PER_PLATFORM = 8;
 router.get('/', async (req, res) => {
   try {
-    const posts = await prisma.socialMediaPost.findMany({
-      where: { status: 'approved' },
-      orderBy: { publishedAt: 'desc' },
-      take: 12,
-    });
+    const lists = await Promise.all(social.PLATFORMS.map((platform) =>
+      prisma.socialMediaPost.findMany({
+        where: { status: 'approved', platform },
+        orderBy: { publishedAt: 'desc' },
+        take: PER_PLATFORM,
+      })));
+    const posts = lists.flat().sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0));
     res.json(posts.map((p) => ({
       id: p.id,
       platform: p.platform,

@@ -5,9 +5,9 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react"
 import { getImageUrl } from "@/lib/api"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useTiming } from "@/components/site/timing-provider"
 import type { GalleryImage } from "@/components/home/gallery-teaser"
 
-const AUTO_MS = 5000
 
 /**
  * Vue « Une par une » de la galerie : chaque photo en grand et entiere
@@ -16,6 +16,8 @@ const AUTO_MS = 5000
  * automatique a la demande.
  */
 export function GalleryOneByOne({ images }: { images: GalleryImage[] }) {
+  // Duree reglable : Parametres → Rythmes et automatismes
+  const AUTO_MS = useTiming("timing_gallery")
   const { t } = useLanguage()
   const reduce = useReducedMotion()
   const [index, setIndex] = useState(0)
@@ -43,7 +45,7 @@ export function GalleryOneByOne({ images }: { images: GalleryImage[] }) {
     if (!playing) return
     const id = setTimeout(() => go(1), AUTO_MS)
     return () => clearTimeout(id)
-  }, [playing, index, go])
+  }, [playing, index, go, AUTO_MS])
 
   if (n === 0) return <p className="py-20 text-center font-display text-2xl text-ivoire/60">{t("home2.pages.gallery.empty")}</p>
   const img = images[index]

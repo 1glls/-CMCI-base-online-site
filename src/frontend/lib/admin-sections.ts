@@ -115,8 +115,8 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: "social", title: "Réseaux sociaux", href: "/admin/social-media", icon: Share2, group: "communication",
     description: "Comptes reliés et publications à valider",
-    where: "Les publications que vous validez apparaissent dans « À la une » de la page d'accueil, rangée « Sur nos réseaux » (les vidéos YouTube se regardent directement sur le site). Les publications en attente, refusées ou masquées ne sont jamais montrées.",
-    publicHref: "/#a-la-une",
+    where: "Les publications que vous validez rejoignent les annonces du haut de l'accueil (« À la une », ou le diaporama plein écran selon le mode choisi dans Paramètres), avec la mention « Sur nos réseaux ». La plus récente passe en premier. Les vidéos YouTube se regardent directement sur le site. Les publications en attente, refusées ou masquées ne sont jamais montrées.",
+    publicHref: "/",
   },
   {
     key: "settings", title: "Paramètres", href: "/admin/settings", icon: Settings, group: "system",
