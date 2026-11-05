@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { AlertTriangle, CalendarClock, CalendarX, ChevronRight, Eye, EyeOff, Info, Link2Off, RefreshCw, Share2 } from "lucide-react"
+import { AlertTriangle, CalendarClock, CalendarX, ChevronRight, CircleAlert, Eye, EyeOff, Info, Link2Off, RefreshCw, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { adminFetch, adminList, getAdmin } from "@/lib/admin-api"
 import { ADMIN_GROUPS, ADMIN_SECTIONS, type AdminGroup } from "@/lib/admin-sections"
@@ -99,6 +99,14 @@ export default function AdminDashboard() {
 
     // Bloc « À traiter »
     const t: Todo[] = []
+    // Comptes de réseaux sociaux configurés mais en erreur (jeton expiré…)
+    try {
+      const accounts = await adminFetch<{ name: string; configured: boolean; enabled: boolean; lastError: string | null }[]>("/api/social-media/accounts")
+      const broken = accounts.filter((a) => a.configured && a.enabled && a.lastError)
+      if (broken.length) {
+        t.push({ key: "social-err", level: "warning", icon: CircleAlert, text: `Réseaux sociaux : ${broken.map((a) => a.name).join(", ")} ${broken.length > 1 ? "ne se synchronisent plus" : "ne se synchronise plus"} (${broken[0].lastError})`, href: "/admin/social-media#comptes", action: "Réparer" })
+      }
+    } catch { /* comptes indisponibles : pas d'alerte */ }
     const pending = result.social?.total ?? 0
     if (pending > 0) {
       t.push({ key: "social", level: "warning", icon: Share2, text: `${pending} publication${pending > 1 ? "s" : ""} des réseaux sociaux en attente de tri.`, href: "/admin/social-media", action: "Trier" })

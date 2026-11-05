@@ -6,10 +6,41 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-// Register Admin (à utiliser une seule fois pour créer le premier admin)
-router.post('/register', async (req, res) => {
+/**
+ * Creation d'un compte admin.
+ *   - Aucun admin en base (tout premier lancement) : ouvert, pour creer le premier compte.
+ *   - Sinon : reserve a un admin deja connecte (jeton valide de role « admin »).
+ * Sans cette garde, n'importe qui pouvait se creer un compte admin sur le site en ligne.
+ * Sur le serveur, un compte peut aussi etre cree sans passer par l'API :
+ * `node scripts/creer-admin.js` (voir CREER-ADMIN.txt).
+ */
+async function onlyFirstAdminOrAdmin(req, res, next) {
   try {
-    const { email, password, name } = req.body;
+    const count = await prisma.admin.count();
+    if (count === 0) return next();
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(403).json({ error: 'Création de compte réservée à un administrateur connecté.' });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ error: 'Création de compte réservée à un administrateur connecté.' });
+    }
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+router.post('/register', onlyFirstAdminOrAdmin, async (req, res) => {
+  try {
+    const { email, password, name } = req.body || {};
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Email, mot de passe et nom sont obligatoires.' });
+    }
+    if (String(password).length < 8) {
+      return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 8 caractères.' });
+    }
 
     // Vérifier si l'admin existe déjà
     const existingAdmin = await prisma.admin.findUnique({ where: { email } });

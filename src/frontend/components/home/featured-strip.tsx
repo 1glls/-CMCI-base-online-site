@@ -8,6 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import { Reveal, WordsReveal } from "@/components/site/motion-kit"
 import { Rich } from "@/components/site/rich-text"
 import type { Slide } from "./hero"
+import { SocialRow, type SocialPost } from "./social-row"
 
 const FEATURED = 3
 /** Duree d'affichage d'une annonce en grand avant de passer a la suivante. */
@@ -37,8 +38,10 @@ function SlideLink({ s, big = false }: { s: Slide; big?: boolean }) {
  * Defilement automatique : toutes les 7 s l'annonce suivante passe en grand
  * (pause au survol, au clavier et hors de l'ecran).
  * Les annonces sont les diapositives de l'admin « Section Hero ».
+ * En dessous, « Sur nos reseaux » : les publications validees dans l'admin
+ * Reseaux sociaux (seule cette rangee s'affiche en mode Diaporama).
  */
-export function FeaturedStrip({ slides }: { slides: Slide[] }) {
+export function FeaturedStrip({ slides, posts = [] }: { slides: Slide[]; posts?: SocialPost[] }) {
   const { t } = useLanguage()
   const reduce = useReducedMotion()
   const [order, setOrder] = useState<string[]>(() => slides.map((s) => s.id))
@@ -64,7 +67,7 @@ export function FeaturedStrip({ slides }: { slides: Slide[] }) {
 
   const byId = new Map(slides.map((s) => [s.id, s]))
   const ordered = order.map((id) => byId.get(id)).filter(Boolean) as Slide[]
-  if (ordered.length === 0) return null
+  if (ordered.length === 0 && posts.length === 0) return null
   const [main, ...secondary] = ordered.slice(0, FEATURED)
   const rest = ordered.slice(FEATURED)
 
@@ -91,6 +94,7 @@ export function FeaturedStrip({ slides }: { slides: Slide[] }) {
           <WordsReveal text={t("home2.featured.title")} />
         </h2>
 
+        {main && (
         <LayoutGroup>
           <div className={`mt-12 grid gap-10 ${secondary.length ? "lg:grid-cols-[1.55fr_1fr]" : ""}`}>
             {/* Annonce principale */}
@@ -160,6 +164,7 @@ export function FeaturedStrip({ slides }: { slides: Slide[] }) {
             )}
           </div>
         </LayoutGroup>
+        )}
 
         {/* Les autres annonces : discretes, mais toujours a portee */}
         {rest.length > 0 && (
@@ -182,6 +187,8 @@ export function FeaturedStrip({ slides }: { slides: Slide[] }) {
             </div>
           </div>
         )}
+
+        <SocialRow posts={posts} separated={!!main} />
       </div>
     </section>
   )

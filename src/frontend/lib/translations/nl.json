@@ -266,7 +266,12 @@
       "label": "In de kijker",
       "title": "Wat er bij ons gebeurt",
       "more": "Ontdek ook",
-      "promote": "Uitlichten"
+      "promote": "Uitlichten",
+      "social": "Op onze kanalen",
+      "socialHint": "Onze nieuwste video's en berichten",
+      "watch": "Bekijken",
+      "openOn": "Bekijk op",
+      "close": "Sluiten"
     },
     "about": {
       "label": "Wie we zijn",

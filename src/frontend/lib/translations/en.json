@@ -266,7 +266,12 @@
       "label": "Highlights",
       "title": "What's happening",
       "more": "Also discover",
-      "promote": "Feature this"
+      "promote": "Feature this",
+      "social": "On our channels",
+      "socialHint": "Our latest videos and posts",
+      "watch": "Watch",
+      "openOn": "View on",
+      "close": "Close"
     },
     "about": {
       "label": "Who we are",

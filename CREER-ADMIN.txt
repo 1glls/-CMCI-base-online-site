@@ -1,64 +1,41 @@
 ╔══════════════════════════════════════════════════════════════╗
-║   ✅ PROBLÈME RÉSOLU - Comment créer un admin maintenant    ║
+║          🔐 CRÉER OU RÉINITIALISER UN COMPTE ADMIN           ║
 ╚══════════════════════════════════════════════════════════════╝
 
-📝 EXPLICATION DU PROBLÈME :
-Le script ne fonctionnait pas car le backend n'était pas démarré.
-Le backend a maintenant été configuré avec SQLite (pas besoin de PostgreSQL).
+🛡️  SÉCURITÉ (nov. 2026)
+La route /api/auth/register n'est plus ouverte à tous :
+  • base vide (tout premier lancement) → création libre du 1er admin ;
+  • sinon → réservée à un administrateur déjà connecté.
+Sans cette protection, n'importe qui pouvait se créer un compte
+admin sur le site en ligne.
 
 ═══════════════════════════════════════════════════════════════
 
-🚀 ÉTAPES POUR CRÉER UN ADMIN :
+✅ MÉTHODE RECOMMANDÉE (local ou VPS) : le script du serveur
 
-1️⃣  DÉMARRER LE BACKEND (dans un terminal)
-    
-    ./demarrer-backend.sh
-    
-    Vous devriez voir : 🚀 Server running on port 5000
+    cd src/backend
+    node scripts/creer-admin.js admin@cmci.be "Admin CMCI"
+
+  → le mot de passe est demandé au clavier (masqué, 8 caractères min.)
+  → si l'email existe déjà, SEUL son mot de passe est remplacé
+    (pratique en cas de mot de passe oublié)
+
+Le script écrit directement dans la base : il ne fonctionne que sur
+la machine qui héberge la base de données (votre PC ou le VPS).
 
 ─────────────────────────────────────────────────────────────
 
-2️⃣  CRÉER L'ADMIN (dans un 2e terminal)
+🆕 PREMIER LANCEMENT (base vide)
 
-    cd otherthings/scripts
-    ./create-admin.sh
-    
-    Suivez les instructions :
-    - Email: admin@cmci.be
-    - Mot de passe: (votre choix)
-    - Nom: Admin CMCI
+    1. Démarrer le backend :  ./demarrer-backend.sh
+    2. Dans un 2e terminal :  cd otherthings/scripts && ./create-admin.sh
+       (ou le script ci-dessus, qui marche aussi)
 
 ─────────────────────────────────────────────────────────────
 
-3️⃣  SE CONNECTER
+🔑 SE CONNECTER
 
-    Frontend : http://localhost:3000/admin
-    
-    Utilisez l'email et mot de passe créés à l'étape 2
-
-═══════════════════════════════════════════════════════════════
-
-🔧 COMMANDE ALTERNATIVE (si le script ne fonctionne pas) :
-
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@cmci.be","password":"VotreMotDePasse","name":"Admin CMCI"}'
-
-═══════════════════════════════════════════════════════════════
-
-✅ CE QUI A ÉTÉ FAIT AUTOMATIQUEMENT :
-
-✓ Base de données SQLite créée (dev.db)
-✓ Dépendances backend installées
-✓ Client Prisma généré
-✓ Migrations appliquées
-✓ Dossiers d'upload créés
-
-═══════════════════════════════════════════════════════════════
-
-📊 VÉRIFIER QUE TOUT FONCTIONNE :
-
-Test API : curl http://localhost:5000/api/health
-Réponse attendue : {"status":"OK","message":"CMCI Backend is running"}
+    Local      : http://localhost:3005/admin   (port de dev du projet)
+    Production : https://www.cmcibelgique.org/admin
 
 ═══════════════════════════════════════════════════════════════

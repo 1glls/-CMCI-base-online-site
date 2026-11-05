@@ -56,4 +56,8 @@ app.listen(PORT, () => {
   // Initialize newsletter cron jobs
   setupCronJobs();
   console.log('📧 Newsletter cron jobs initialized');
+
+  // Reseaux sociaux : recuperation automatique toutes les 6 heures
+  require('./services/social-media.service').setupSocialCron();
+  console.log('🔄 Social media sync cron initialized');
 });

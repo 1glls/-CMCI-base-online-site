@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site/footer"
 import { SectionReveal, SectionSeam } from "@/components/site/section-transition"
 import { Hero, type HeroMode, type Slide } from "@/components/home/hero"
 import { FeaturedStrip } from "@/components/home/featured-strip"
+import type { SocialPost } from "@/components/home/social-row"
 import { AboutTeaser } from "@/components/home/about-teaser"
 import { Values } from "@/components/home/values"
 import { Ministries, type Ministry } from "@/components/home/ministries"
@@ -42,7 +43,7 @@ const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : [])
  * « diaporama ») est le reglage Parametres → Haut de la page d'accueil.
  */
 export default async function HomePage() {
-  const [slides, books, countdowns, events, ministries, gallery, assemblies, settings] = await Promise.all([
+  const [slides, books, countdowns, events, ministries, gallery, assemblies, socialPosts, settings] = await Promise.all([
     fetchApi<Slide[]>("/api/hero?lang=fr", [], 60),
     fetchApi<HeroBook[]>("/api/books/hero", [], 60),
     fetchApi<Countdown[]>("/api/countdowns?lang=fr", [], 60),
@@ -50,11 +51,13 @@ export default async function HomePage() {
     fetchApi<Ministry[]>("/api/ministries?lang=fr", [], 60),
     fetchApi<GalleryImage[]>("/api/gallery", [], 60),
     fetchApi<Assembly[]>("/api/assemblies?lang=fr", [], 60),
+    fetchApi<SocialPost[]>("/api/social-media", [], 60),
     fetchSettings(),
   ])
   const mode: HeroMode = settings.hero_mode === "diaporama" ? "diaporama" : "livres"
   const heroSlides = arr<Slide>(slides)
   const assemblyList = arr<Assembly>(assemblies)
+  const posts = arr<SocialPost>(socialPosts)
 
   // Ordre valide : hero, a la une, mieux nous connaitre, identite, ministeres,
   // agenda, assemblees, galerie, puis contact + pied de page fusionnes.
@@ -64,7 +67,10 @@ export default async function HomePage() {
       <SiteHeader home={HOME_PATH} countdowns={arr<Countdown>(countdowns)} />
       <Hero mode={mode} initialSlides={heroSlides} books={arr<HeroBook>(books)} />
       {/* Entre les sections : couture doree animee, et chaque section monte en apparaissant */}
-      {mode === "livres" && <SectionReveal><FeaturedStrip slides={heroSlides} /></SectionReveal>}
+      {/* « A la une » : annonces (mode Message + livres) et publications des reseaux sociaux */}
+      {(mode === "livres" || posts.length > 0) && (
+        <SectionReveal><FeaturedStrip slides={mode === "livres" ? heroSlides : []} posts={posts} /></SectionReveal>
+      )}
       <SectionSeam />
       <SectionReveal><AboutTeaser /></SectionReveal>
       {/* Notre identite a ses propres arches d'entree et de sortie */}

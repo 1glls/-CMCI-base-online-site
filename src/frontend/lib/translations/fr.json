@@ -266,7 +266,12 @@
       "label": "À la une",
       "title": "Ce qui se passe chez nous",
       "more": "Découvrir aussi",
-      "promote": "Mettre en avant"
+      "promote": "Mettre en avant",
+      "social": "Sur nos réseaux",
+      "socialHint": "Nos dernières vidéos et publications",
+      "watch": "Regarder",
+      "openOn": "Voir sur",
+      "close": "Fermer"
     },
     "about": {
       "label": "Qui sommes-nous",

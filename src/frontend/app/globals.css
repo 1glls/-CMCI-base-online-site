@@ -470,6 +470,7 @@ html {
    Le site public n'a jamais cette classe : il n'est pas touche. */
 .admin-nuit {
   --vert: #5cd394;
+  --succes: #22c55e; /* notifications de succes : vert vif */
   --rouge-texte: #ff7a82;
   --background: var(--nuit);
   --foreground: var(--ivoire);
@@ -545,6 +546,7 @@ html {
 :root[data-theme="light"].admin-nuit,
 :root[data-theme="light"] .admin-nuit {
   --vert: #1d7a4a;
+  --succes: #15803d;
   --rouge-texte: #b3121f;
   --card: #fffdf8;
   --popover: #fffdf8;
@@ -562,8 +564,8 @@ html {
 }
 .admin-nuit [data-sonner-toast] [data-title] { font-weight: 600; font-size: .9rem; }
 .admin-nuit [data-sonner-toast] [data-description] { color: var(--muted-foreground) !important; font-size: .82rem; line-height: 1.4; }
-.admin-nuit [data-sonner-toast][data-type="success"] { border-left-color: var(--or) !important; }
-.admin-nuit [data-sonner-toast][data-type="success"] [data-icon] { color: var(--or); }
+.admin-nuit [data-sonner-toast][data-type="success"] { border-left-color: var(--succes) !important; }
+.admin-nuit [data-sonner-toast][data-type="success"] [data-icon] { color: var(--succes); }
 .admin-nuit [data-sonner-toast][data-type="error"] { border-left-color: var(--rouge) !important; }
 .admin-nuit [data-sonner-toast][data-type="error"] [data-icon] { color: var(--rouge-texte); }
 .admin-nuit [data-sonner-toast][data-type="warning"] { border-left-color: #f59e0b !important; }
