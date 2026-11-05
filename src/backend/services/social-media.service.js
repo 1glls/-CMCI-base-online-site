@@ -124,11 +124,33 @@ function explain(platform, error) {
   }
 
   if (platform === 'youtube') {
-    const reason = data?.error?.errors?.[0]?.reason || '';
-    if (/keyInvalid|badRequest/.test(reason) || res.status === 400) return new SocialError('Clé API YouTube invalide : vérifiez-la dans Google Cloud Console.', 'auth');
-    if (/quotaExceeded|dailyLimitExceeded/.test(reason)) return new SocialError('Quota YouTube du jour atteint : la synchronisation reprendra demain.', 'quota');
-    if (/accessNotConfigured|forbidden/.test(reason) || res.status === 403) return new SocialError('L\'API « YouTube Data API v3 » n\'est pas activée pour cette clé (Google Cloud Console → Bibliothèque).', 'auth');
-    return new SocialError(`YouTube a refusé la demande : ${data?.error?.message || res.status}`);
+    // Google donne deux niveaux de raison : errors[0].reason (ancien format) et
+    // details[].reason (ErrorInfo, plus precis : API_KEY_HTTP_REFERRER_BLOCKED…).
+    const err = data?.error || {};
+    const reason = err.errors?.[0]?.reason || '';
+    const info = (err.details || []).find((d) => d.reason)?.reason || '';
+    const google = err.message ? ` (Google : « ${err.message} »)` : '';
+    const all = `${reason} ${info} ${err.message || ''}`;
+
+    if (/API_KEY_HTTP_REFERRER_BLOCKED|referer/i.test(all)) {
+      return new SocialError(`Clé restreinte aux sites web (« Référents HTTP ») : le serveur du site ne peut pas l'utiliser. Google Cloud → Identifiants → votre clé → « Restrictions relatives aux applications » : choisissez « Aucune » ou « Adresses IP » (avec l'adresse IP du serveur), puis enregistrez.${google}`, 'config');
+    }
+    if (/API_KEY_IP_ADDRESS_BLOCKED|ip address/i.test(all)) {
+      return new SocialError(`Clé restreinte à certaines adresses IP, et celle du serveur n'en fait pas partie. Ajoutez l'IP du serveur dans les restrictions de la clé (Google Cloud → Identifiants).${google}`, 'config');
+    }
+    if (/API_KEY_SERVICE_BLOCKED|are blocked/i.test(all)) {
+      return new SocialError(`Les « Restrictions d'API » de cette clé n'autorisent pas YouTube Data API v3. Google Cloud → Identifiants → votre clé → Restrictions relatives aux API : ajoutez « YouTube Data API v3 » (ou choisissez « Ne pas restreindre la clé »).${google}`, 'config');
+    }
+    if (/API_KEY_INVALID|keyInvalid/i.test(all)) {
+      return new SocialError(`Clé API YouTube invalide : vérifiez qu'elle est copiée en entier (elle commence par AIza…).${google}`, 'auth');
+    }
+    if (/quotaExceeded|dailyLimitExceeded|RATE_LIMIT/i.test(all)) {
+      return new SocialError('Quota YouTube du jour atteint : la synchronisation reprendra demain.', 'quota');
+    }
+    if (/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/i.test(all)) {
+      return new SocialError(`« YouTube Data API v3 » n'est pas activée dans le projet Google Cloud de CETTE clé (vérifiez que la clé et l'activation sont dans le même projet). Si vous venez de l'activer, attendez 5 minutes puis réessayez.${google}`, 'auth');
+    }
+    return new SocialError(`YouTube a refusé la demande (code ${res.status}).${google}`);
   }
 
   if (platform === 'facebook' || platform === 'instagram') {
@@ -437,6 +459,7 @@ module.exports = {
   FIELDS,
   NAMES,
   SocialError,
+  explain, // exporte pour les tests
   credentialsFor,
   parseCredentials,
   getAccount,
