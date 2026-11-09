@@ -61,6 +61,8 @@ router.get('/jobs', ...admin, async (req, res) => {
 router.post('/jobs/:key/run', ...admin, async (req, res) => {
   try {
     if (!scheduler.JOBS[req.params.key]) return res.status(404).json({ error: 'Tâche inconnue' });
+    // Controle des liens : trop long pour une requete HTTP, lance en arriere-plan.
+    if (req.params.key === 'links') return res.status(202).json(scheduler.startJob('links'));
     res.json(await scheduler.runJob(req.params.key));
   } catch (error) {
     res.status(500).json({ error: error.message });

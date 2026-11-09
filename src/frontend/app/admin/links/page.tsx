@@ -6,7 +6,7 @@
  * résultat du dernier contrôle. Le contrôle tourne tout seul (tâche « links »
  * du planificateur, backend/services/scheduler.service.js) ou à la demande.
  */
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import {
   CheckCircle2, CircleAlert, ExternalLink, EyeOff, FileImage, Globe, Link2, Loader2, Play, RefreshCw, Save, Search, TriangleAlert, Undo2,
@@ -17,6 +17,7 @@ import { AdminPageHeader, FieldHelp } from "@/components/admin/page-header"
 import { LinksCheckSettings } from "@/components/admin/timing-settings"
 import { adminFetch } from "@/lib/admin-api"
 import { notify } from "@/lib/admin-notify"
+import { toast } from "sonner"
 
 type State = "broken" | "warning" | "ok" | "pending"
 interface Row {
@@ -89,16 +90,56 @@ export default function LinksPage() {
       && (!q || r.url.toLowerCase().includes(q) || (r.label ?? "").toLowerCase().includes(q)))
   }, [rows, tab, kind, query])
 
-  const runAll = async () => {
+  /**
+   * Le contrôle complet tourne en arrière-plan sur le serveur (il dure plus
+   * longtemps que ce qu'un proxy accepte pour une requête). On le lance, puis
+   * on interroge l'état toutes les 3 s jusqu'à ce qu'il soit terminé.
+   */
+  const polling = useRef(false)
+  const waitForEnd = useCallback(async () => {
+    if (polling.current) return
+    polling.current = true
     setRunning(true)
+    const id = toast.loading("Contrôle de tous les liens en cours… (une à deux minutes)", { description: "Vous pouvez quitter la page : il continue sur le serveur." })
+    let failures = 0
     try {
-      await notify.promise(
-        adminFetch<{ ok: boolean; message: string }>("/api/links/run", { method: "POST" }),
-        { chargement: "Contrôle de tous les liens en cours… (quelques minutes)", succes: "Contrôle terminé", detailSucces: (r) => r.message, erreur: "Le contrôle a échoué" },
-      )
+      for (;;) {
+        await new Promise((r) => setTimeout(r, 3000))
+        try {
+          const s = await adminFetch<Summary>("/api/links/summary")
+          failures = 0
+          setSummary(s)
+          if (!s.job?.running) {
+            const msg = s.job?.lastResult?.message
+            if (s.job?.lastResult?.ok === false) toast.error("Le contrôle a échoué", { id, description: msg, duration: Infinity })
+            else toast.success("Contrôle terminé", { id, description: msg, duration: 6000 })
+            break
+          }
+        } catch {
+          // Coupure passagère : on réessaie quelques fois avant d'abandonner.
+          if (++failures >= 5) {
+            toast.error("Suivi du contrôle interrompu", { id, description: "Le serveur ne répond plus. Le contrôle continue peut-être : rechargez la page dans une minute.", duration: Infinity })
+            break
+          }
+        }
+      }
       await load()
-    } catch { /* message déjà affiché */ } finally {
+    } finally {
+      polling.current = false
       setRunning(false)
+    }
+  }, [load])
+
+  // Contrôle déjà en cours à l'ouverture de la page (lancé par le planificateur ou un autre onglet)
+  useEffect(() => { if (summary?.job?.running) waitForEnd() }, [summary?.job?.running, waitForEnd])
+
+  const runAll = async () => {
+    try {
+      const r = await adminFetch<{ ok: boolean; started: boolean; message: string }>("/api/links/run", { method: "POST" })
+      if (!r.started) notify.info("Un contrôle est déjà en cours", { detail: "Suivi de son avancement…" })
+      waitForEnd()
+    } catch (e) {
+      notify.error("Impossible de lancer le contrôle", { erreur: e, reessayer: runAll })
     }
   }
 
@@ -229,8 +270,8 @@ export default function LinksPage() {
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-muted-foreground">{TABS.find((t) => t.key === tab)?.hint}</p>
           {(tab === "broken" || tab === "warning") && filtered.length > 0 && (
-            <Button size="sm" variant="outline" onClick={() => recheck(filtered.slice(0, 500).map((r) => r.id), "Nouveau test de la liste")}>
-              <RefreshCw className="h-4 w-4" /> Retester ces {Math.min(filtered.length, 500)} liens
+            <Button size="sm" variant="outline" onClick={() => recheck(filtered.slice(0, 200).map((r) => r.id), "Nouveau test de la liste")}>
+              <RefreshCw className="h-4 w-4" /> Retester {filtered.length > 200 ? "les 200 premiers" : `ces ${filtered.length}`} liens
             </Button>
           )}
         </div>

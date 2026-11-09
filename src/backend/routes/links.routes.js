@@ -56,10 +56,11 @@ router.get('/config', async (req, res) => {
   }
 });
 
-// POST /api/links/run : controle complet tout de suite
+// POST /api/links/run : controle complet, lance en arriere-plan (reponse immediate).
+// La page admin suit l'avancement avec GET /summary (job.running).
 router.post('/run', async (req, res) => {
   try {
-    res.json(await scheduler.runJob('links'));
+    res.status(202).json(scheduler.startJob('links'));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -68,7 +69,8 @@ router.post('/run', async (req, res) => {
 // POST /api/links/recheck { ids } : retester une selection (sans email)
 router.post('/recheck', async (req, res) => {
   try {
-    const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(String).slice(0, 500) : [];
+    // 200 max : la requete doit finir bien avant le delai du proxy (60 s).
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(String).slice(0, 200) : [];
     if (ids.length === 0) return res.status(400).json({ error: 'Aucun lien sélectionné.' });
     const r = await checker.runLinkCheck({ ids });
     const rows = await prisma.linkCheck.findMany({ where: { id: { in: ids } } });

@@ -114,6 +114,18 @@ export function TimingSettings() {
       })
       if (ok !== true) return
     }
+    if (job.key === "links") {
+      try {
+        const r = await adminFetch<{ started: boolean; message: string }>("/api/settings/jobs/links/run", { method: "POST" })
+        notify.info(r.started ? "Contrôle des liens lancé" : "Un contrôle des liens est déjà en cours", {
+          detail: "Il tourne sur le serveur (une à deux minutes). Résultat sur la page Contrôle des liens.",
+        })
+        await load()
+      } catch (e) {
+        notify.error("Impossible de lancer le contrôle des liens", { erreur: e })
+      }
+      return
+    }
     setBusyJob(job.key)
     try {
       const r = await notify.promise(

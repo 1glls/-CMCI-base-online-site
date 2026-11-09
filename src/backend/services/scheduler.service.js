@@ -240,6 +240,18 @@ async function runJob(key, { now = new Date(), deps = {}, settings } = {}) {
   return result;
 }
 
+/**
+ * Lance une tache sans attendre sa fin (taches longues comme `links`) :
+ * un proxy (nginx) couperait la requete HTTP avant la fin du travail.
+ * L'admin suit l'avancement via jobsStatus() (champ `running`).
+ */
+function startJob(key) {
+  if (!JOBS[key]) throw new Error(`Tâche inconnue : ${key}`);
+  if (running.has(key)) return { ok: false, started: false, message: 'Déjà en cours.' };
+  runJob(key).catch((e) => console.error(`Tache ${key} :`, e.message));
+  return { ok: true, started: true, message: 'Lancé en arrière-plan.' };
+}
+
 /** Un passage : lance chaque tache active dont c'est l'heure. */
 async function tick({ now = new Date(), deps = {} } = {}) {
   const s = await readSettings();
@@ -279,4 +291,4 @@ function setupScheduler() {
   }, { timezone: TZ });
 }
 
-module.exports = { setupScheduler, tick, runJob, jobsStatus, readSettings, brussels, JOBS };
+module.exports = { setupScheduler, tick, runJob, startJob, jobsStatus, readSettings, brussels, JOBS };
