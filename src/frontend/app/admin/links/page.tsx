@@ -30,8 +30,9 @@ interface Job { label: string; enabled: boolean; schedule: string; lastRun: stri
 interface Summary { total: number; ok: number; warning: number; broken: number; pending: number; ignored: number; job: Job | null }
 interface Config { mode: string; intervalHours: string; alertEmail: string }
 
-type Tab = "broken" | "warning" | "ok" | "ignored"
+type Tab = "all" | "broken" | "warning" | "ok" | "ignored"
 const TABS: { key: Tab; label: string; icon: typeof Link2; hint: string }[] = [
+  { key: "all", label: "Tous", icon: Link2, hint: "Tous les liens catalogués, les cassés en premier." },
   { key: "broken", label: "Cassés", icon: CircleAlert, hint: "Introuvables (404), domaine disparu, erreur du serveur : à corriger." },
   { key: "warning", label: "À vérifier", icon: TriangleAlert, hint: "Le site distant a refusé le robot ou n'a pas répondu à temps. Ouvrez le lien dans votre navigateur : s'il marche, cliquez sur « Ignorer »." },
   { key: "ok", label: "OK", icon: CheckCircle2, hint: "Liens qui répondaient correctement au dernier contrôle." },
@@ -54,6 +55,8 @@ export default function LinksPage() {
   const [config, setConfig] = useState<Config | null>(null)
   const [email, setEmail] = useState("")
   const [tab, setTab] = useState<Tab>("broken")
+  // Onglet d'ouverture : « Cassés » s'il y en a, sinon « Tous » (sinon la liste paraît vide).
+  const tabChosen = useRef(false)
   const [kind, setKind] = useState<"" | Row["kind"]>("")
   const [query, setQuery] = useState("")
   const [shown, setShown] = useState(PAGE)
@@ -79,14 +82,20 @@ export default function LinksPage() {
   useEffect(() => { load() }, [load])
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { broken: 0, warning: 0, ok: 0, ignored: 0, pending: 0 }
+    const c: Record<string, number> = { all: rows?.length ?? 0, broken: 0, warning: 0, ok: 0, ignored: 0, pending: 0 }
     for (const r of rows ?? []) c[tabOf(r)]++
     return c
   }, [rows])
 
+  useEffect(() => {
+    if (!rows || tabChosen.current) return
+    tabChosen.current = true
+    setTab(counts.broken > 0 ? "broken" : "all")
+  }, [rows, counts.broken])
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return (rows ?? []).filter((r) => tabOf(r) === tab && (!kind || r.kind === kind)
+    return (rows ?? []).filter((r) => (tab === "all" || tabOf(r) === tab) && (!kind || r.kind === kind)
       && (!q || r.url.toLowerCase().includes(q) || (r.label ?? "").toLowerCase().includes(q)))
   }, [rows, tab, kind, query])
 
@@ -201,7 +210,7 @@ export default function LinksPage() {
       />
 
       {/* Résumé */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {TABS.map((t) => (
           <button
             key={t.key} type="button" onClick={() => { setTab(t.key); setShown(PAGE) }}
@@ -282,7 +291,8 @@ export default function LinksPage() {
           <div className="mt-4 rounded-lg border border-border bg-card p-8 text-center text-sm text-muted-foreground">
             {rows.length === 0
               ? <>Aucun contrôle n'a encore été fait. Cliquez sur « Contrôler maintenant ».</>
-              : tab === "broken" ? <><CheckCircle2 className="mx-auto mb-2 h-6 w-6 text-[var(--succes)]" />Aucun lien cassé{kind || query ? " pour ce filtre" : ""}.</> : "Rien ici."}
+              : tab === "broken" ? <><CheckCircle2 className="mx-auto mb-2 h-6 w-6 text-[var(--succes)]" />Aucun lien cassé{kind || query ? " pour ce filtre" : ""}.
+                  <div className="mt-3"><Button size="sm" variant="outline" onClick={() => { setTab("all"); setShown(PAGE) }}>Voir tous les liens ({counts.all})</Button></div></> : "Rien ici."}
           </div>
         ) : (
           <ul className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
