@@ -79,13 +79,13 @@ export function socialToSlide(p: SocialPost): Slide {
 
 /**
  * Ordre validé : la publication la plus récente, puis les annonces (ordre de
- * l'admin), puis les autres publications, au plus `count` publications.
+ * l'admin), puis les autres publications. Toutes les publications publiées
+ * dans l'admin sont affichées : pour en retirer une, on la masque.
  */
-export function mergeSocialSlides(slides: Slide[], posts: SocialPost[], count: number): Slide[] {
-  if (!count || posts.length === 0) return slides
+export function mergeSocialSlides(slides: Slide[], posts: SocialPost[]): Slide[] {
+  if (posts.length === 0) return slides
   const recent = [...posts]
     .sort((a, b) => (b.publishedAt ? Date.parse(b.publishedAt) : 0) - (a.publishedAt ? Date.parse(a.publishedAt) : 0))
-    .slice(0, count)
     .map(socialToSlide)
   const [first, ...others] = recent
   return [first, ...slides, ...others]

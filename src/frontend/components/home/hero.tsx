@@ -272,17 +272,16 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
   )
 }
 
-export function Hero({ mode, initialSlides, books, posts = [], socialCount = 3 }: {
+export function Hero({ mode, initialSlides, books, posts = [] }: {
   mode: HeroMode
   initialSlides: Slide[]
   books: HeroBook[]
   /** Publications des reseaux validees : en mode Diaporama, elles rejoignent les diapositives. */
   posts?: SocialPost[]
-  socialCount?: number
 }) {
   const slides = useLocalizedData<Slide[]>("/api/hero", initialSlides)
   const list = Array.isArray(slides) ? slides : []
   return mode === "diaporama"
-    ? <HeroDiaporama slides={mergeSocialSlides(list, posts, socialCount)} books={books} />
+    ? <HeroDiaporama slides={mergeSocialSlides(list, posts)} books={books} />
     : <HeroLivres slides={list} books={books} />
 }

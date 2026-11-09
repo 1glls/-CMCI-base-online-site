@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { AdminPageHeader, FieldHelp } from "@/components/admin/page-header"
 import { askConfirm } from "@/components/admin/confirm-dialog"
@@ -130,7 +129,6 @@ export default function SocialMediaPage() {
   const [syncing, setSyncing] = useState(false)
   const [openForm, setOpenForm] = useState<Platform | null>(null)
   // Réglages liés : nombre de publications dans le haut de l'accueil, rythme de synchro
-  const [heroCount, setHeroCount] = useState("3")
   const [syncHours, setSyncHours] = useState("6")
 
   const load = useCallback(async () => {
@@ -144,7 +142,6 @@ export default function SocialMediaPage() {
       setLoadError(null)
       const settings = await adminFetch<{ key: string; value: string }[]>("/api/settings")
       const map = Object.fromEntries(settings.map((x) => [x.key, x.value]))
-      setHeroCount(map.social_hero_count ?? "3")
       setSyncHours(map.social_sync_hours ?? "6")
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : "Chargement impossible")
@@ -241,20 +238,6 @@ export default function SocialMediaPage() {
   const networks = (Object.keys(NAMES) as Platform[]).filter((n) => posts.some((p) => p.platform === n))
   const configured = accounts?.filter((a) => a.configured).length ?? 0
 
-  const saveHeroCount = async (v: string) => {
-    const previous = heroCount
-    setHeroCount(v)
-    try {
-      await adminFetch("/api/settings", { method: "PUT", json: { values: { social_hero_count: v } } })
-      notify.success(
-        v === "0" ? "Publications retirées du haut de l'accueil" : `${v} publication${v === "1" ? "" : "s"} dans le haut de l'accueil`,
-        { detail: v === "0" ? "Les annonces restent affichées seules." : "La plus récente passe en premier, avant vos annonces. Visible sur le site d'ici une minute.", lien: { href: "/" } },
-      )
-    } catch (e) {
-      setHeroCount(previous)
-      notify.error("Modification impossible", { erreur: e })
-    }
-  }
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -274,17 +257,10 @@ export default function SocialMediaPage() {
           (<Link href="/admin/settings" className="text-or underline">modifier le rythme</Link>). Les nouvelles publications arrivent
           « en attente » : rien n'est montré sur le site sans votre accord (sauf si « Publier automatiquement » est activé pour un réseau).
         </p>
-        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm">
-          <span className="font-medium">Publications dans le haut de l'accueil :</span>
-          <Select value={heroCount} onValueChange={saveHeroCount}>
-            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="0">Aucune</SelectItem>
-              {["1", "2", "3", "4", "5", "6"].map((n) => <SelectItem key={n} value={n}>{n === "1" ? "La plus récente" : `Les ${n} plus récentes`}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <span className="text-xs text-muted-foreground">La plus récente passe en premier, avant vos annonces ; les autres suivent dans la rotation.</span>
-        </div>
+        <p className="rounded-lg border border-border bg-card px-4 py-3 text-sm">
+          <span className="font-medium">Dans le haut de l'accueil : toutes les publications « Publiées ».</span>{" "}
+          <span className="text-muted-foreground">La plus récente passe en premier, avant vos annonces ; les autres suivent dans la rotation. Pour en retirer une, cliquez sur « Masquer ».</span>
+        </p>
       </AdminPageHeader>
 
       {loadError && (

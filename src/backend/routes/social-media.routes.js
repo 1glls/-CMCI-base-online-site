@@ -13,10 +13,10 @@ const POST_STATUSES = ['pending', 'approved', 'rejected', 'hidden'];
 
 /* ---------------------------------- public ---------------------------------- */
 
-// Publications approuvees, affichees dans « A la une » de l'accueil.
-// Jusqu'a PER_PLATFORM par reseau (un reseau tres actif ne masque pas les
-// autres), du plus recent au plus ancien ; le site les range par reseau.
-const PER_PLATFORM = 8;
+// Publications approuvees, affichees dans « A la une » de l'accueil : toutes,
+// du plus recent au plus ancien. Pour en retirer une, l'admin la masque.
+// PER_PLATFORM n'est qu'un garde-fou contre une liste demesuree.
+const PER_PLATFORM = 50;
 router.get('/', async (req, res) => {
   try {
     const lists = await Promise.all(social.PLATFORMS.map((platform) =>

@@ -41,12 +41,12 @@ function SlideLink({ s, big = false }: { s: Slide; big?: boolean }) {
  * la plus recente en premier (components/home/social-badge.tsx).
  * Duree d'affichage reglable : Parametres → Rythmes et automatismes.
  */
-export function FeaturedStrip({ slides: baseSlides, posts = [], socialCount = 3 }: { slides: Slide[]; posts?: SocialPost[]; socialCount?: number }) {
+export function FeaturedStrip({ slides: baseSlides, posts = [] }: { slides: Slide[]; posts?: SocialPost[] }) {
   const { t } = useLanguage()
   const reduce = useReducedMotion()
   const AUTO_MS = useTiming("timing_featured")
   const player = useVideoPlayer()
-  const slides = useMemo(() => mergeSocialSlides(baseSlides, posts, socialCount), [baseSlides, posts, socialCount])
+  const slides = useMemo(() => mergeSocialSlides(baseSlides, posts), [baseSlides, posts])
   const [order, setOrder] = useState<string[]>(() => slides.map((s) => s.id))
   const sectionRef = useRef<HTMLElement>(null)
   const inView = useInView(sectionRef, { amount: 0.3 })

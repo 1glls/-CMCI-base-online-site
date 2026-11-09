@@ -58,8 +58,6 @@ export default async function HomePage() {
   const heroSlides = arr<Slide>(slides)
   const assemblyList = arr<Assembly>(assemblies)
   const posts = arr<SocialPost>(socialPosts)
-  // Nombre de publications des reseaux dans le haut de l'accueil (admin Reseaux sociaux)
-  const socialCount = Math.max(0, Math.min(6, parseInt(settings.social_hero_count ?? "3", 10) || 0))
 
   // Ordre valide : hero, a la une, mieux nous connaitre, identite, ministeres,
   // agenda, assemblees, galerie, puis contact + pied de page fusionnes.
@@ -67,11 +65,11 @@ export default async function HomePage() {
     <main className="grain-page bg-nuit">
       <ChurchJsonLd settings={settings} assemblies={assemblyList} />
       <SiteHeader home={HOME_PATH} countdowns={arr<Countdown>(countdowns)} />
-      <Hero mode={mode} initialSlides={heroSlides} books={arr<HeroBook>(books)} posts={posts} socialCount={socialCount} />
+      <Hero mode={mode} initialSlides={heroSlides} books={arr<HeroBook>(books)} posts={posts} />
       {/* Entre les sections : couture doree animee, et chaque section monte en apparaissant */}
       {/* « A la une » (mode Message + livres) : annonces + publications des reseaux */}
       {mode === "livres" && (
-        <SectionReveal><FeaturedStrip slides={heroSlides} posts={posts} socialCount={socialCount} /></SectionReveal>
+        <SectionReveal><FeaturedStrip slides={heroSlides} posts={posts} /></SectionReveal>
       )}
       <SectionSeam />
       <SectionReveal><AboutTeaser /></SectionReveal>
