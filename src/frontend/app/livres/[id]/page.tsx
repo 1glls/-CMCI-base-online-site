@@ -47,8 +47,28 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
   const [book, settings] = await Promise.all([fetchBook(id), fetchSettings()]);
   if (!book) notFound();
 
+  // Donnees structurees schema.org : aident Google a comprendre la fiche.
+  const plain = book.description ? book.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: book.title,
+    url: `https://www.cmcibelgique.org/livres/${id}`,
+    ...(book.author ? { author: { '@type': 'Person', name: book.author } } : {}),
+    ...(book.languageCode ? { inLanguage: book.languageCode } : {}),
+    ...(book.cover ? { image: getFileUrl(book.cover) } : {}),
+    ...(plain ? { description: plain.slice(0, 500) } : {}),
+    ...(book.pages ? { numberOfPages: book.pages } : {}),
+    ...(book.publisherName ? { publisher: { '@type': 'Organization', name: book.publisherName } } : {}),
+  };
+
   return (
     <div className="grain-page bg-nuit">
+      <script
+        type="application/ld+json"
+        // « < » echappe : une description ne doit jamais pouvoir fermer la balise script.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <SiteHeader home={HOME_PATH} />
       <main className="pt-36">
         <BookDetail book={book} />

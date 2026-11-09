@@ -370,3 +370,27 @@ model Category {
 
   @@map("categories")
 }
+
+/// Catalogue des liens du site et resultat de leur dernier controle
+/// (page admin « Contrôle des liens », tache planifiee `links`).
+model LinkCheck {
+  id            String    @id @default(uuid())
+  url           String                       // URL absolue testee
+  kind          String                       // external | file | page
+  sourceModel   String                       // Event, HeroSlide, Book, Settings, Sitemap…
+  sourceId      String    @default("")       // "" quand la source n'a pas d'id (sitemap, reglage)
+  field         String                       // registrationUrl, cover, externalLink…
+  label         String?                      // libelle lisible : « Événement : Convention 2026 »
+  adminHref     String?                      // page admin ou corriger
+  status        Int?                         // code HTTP final (null = erreur reseau)
+  state         String    @default("pending") // pending | ok | warning | broken
+  error         String?
+  firstFailedAt DateTime?
+  lastCheckedAt DateTime?
+  ignored       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  @@unique([sourceModel, sourceId, field, url])
+  @@index([state])
+  @@map("link_checks")
+}

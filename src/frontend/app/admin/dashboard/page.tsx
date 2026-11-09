@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { AlertTriangle, CalendarClock, CalendarX, ChevronRight, CircleAlert, Eye, EyeOff, Info, Link2Off, RefreshCw, Share2 } from "lucide-react"
+import { AlertTriangle, CalendarClock, CalendarX, ChevronRight, CircleAlert, Eye, EyeOff, Info, Link2, Link2Off, RefreshCw, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { adminFetch, adminList, getAdmin } from "@/lib/admin-api"
 import { ADMIN_GROUPS, ADMIN_SECTIONS, type AdminGroup } from "@/lib/admin-sections"
@@ -87,6 +87,10 @@ export default function AdminDashboard() {
         const pending = await adminList("/api/social-media/all?status=pending")
         return { total: pending.length, hidden: 0, label: "en attente" }
       }],
+      ["links", async () => {
+        const s = await adminFetch<{ broken: number; warning: number; total: number }>("/api/links/summary")
+        return { total: s.broken, hidden: 0, label: s.total ? "liens cassés" : "pas encore contrôlé" }
+      }],
     ]
     await Promise.all(
       extra.map(async ([key, fn]) => {
@@ -110,6 +114,10 @@ export default function AdminDashboard() {
     const pending = result.social?.total ?? 0
     if (pending > 0) {
       t.push({ key: "social", level: "warning", icon: Share2, text: `${pending} publication${pending > 1 ? "s" : ""} des réseaux sociaux en attente de tri.`, href: "/admin/social-media", action: "Trier" })
+    }
+    const brokenLinks = result.links?.total ?? 0
+    if (brokenLinks > 0) {
+      t.push({ key: "links", level: "warning", icon: Link2, text: `${brokenLinks} lien${brokenLinks > 1 ? "s" : ""} cassé${brokenLinks > 1 ? "s" : ""} (page, image ou lien externe qui ne répond plus).`, href: "/admin/links", action: "Voir" })
     }
     const events = lists.events ?? []
     const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -185,7 +193,7 @@ export default function AdminDashboard() {
           {ADMIN_GROUPS.map((g, i) => {
             const items = ADMIN_SECTIONS.filter((s) => s.group === g.key)
             const active = g.key === group
-            const hasAlert = items.some((s) => s.key === "social" && (counts.social?.total ?? 0) > 0)
+            const hasAlert = items.some((s) => (s.key === "social" || s.key === "links") && (counts[s.key]?.total ?? 0) > 0)
             return (
               <button
                 key={g.key}
@@ -231,7 +239,7 @@ export default function AdminDashboard() {
               <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {items.map((s) => {
                   const c = counts[s.key]
-                  const alert = s.key === "social" && (c?.total ?? 0) > 0
+                  const alert = (s.key === "social" || s.key === "links") && (c?.total ?? 0) > 0
                   return (
                     <Link
                       key={s.key}

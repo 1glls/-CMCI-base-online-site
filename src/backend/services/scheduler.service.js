@@ -9,6 +9,7 @@
  *   translation : traduction des contenus manquants (mode « planifie »)
  *   newsletter  : envoi automatique (quotidien / hebdomadaire / mensuel)
  *   reminders   : rappels d'evenements (la veille et le jour meme)
+ *   links       : controle des liens (404…), toutes les N heures, alerte email
  *
  * Chaque tache memorise son dernier passage (job_<cle>_last_run) et son
  * compte rendu (job_<cle>_last_result) pour l'affichage dans l'admin.
@@ -29,7 +30,44 @@ const DEFAULTS = {
   newsletter_day: 'monday',
   newsletter_time: '09:00',
   newsletter_reminders: 'true',
+  links_check_mode: 'auto',
+  links_check_interval_hours: '168',
+  links_alert_email: '',
 };
+
+const LINKS_FREQ = { 24: 'tous les jours', 72: 'tous les 3 jours', 168: 'chaque semaine', 720: 'chaque mois' };
+const linksHours = (s) => Number(s.links_check_interval_hours) || 168;
+
+const escapeHtml = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/** Email recapitulatif des liens nouvellement casses. */
+async function sendLinksAlert(s, newlyBroken, totals, send) {
+  let to = String(s.links_alert_email || '').split(/[,;\s]+/).filter(Boolean);
+  if (to.length === 0) to = (await prisma.admin.findMany({ select: { email: true } })).map((a) => a.email);
+  if (to.length === 0) return 'aucun destinataire';
+  const front = (process.env.FRONTEND_URL || 'https://www.cmcibelgique.org').replace(/\/$/, '');
+  const shown = newlyBroken.slice(0, 50);
+  const rows = shown.map((l) => `
+    <tr>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee">${escapeHtml(l.label)}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;word-break:break-all"><a href="${escapeHtml(l.url)}">${escapeHtml(l.url)}</a></td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;white-space:nowrap">${escapeHtml(l.status ?? '—')} ${escapeHtml(l.error || '')}</td>
+    </tr>`).join('');
+  const more = newlyBroken.length > shown.length ? `<p>… et ${newlyBroken.length - shown.length} autre(s).</p>` : '';
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#222;max-width:760px">
+      <h2 style="margin:0 0 8px">${newlyBroken.length} lien(s) cassé(s) détecté(s)</h2>
+      <p>Le contrôle automatique a testé ${totals.checked} liens du site : ${totals.broken} cassé(s) au total, ${totals.warning} à vérifier.</p>
+      <table style="border-collapse:collapse;width:100%;font-size:13px">
+        <tr style="background:#f6f2e7;text-align:left"><th style="padding:6px 8px">Contenu</th><th style="padding:6px 8px">Lien</th><th style="padding:6px 8px">Réponse</th></tr>
+        ${rows}
+      </table>
+      ${more}
+      <p style="margin-top:16px"><a href="${front}/admin/links">Ouvrir le contrôle des liens dans l'administration</a></p>
+    </div>`;
+  const r = await send({ to: to.join(','), subject: `CMCI Belgique — ${newlyBroken.length} lien(s) cassé(s)`, html });
+  return r && r.success === false ? `email non envoyé (${r.error})` : `email envoyé à ${to.join(', ')}`;
+}
 
 const DAYS_FR = { monday: 'lundi', tuesday: 'mardi', wednesday: 'mercredi', thursday: 'jeudi', friday: 'vendredi', saturday: 'samedi', sunday: 'dimanche' };
 
@@ -156,6 +194,28 @@ const JOBS = {
       const r = await send({ now, send: deps.sendEmail });
       return { ok: true, message: r.message };
     },
+  },
+};
+
+JOBS.links = {
+  label: 'Contrôle des liens',
+  enabled: (s) => s.links_check_mode === 'auto',
+  due: (s, now) => now - lastRun(s, 'links') >= linksHours(s) * HOUR,
+  next: (s) => new Date(lastRun(s, 'links') ? lastRun(s, 'links') + linksHours(s) * HOUR : Date.now()).toISOString(),
+  schedule: (s) => (s.links_check_mode === 'auto'
+    ? `Automatique, ${LINKS_FREQ[linksHours(s)] || `toutes les ${linksHours(s)} h`}`
+    : 'Manuel (page Contrôle des liens)'),
+  async run(deps, now, s) {
+    const runLinkCheck = deps.runLinkCheck || require('./link-checker.service').runLinkCheck;
+    const r = await runLinkCheck();
+    let message = `${r.checked} lien(s) contrôlé(s) · ${r.broken} cassé(s)`
+      + (r.newlyBroken.length ? ` dont ${r.newlyBroken.length} nouveau(x)` : '')
+      + (r.warning ? ` · ${r.warning} à vérifier` : '');
+    if (r.newlyBroken.length) {
+      const send = deps.sendEmail || require('./email.service').sendEmail;
+      message += ` · ${await sendLinksAlert(s, r.newlyBroken, r, send)}`;
+    }
+    return { ok: true, message, broken: r.broken };
   },
 };
 

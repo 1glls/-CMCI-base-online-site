@@ -9,6 +9,17 @@ const nextConfig = {
   turbopack: {
     root: path.dirname(fileURLToPath(import.meta.url)),
   },
+  // Le HTML embarque des chemins relatifs de l'API (couvertures « /api/books/…/cover »,
+  // fichiers « /uploads/… »). Google les resout contre www et tombait sur des 404 :
+  // on les renvoie vers le vrai serveur de l'API.
+  async redirects() {
+    const api = process.env.NEXT_PUBLIC_API_URL || 'https://api.cmcibelgique.org'
+    if (!/^https?:\/\//.test(api) || api.includes('localhost')) return []
+    return [
+      { source: '/api/:path*', destination: `${api}/api/:path*`, permanent: true },
+      { source: '/uploads/:path*', destination: `${api}/uploads/:path*`, permanent: true },
+    ]
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

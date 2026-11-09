@@ -8,7 +8,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   BookOpen, Calendar, Church, ClipboardList, DatabaseBackup, FileText, Image, Languages,
-  Layers, LayoutTemplate, Library, Mail, MapPin, Megaphone, MessageSquare, Settings, Settings2,
+  Layers, LayoutTemplate, Library, Link2, Mail, MapPin, Megaphone, MessageSquare, Settings, Settings2,
   Share2, Tags, Timer,
 } from "lucide-react"
 
@@ -128,6 +128,11 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     key: "translations", title: "Traductions", href: "/admin/translations", icon: Languages, group: "system",
     description: "Traduction automatique EN / NL",
     where: "Versions anglaise et néerlandaise de tout le contenu (sélecteur de langue du site).",
+  },
+  {
+    key: "links", title: "Contrôle des liens", href: "/admin/links", icon: Link2, group: "system",
+    description: "Liens cassés, images et pages en erreur (404)",
+    where: "Interne : vérifie les liens saisis dans l'admin, les images et fichiers, et toutes les pages du site (celles que Google explore).",
   },
   {
     key: "backup", title: "Sauvegardes", href: "/admin/backup", icon: DatabaseBackup, group: "system",

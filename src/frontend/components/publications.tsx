@@ -28,8 +28,8 @@ function stripHtml(s: string): string {
     .trim();
 }
 
-interface Category { id: string; slug: string; name: string; }
-interface Book {
+export interface Category { id: string; slug: string; name: string; }
+export interface Book {
   id: string; title: string; author: string | null; description: string;
   cover: string | null; file: string | null; preview: string | null;
   externalLink: string | null; featured?: boolean; categories?: Category[];
@@ -37,7 +37,7 @@ interface Book {
   languageCode?: string | null; priceLabel?: string | null;
   groupLanguages?: { code: string | null; name: string }[];
 }
-interface Tract {
+export interface Tract {
   id: string; slug: string; title: string; description: string;
   cover: string | null; languageCount: number; featured?: boolean;
   categories?: Category[];
@@ -209,12 +209,19 @@ function FeaturedCarousel({ slides, onPreview }: { slides: Slide[]; onPreview: (
 
 /* ------------------------------------------------------------------------- */
 
-export function Publications() {
+/**
+ * `initial*` : catalogue charge cote serveur (en francais). Sans lui, le HTML
+ * recu par Google ne contenait aucun lien vers les fiches livres.
+ */
+export function Publications({ initialBooks, initialTracts, initialCategories }: {
+  initialBooks?: Book[]; initialTracts?: Tract[]; initialCategories?: Category[];
+} = {}) {
   const { t, language } = useLanguage();
-  const [books, setBooks] = useState<Book[]>([]);
-  const [tracts, setTracts] = useState<Tract[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const hasInitial = Array.isArray(initialBooks) && initialBooks.length > 0;
+  const [books, setBooks] = useState<Book[]>(initialBooks ?? []);
+  const [tracts, setTracts] = useState<Tract[]>(initialTracts ?? []);
+  const [categories, setCategories] = useState<Category[]>(initialCategories ?? []);
+  const [loading, setLoading] = useState(!hasInitial);
   const [previewed, setPreviewed] = useState<Book | null>(null);
   // Le filtre s'appuie sur le slug, jamais sur le libelle : celui-ci est
   // traduit, et le regroupement casserait au changement de langue.
@@ -224,7 +231,10 @@ export function Publications() {
   const [query, setQuery] = useState('');
   const [showAllLangs, setShowAllLangs] = useState(false);
 
+  // Le serveur a deja fourni la version francaise : inutile de la recharger.
+  const skipFirstFetch = useRef(hasInitial && language === 'fr');
   useEffect(() => {
+    if (skipFirstFetch.current) { skipFirstFetch.current = false; return; }
     (async () => {
       // Promise.allSettled et non Promise.all : une ressource indisponible
       // (categories absentes d'un backend plus ancien, par exemple) ne doit

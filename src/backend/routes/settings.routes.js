@@ -24,6 +24,10 @@ const VALIDATORS = {
   translation_mode: oneOf(['immediate', 'scheduled', 'manual'], 'Mode de traduction'),
   translation_interval_hours: oneOf(['1', '6', '12', '24'], 'Intervalle de traduction'),
   newsletter_reminders: oneOf(['true', 'false'], 'Rappels d\'événements'),
+  links_check_mode: oneOf(['auto', 'manual'], 'Contrôle des liens'),
+  links_check_interval_hours: oneOf(['24', '72', '168', '720'], 'Fréquence du contrôle des liens'),
+  links_alert_email: (v) => (String(v).split(/[,;\s]+/).filter(Boolean).every((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))
+    ? null : 'Email d\'alerte des liens : adresse invalide.'),
 };
 const validate = (key, value) => {
   if (key.startsWith('timing_')) return range(3, 30, 'Durée')(value);
@@ -34,7 +38,10 @@ const validate = (key, value) => {
 // GET settings (public : coordonnees, reseaux, durees… mais pas l'etat interne des taches)
 router.get('/', async (req, res) => {
   try {
-    const settings = await prisma.settings.findMany({ where: { NOT: { key: { startsWith: 'job_' } } } });
+    // Adresse d'alerte : jamais publique (lue par l'admin via /api/links/config).
+    const settings = await prisma.settings.findMany({
+      where: { AND: [{ NOT: { key: { startsWith: 'job_' } } }, { NOT: { key: 'links_alert_email' } }] },
+    });
     res.json(settings);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -31,6 +31,7 @@ app.use('/api/books', require('./routes/books.routes'));
 app.use('/api/tracts', require('./routes/tracts.routes'));
 app.use('/api/categories', require('./routes/categories.routes'));
 app.use('/api/countdowns', require('./routes/countdowns.routes'));
+app.use('/api/links', require('./routes/links.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

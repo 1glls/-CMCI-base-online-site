@@ -4,11 +4,12 @@
  * Paramètres → « Rythmes et automatismes » :
  *   - durées de défilement des éléments animés du site (lib/timings.ts) ;
  *   - tâches automatiques du serveur (services/scheduler.service.js) :
- *     synchro des réseaux, traduction des nouveaux contenus, newsletter.
+ *     synchro des réseaux, traduction des nouveaux contenus, newsletter,
+ *     contrôle des liens.
  */
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { CheckCircle2, CircleAlert, Clock3, Languages, Loader2, Mail, Play, RefreshCw, RotateCcw, Save, Share2, Timer } from "lucide-react"
+import { CheckCircle2, CircleAlert, Clock3, Languages, Link2, Loader2, Mail, Play, RefreshCw, RotateCcw, Save, Share2, Timer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -19,7 +20,7 @@ import { notify } from "@/lib/admin-notify"
 import { TIMINGS, TIMING_MAX, TIMING_MIN, timingSeconds, type TimingKey } from "@/lib/timings"
 
 interface Job {
-  key: "social" | "translation" | "newsletter" | "reminders"
+  key: "social" | "translation" | "newsletter" | "reminders" | "links"
   label: string
   enabled: boolean
   schedule: string
@@ -279,8 +280,55 @@ export function TimingSettings() {
           </label>
           <FieldHelp>Envoyé chaque jour à l'heure choisie sur la page Newsletter, seulement s'il y a un événement ce jour-là ou le lendemain.</FieldHelp>
         </JobRow>
+
+        {/* Contrôle des liens */}
+        <JobRow icon={Link2} job={job("links")} busy={busyJob === "links"} onRun={() => job("links") && runNow(job("links")!)} runLabel="Contrôler maintenant">
+          <LinksCheckSettings settings={settings} saveOne={saveOne} />
+          <FieldHelp>Teste les liens saisis dans l'admin, les images et fichiers, et toutes les pages du site. Détail, liens cassés et email d'alerte : page <Link href="/admin/links" className="text-or underline">Contrôle des liens</Link>.</FieldHelp>
+        </JobRow>
       </div>
     </section>
+  )
+}
+
+/** Choix Manuel / Automatique + fréquence (réutilisé par la page Contrôle des liens). */
+export function LinksCheckSettings({ settings, saveOne }: {
+  settings: Record<string, string>
+  saveOne: (key: string, value: string, message: string) => void
+}) {
+  const mode = settings.links_check_mode ?? "auto"
+  const FREQ: Record<string, string> = { "24": "Tous les jours", "72": "Tous les 3 jours", "168": "Chaque semaine", "720": "Chaque mois" }
+  return (
+    <>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {[
+          { v: "auto", t: "Automatique", d: "Le serveur contrôle tout seul et vous écrit si un lien casse." },
+          { v: "manual", t: "Manuel", d: "Seulement quand vous cliquez sur « Contrôler maintenant »." },
+        ].map((o) => {
+          const active = mode === o.v
+          return (
+            <button
+              key={o.v} type="button"
+              onClick={() => !active && saveOne("links_check_mode", o.v, `Contrôle des liens : mode « ${o.t} »`)}
+              className={`rounded-md border p-3 text-left text-sm transition-colors ${active ? "border-or bg-or/10" : "border-border hover:border-or/50"}`}
+              aria-pressed={active}
+            >
+              <span className="font-medium">{o.t}</span>
+              <span className="mt-1 block text-xs text-muted-foreground">{o.d}</span>
+            </button>
+          )
+        })}
+      </div>
+      {mode === "auto" && (
+        <div className="mt-3 flex items-center gap-2 text-sm">
+          Fréquence
+          <Select value={settings.links_check_interval_hours ?? "168"} onValueChange={(v) => saveOne("links_check_interval_hours", v, `Contrôle des liens : ${FREQ[v]?.toLowerCase()}`)}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>{Object.entries(FREQ).map(([h, t]) => <SelectItem key={h} value={h}>{t}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+      )}
+    </>
   )
 }
 
