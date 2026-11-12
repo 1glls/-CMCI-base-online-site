@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
+import { useInView } from "motion/react"
 import { Clock, MapPin, Navigation, Phone } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useLocalizedData } from "@/hooks/use-localized-data"
@@ -28,6 +29,9 @@ export function Assemblies({ initial }: { initial: Assembly[] }) {
   // D'ou vient le survol : de la liste ou de la carte (seul ce dernier fait defiler la liste)
   const [hover, setHover] = useState<{ id: string; from: "list" | "map" } | null>(null)
   const listRef = useRef<HTMLUListElement>(null)
+  // La carte (Leaflet + ~570 Ko de tuiles) n'est montee qu'a l'approche de la section
+  const mapRef = useRef<HTMLDivElement>(null)
+  const mapNear = useInView(mapRef, { once: true, margin: "600px 0px" })
   const itemRefs = useRef<Record<string, HTMLLIElement | null>>({})
 
   useEffect(() => {
@@ -45,15 +49,17 @@ export function Assemblies({ initial }: { initial: Assembly[] }) {
 
   return (
     <section id="assemblees" className="relative bg-nuit text-ivoire">
-      <div className="map-nuit relative h-[min(88vh,760px)] min-h-[560px] [&_.leaflet-container]:bg-nuit">
-        <AssemblyMap
-          assemblies={list}
-          selectedAssembly={selected}
-          onSelectAssembly={setSelected}
-          variant="dark"
-          hoveredId={hover?.id ?? null}
-          onHoverAssembly={(id) => setHover(id ? { id, from: "map" } : null)}
-        />
+      <div ref={mapRef} className="map-nuit relative h-[min(88vh,760px)] min-h-[560px] [&_.leaflet-container]:bg-nuit">
+        {mapNear && (
+          <AssemblyMap
+            assemblies={list}
+            selectedAssembly={selected}
+            onSelectAssembly={setSelected}
+            variant="dark"
+            hoveredId={hover?.id ?? null}
+            onHoverAssembly={(id) => setHover(id ? { id, from: "map" } : null)}
+          />
+        )}
         {/* Fondus pour fondre la carte dans la page */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[400] h-32 bg-gradient-to-b from-nuit to-transparent" />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[400] h-32 bg-gradient-to-t from-nuit to-transparent" />

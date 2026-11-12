@@ -3,6 +3,7 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
+const { optimizeUploadedImage } = require('../utils/image-processor');
 const path = require('path');
 const { applyTranslations, autoTranslate, changedTranslatableFields } = require('../services/translation.service');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
@@ -81,7 +82,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE event (admin)
-router.post('/', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, upload.single('image'), optimizeUploadedImage(), async (req, res) => {
   try {
     const { title, date, time, location, description, status, registrationUrl, registrationButtonText, exploreButtonText, exploreUrl } = req.body;
     const image = req.file ? `/uploads/events/${req.file.filename}` : null;
@@ -112,7 +113,7 @@ router.post('/', authMiddleware, adminMiddleware, upload.single('image'), async 
 });
 
 // UPDATE event (admin)
-router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
+router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), optimizeUploadedImage(), async (req, res) => {
   try {
     const { title, date, time, location, description, status, registrationUrl, registrationButtonText, exploreButtonText, exploreUrl } = req.body;
     const updateData = { title, date, time, location, description, status };

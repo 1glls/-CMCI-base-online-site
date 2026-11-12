@@ -33,7 +33,7 @@ export function PageHero({
     <section ref={ref} className="relative overflow-hidden bg-nuit pb-20 pt-48 text-ivoire md:pb-28 md:pt-56">
       {slides && slides.length > 1 ? (
         <motion.div aria-hidden style={{ y }} className="absolute inset-y-0 right-0 h-full w-full md:w-[70%]">
-          <AutoSlideshow images={slides} className="fondu-fond photo-fond h-full w-full" />
+          <AutoSlideshow eager images={slides} className="fondu-fond photo-fond h-full w-full" />
         </motion.div>
       ) : (image || slides?.[0]) && (
         <motion.img

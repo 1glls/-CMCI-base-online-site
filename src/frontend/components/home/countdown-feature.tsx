@@ -108,7 +108,7 @@ export function CountdownFeature({ countdown: c, tone = "charbon" }: { countdown
 
         {c.image && (
           <Reveal delay={0.2} className="mx-auto w-full max-w-md">
-            <img src={getImageUrl(c.image)} alt="" className="fondu aspect-[4/5] w-full scale-110 object-cover" />
+            <img src={getImageUrl(c.image)} alt="" loading="lazy" decoding="async" className="fondu aspect-[4/5] w-full scale-110 object-cover" />
           </Reveal>
         )}
       </div>

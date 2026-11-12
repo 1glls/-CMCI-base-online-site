@@ -120,6 +120,8 @@ export function SiteHeader({ home = "/", countdowns }: { home?: string; countdow
               ) : (
                 <Link
                   key={entry.href} href={entry.href}
+                  // /livres embarque tout le catalogue (~350 Ko) : prechargement au survol seulement
+                  prefetch={entry.href === "/livres" ? false : undefined}
                   className="font-caps text-[11px] uppercase tracking-[0.22em] text-ivoire/85 transition-colors hover:text-or-clair"
                 >
                   {entry.label}
@@ -167,7 +169,7 @@ export function SiteHeader({ home = "/", countdowns }: { home?: string; countdow
                   initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.15 + i * 0.05, duration: 0.5 }}
                 >
-                  <Link href={item.href} onClick={() => setMenuOpen(false)} className="block py-2 font-display text-3xl hover:text-or-clair">
+                  <Link href={item.href} prefetch={item.href === "/livres" ? false : undefined} onClick={() => setMenuOpen(false)} className="block py-2 font-display text-3xl hover:text-or-clair">
                     {item.label}
                   </Link>
                 </motion.div>

@@ -98,7 +98,7 @@ export function BookFan({ books, size = "lg" }: { books: HeroBook[]; size?: "lg"
         })}
         {/* Le livre de devant ouvre sa fiche */}
         <Link
-          href={`/livres/${front.id}`}
+          href={`/livres/${front.id}`} prefetch={false}
           className="absolute inset-0 z-[100]"
           aria-label={`${t("home2.hero.readBook")} : ${front.title}`}
         />
@@ -111,7 +111,7 @@ export function BookFan({ books, size = "lg" }: { books: HeroBook[]; size?: "lg"
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.4 }}
           >
-            <Link href={`/livres/${front.id}`} className="group inline-flex items-start gap-1 font-display text-xl leading-tight text-ivoire hover:text-or-clair">
+            <Link href={`/livres/${front.id}`} prefetch={false} className="group inline-flex items-start gap-1 font-display text-xl leading-tight text-ivoire hover:text-or-clair">
               <span className="line-clamp-2">{front.title}</span>
               <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-or transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
@@ -121,12 +121,15 @@ export function BookFan({ books, size = "lg" }: { books: HeroBook[]; size?: "lg"
       </div>
 
       {n > 1 && (
-        <div className="mt-3 flex gap-2" role="tablist">
+        <div className="mt-1 flex" role="tablist">
           {books.map((b, i) => (
+            // Zone tactile de 24 px de haut (PageSpeed) ; la barre visible reste fine
             <button
               key={b.id} onClick={() => setActive(i)} aria-label={b.title} aria-selected={i === active % n} role="tab"
-              className={`h-1 transition-all ${i === active % n ? "w-8 bg-or" : "w-3 bg-ivoire/25 hover:bg-ivoire/50"}`}
-            />
+              className="group flex h-6 min-w-6 items-center justify-center"
+            >
+              <span className={`block h-1 transition-all ${i === active % n ? "w-8 bg-or" : "w-3 bg-ivoire/25 group-hover:bg-ivoire/50"}`} />
+            </button>
           ))}
         </div>
       )}

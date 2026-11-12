@@ -133,9 +133,9 @@ export function SiteFooter({
         </div>
       </div>
       <div className="border-t border-ivoire/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-ivoire/45 md:flex-row">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-ivoire/60 md:flex-row">
           <p>© {new Date().getFullYear()} CMCI Belgique. {t("footer.rights")} <span className="text-rouge">♥</span> {t("footer.forGlory")}</p>
-          <p className="font-display text-sm italic text-ivoire/40">«&nbsp;<Rich text={t("home2.hero.title")} />&nbsp;»</p>
+          <p className="font-display text-sm italic text-ivoire/60">«&nbsp;<Rich text={t("home2.hero.title")} />&nbsp;»</p>
           <nav aria-label={t("footer.privacy")} className="flex gap-5">
             <Link href="/confidentialite" className="transition-colors hover:text-or-clair">{t("footer.privacy")}</Link>
             <Link href="/conditions" className="transition-colors hover:text-or-clair">{t("footer.terms")}</Link>

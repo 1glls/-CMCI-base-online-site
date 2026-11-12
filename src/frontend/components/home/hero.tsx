@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "motion/react"
 import { ArrowRight, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
@@ -44,10 +44,10 @@ function HeroHeading({ className = "" }: { className?: string }) {
         {t("home2.hero.eyebrow")}
       </span>
       <span className="block font-display text-[clamp(2.8rem,6.6vw,6.2rem)] font-medium leading-[0.98] text-ivoire">
-        <WordsReveal text={rest.length ? `${first},` : first} />
+        <WordsReveal onLoad text={rest.length ? `${first},` : first} />
         {rest.length > 0 && (
           <span className="block italic text-or-clair">
-            <WordsReveal text={rest.join(", ")} delay={0.25} />
+            <WordsReveal onLoad text={rest.join(", ")} delay={0.2} />
           </span>
         )}
       </span>
@@ -85,7 +85,7 @@ function HeroLivres({ slides, books }: { slides: Slide[]; books: HeroBook[] }) {
   return (
     <section id="accueil" ref={ref} className="relative flex min-h-[100svh] items-center overflow-hidden bg-nuit pb-24 pt-40">
       <motion.div aria-hidden className="absolute inset-0" style={{ y: bgY, scale: bgScale }}>
-        <img src={bg} alt="" className="photo-fond h-full w-full object-cover" />
+        <img src={bg} alt="" fetchPriority="high" className="photo-fond h-full w-full object-cover" />
       </motion.div>
       <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-nuit via-nuit/85 to-nuit/30" />
       <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-nuit via-nuit/70 to-transparent" />
@@ -94,33 +94,23 @@ function HeroLivres({ slides, books }: { slides: Slide[]; books: HeroBook[] }) {
       <motion.div style={{ y: contentY }} className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-16 px-6 lg:grid-cols-[1.25fr_1fr]">
         <div>
           <HeroHeading />
-          <motion.p
-            initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.7, ease: EASE }}
-            className="mt-8 max-w-xl text-lg leading-relaxed text-ivoire/75"
-          >
+          {/* Entrees en CSS (.hero-entree, app/globals.css) : visibles des le
+              premier affichage, sans attendre le JavaScript (LCP mobile) */}
+          <p className="hero-entree mt-8 max-w-xl text-lg leading-relaxed text-ivoire/75" style={{ "--d": "0.35s" } as CSSProperties}>
             <Rich text={t("home2.hero.lead")} />
-          </motion.p>
-          <motion.div
-            initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.9, ease: EASE }}
-            className="mt-10 flex flex-wrap gap-4"
-          >
+          </p>
+          <div className="hero-entree mt-10 flex flex-wrap gap-4" style={{ "--d": "0.5s" } as CSSProperties}>
             <a href="#evenements" className="group inline-flex items-center gap-3 bg-or px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-nuit transition-colors hover:bg-or-clair">
               {t("home2.hero.agenda")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
-            <Link href="/livres" className="inline-flex items-center gap-3 border border-ivoire/40 px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-ivoire transition-colors hover:border-or hover:text-or-clair">
+            <Link href="/livres" prefetch={false} className="inline-flex items-center gap-3 border border-ivoire/40 px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-ivoire transition-colors hover:border-or hover:text-or-clair">
               {t("home2.hero.library")}
             </Link>
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div
-          initial={reduce ? false : { opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1.3, delay: 0.4, ease: EASE }}
-          className="flex flex-col items-center"
-        >
+        <div className="hero-entree-droite flex flex-col items-center" style={{ "--d": "0.3s" } as CSSProperties}>
           {books.length > 0 ? (
             <>
               <span className="eyebrow mb-10 flex items-center gap-3 !text-[10px] text-ivoire/60">
@@ -135,7 +125,7 @@ function HeroLivres({ slides, books }: { slides: Slide[]; books: HeroBook[] }) {
               <Logo className="absolute inset-[22%] h-[56%] w-[56%] object-contain" />
             </div>
           )}
-        </motion.div>
+        </div>
       </motion.div>
       <ScrollCue />
     </section>
@@ -198,7 +188,8 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
           <span className="h-px w-10 bg-or" />{t("home2.hero.eyebrow")}
         </span>
 
-        <AnimatePresence mode="wait">
+        {/* initial={false} : la 1re diapositive est visible des le HTML serveur (LCP) */}
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={isLibrary ? "library" : slide?.id ?? "fallback"}
             initial={reduce ? false : { opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }}
@@ -215,7 +206,7 @@ function HeroDiaporama({ slides, books }: { slides: Slide[]; books: HeroBook[] }
               </p>
               <div className="mt-9 flex flex-wrap gap-4">
                 {isLibrary ? (
-                  <Link href="/livres" className="inline-flex items-center gap-3 bg-or px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-nuit hover:bg-or-clair">
+                  <Link href="/livres" prefetch={false} className="inline-flex items-center gap-3 bg-or px-7 py-4 font-caps text-xs uppercase tracking-[0.2em] text-nuit hover:bg-or-clair">
                     {t("home2.hero.library")} <ArrowRight className="h-4 w-4" />
                   </Link>
                 ) : slide?.social ? (

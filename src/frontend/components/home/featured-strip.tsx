@@ -110,7 +110,7 @@ export function FeaturedStrip({ slides: baseSlides, posts = [] }: { slides: Slid
               >
                 <div className="relative aspect-[4/3] overflow-hidden lg:aspect-[16/11]">
                   <img
-                    src={getImageUrl(main.image, FALLBACK)} alt=""
+                    src={getImageUrl(main.image, FALLBACK)} alt="" loading="lazy" decoding="async"
                     className="fondu h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]"
                   />
                   <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-nuit via-nuit/30 to-transparent" />
@@ -162,7 +162,7 @@ export function FeaturedStrip({ slides: baseSlides, posts = [] }: { slides: Slid
                     className="group grid grid-cols-[42%_1fr] items-center gap-5"
                   >
                     <button type="button" onClick={() => promote(s.id)} aria-label={`${t("home2.featured.promote")} : ${s.title}`} className="relative aspect-[4/5] overflow-hidden">
-                      <img src={getImageUrl(s.image, FALLBACK)} alt="" className="fondu h-full w-full scale-110 object-cover transition-transform duration-[1.2s] group-hover:scale-[1.16]" />
+                      <img src={getImageUrl(s.image, FALLBACK)} alt="" loading="lazy" decoding="async" className="fondu h-full w-full scale-110 object-cover transition-transform duration-[1.2s] group-hover:scale-[1.16]" />
                     </button>
                     <div>
                       {s.social ? <SocialBadge social={s.social} className="!text-[9px]" /> : s.linkedEvent?.date && <p className="eyebrow !text-[9px] text-or">{s.linkedEvent.date}</p>}
@@ -191,7 +191,7 @@ export function FeaturedStrip({ slides: baseSlides, posts = [] }: { slides: Slid
                   aria-label={`${t("home2.featured.promote")} : ${s.title}`}
                   className="group flex w-72 shrink-0 items-center gap-4 text-left"
                 >
-                  <img src={getImageUrl(s.image, FALLBACK)} alt="" className="fondu h-20 w-24 shrink-0 object-cover opacity-70 transition-opacity group-hover:opacity-100" />
+                  <img src={getImageUrl(s.image, FALLBACK)} alt="" loading="lazy" decoding="async" className="fondu h-20 w-24 shrink-0 object-cover opacity-70 transition-opacity group-hover:opacity-100" />
                   <span>
                     <span className="line-clamp-2 font-display text-lg leading-snug text-ivoire/80 transition-colors group-hover:text-or-clair"><Rich text={s.title} /></span>
                     {s.social ? (() => { const Icon = SOCIAL_ICONS[s.social.platform]; return <span className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-or/80"><Icon className="h-3 w-3" />{t("home2.featured.social")}</span> })()

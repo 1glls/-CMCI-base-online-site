@@ -20,6 +20,15 @@ const nextConfig = {
       { source: '/uploads/:path*', destination: `${api}/uploads/:path*`, permanent: true },
     ]
   },
+  // Fichiers de public/ : Next les sert avec max-age=0. Logos et photos fixes
+  // changent rarement, un mois de cache (PageSpeed « durees de mise en cache »).
+  async headers() {
+    const month = [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }]
+    return [
+      { source: '/cmci-logo-:variant.webp', headers: month },
+      { source: '/images/:path*', headers: month },
+    ]
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

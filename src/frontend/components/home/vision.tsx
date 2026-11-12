@@ -38,7 +38,7 @@ export function Vision({ image }: { image?: string | null }) {
     <section id="vision" className="bande relative overflow-hidden pb-28 pt-16 text-ivoire">
       {image && (
         /* Attenuee (60 % de l'intensite des photos de fond) : le texte passe devant */
-        <img aria-hidden src={getImageUrl(image)} alt="" style={{ opacity: "calc(var(--photo-fond) * .6)" }} className="fondu-vers-gauche pointer-events-none absolute right-0 top-0 h-[70%] w-full object-cover md:w-[48%]" />
+        <img aria-hidden src={getImageUrl(image)} alt="" loading="lazy" decoding="async" style={{ opacity: "calc(var(--photo-fond) * .6)" }} className="fondu-vers-gauche pointer-events-none absolute right-0 top-0 h-[70%] w-full object-cover md:w-[48%]" />
       )}
       <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-nuit via-nuit/75 to-transparent" />
       <Filigree kind="text" text="1975 — 2065" className="-right-10 top-10 text-[clamp(6rem,14vw,13rem)]" />

@@ -21,7 +21,7 @@ export function About({ image }: { image: string | null }) {
       <div className="mx-auto grid max-w-7xl items-center gap-20 px-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div ref={ref} className="relative mx-auto w-full max-w-md">
           <motion.div style={{ y }} className="relative aspect-[3/4]">
-            <img src={getImageUrl(image, "/images/hero-mission.jpg")} alt="" className="fondu-vers-droite h-full w-full scale-110 object-cover" />
+            <img src={getImageUrl(image, "/images/hero-mission.jpg")} alt="" loading="lazy" decoding="async" className="fondu-vers-droite h-full w-full scale-110 object-cover" />
           </motion.div>
           {/* Anneau de texte tournant, pose a cheval sur l'arche */}
           <div className="absolute -bottom-12 -right-6 h-40 w-40 text-or-clair md:-right-14 md:h-48 md:w-48">

@@ -47,7 +47,7 @@ export function Ministries({ initial }: { initial: Ministry[] }) {
               transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* .photo-fond : plus marquee en mode clair */}
-              <img src={getImageUrl(active.image)} alt="" className="fondu-fond photo-fond h-full w-full object-cover" />
+              <img src={getImageUrl(active.image)} alt="" loading="lazy" decoding="async" className="fondu-fond photo-fond h-full w-full object-cover" />
             </motion.div>
           )}
         </AnimatePresence>

@@ -5,7 +5,7 @@
  * Tout respecte prefers-reduced-motion : le contenu reste affiche, sans
  * mouvement.
  */
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import {
   motion, useInView, useReducedMotion, useScroll, useTransform, animate,
   type MotionValue,
@@ -53,26 +53,40 @@ function wordsWithJesus(text: string): Seg[][] {
   return words
 }
 
-/** Titre revele mot a mot, chaque mot monte depuis un masque. Le nom de Jesus reste en rouge. */
-export function WordsReveal({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
+/**
+ * Titre revele mot a mot, chaque mot monte depuis un masque. Le nom de Jesus reste en rouge.
+ * `onLoad` : animation CSS (.hero-mot) lancee des le premier affichage, pour les
+ * titres visibles a l'arrivee (hero) \u2014 sans attendre le JavaScript. Sinon : au defilement.
+ * Le texte lisible par les lecteurs d'ecran est dans un sr-only (aria-label est
+ * interdit sur un simple span).
+ */
+export function WordsReveal({ text, className, delay = 0, onLoad = false }: { text: string; className?: string; delay?: number; onLoad?: boolean }) {
   const reduce = useReducedMotion()
   const words = wordsWithJesus(text)
   return (
-    <span className={className} aria-label={text}>
-      {words.map((segs, i) => (
-        <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.12em] align-bottom">
-          <motion.span
-            className="inline-block"
-            initial={reduce ? false : { y: "110%" }}
-            whileInView={{ y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, delay: delay + i * 0.06, ease: EASE }}
-          >
-            {segs.map((sg, j) => (sg.red ? <span key={j} className="text-rouge">{sg.text}</span> : sg.text))}
-          </motion.span>
-          {i < words.length - 1 && "\u00a0"}
-        </span>
-      ))}
+    <span className={className}>
+      <span className="sr-only">{text}</span>
+      {words.map((segs, i) => {
+        const content = segs.map((sg, j) => (sg.red ? <span key={j} className="text-rouge">{sg.text}</span> : sg.text))
+        return (
+          <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.12em] align-bottom">
+            {onLoad ? (
+              <span className="hero-mot inline-block" style={{ "--d": `${delay + i * 0.06}s` } as CSSProperties}>{content}</span>
+            ) : (
+              <motion.span
+                className="inline-block"
+                initial={reduce ? false : { y: "110%" }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.9, delay: delay + i * 0.06, ease: EASE }}
+              >
+                {content}
+              </motion.span>
+            )}
+            {i < words.length - 1 && "\u00a0"}
+          </span>
+        )
+      })}
     </span>
   )
 }

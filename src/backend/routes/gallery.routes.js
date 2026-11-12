@@ -3,6 +3,7 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const multer = require('multer');
+const { optimizeUploadedImage } = require('../utils/image-processor');
 const path = require('path');
 const { deleteUploadedFile } = require('../utils/upload-cleanup');
 
@@ -62,7 +63,7 @@ router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // CREATE gallery image (admin)
-router.post('/', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, upload.single('image'), optimizeUploadedImage(), async (req, res) => {
   try {
     const { alt, category, status, src: srcUrl } = req.body;
     
@@ -91,7 +92,7 @@ router.post('/', authMiddleware, adminMiddleware, upload.single('image'), async 
 });
 
 // UPDATE gallery image (admin)
-router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
+router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), optimizeUploadedImage(), async (req, res) => {
   try {
     const { alt, category, status, src: srcUrl } = req.body;
     const updateData = { alt, category, status };

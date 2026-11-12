@@ -252,8 +252,65 @@ function deleteHeroImages(desktopPath, mobilePath) {
   }
 }
 
+/**
+ * Recompresse une image uploadee en WebP (largeur max `maxWidth`, jamais
+ * agrandie). Les photos brutes (PNG de 500 Ko, JPG d'appareil photo) pesaient
+ * lourd sur la page d'accueil (PageSpeed « Ameliorer l'affichage des images »).
+ * Les GIF (souvent animes) et les fichiers deja petits en WebP sont laisses tels quels.
+ *
+ * @param {string} filePath - chemin du fichier sur le disque
+ * @param {{ maxWidth?: number, quality?: number, keepOriginal?: boolean }} options
+ * @returns {Promise<string>} chemin du fichier final (.webp, ou l'original si inchange)
+ */
+async function optimizeUpload(filePath, { maxWidth = 1920, quality = 85, keepOriginal = false } = {}) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return filePath;
+
+  const input = await fs.promises.readFile(filePath);
+  const meta = await sharp(input).metadata();
+  if (ext === '.webp' && (meta.width || 0) <= maxWidth && input.length < 300 * 1024) return filePath;
+
+  const output = ext === '.webp'
+    ? filePath
+    : filePath.slice(0, -ext.length) + '.webp';
+  const data = await sharp(input)
+    .rotate() // applique l'orientation EXIF des photos de telephone
+    .resize({ width: maxWidth, withoutEnlargement: true })
+    .webp({ quality })
+    .toBuffer();
+
+  // Si la conversion n'apporte rien (image deja tres optimisee), on garde l'original
+  if (data.length >= input.length && ext !== '.png') return filePath;
+
+  await fs.promises.writeFile(output, data);
+  if (output !== filePath && !keepOriginal) await fs.promises.unlink(filePath).catch(() => {});
+  return output;
+}
+
+/**
+ * Middleware Express a placer juste apres `upload.single(...)` (multer, stockage
+ * disque) : convertit le fichier recu et met a jour req.file (filename, path),
+ * de sorte que la route enregistre directement le chemin .webp.
+ * En cas d'echec de sharp, l'original est conserve (l'upload ne casse jamais).
+ */
+function optimizeUploadedImage(options) {
+  return async (req, res, next) => {
+    if (!req.file?.path) return next();
+    try {
+      const finalPath = await optimizeUpload(req.file.path, options);
+      req.file.path = finalPath;
+      req.file.filename = path.basename(finalPath);
+    } catch (error) {
+      console.error('Optimisation de l\'image impossible, original conserve :', error.message);
+    }
+    next();
+  };
+}
+
 module.exports = {
   processHeroImage,
   deleteHeroImages,
-  getImageBuffer
+  getImageBuffer,
+  optimizeUpload,
+  optimizeUploadedImage
 };
